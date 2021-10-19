@@ -1,0 +1,17 @@
+{
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "excludePlatforms": [],
+  "includePlatforms": [],
+  "name": "Appalachia.Utility.Constants",
+  "noEngineReferences": false,
+  "optionalUnityReferences": [],
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "references": [
+    "GUID:d8b63aba1907145bea998dd612889d6b"
+  ],
+  "rootNamespace": "",
+  "versionDefines": []
+}

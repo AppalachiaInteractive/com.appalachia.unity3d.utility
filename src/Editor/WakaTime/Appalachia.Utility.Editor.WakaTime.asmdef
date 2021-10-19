@@ -1,0 +1,19 @@
+{
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "excludePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "name": "Appalachia.Utility.Editor.WakaTime",
+  "noEngineReferences": false,
+  "optionalUnityReferences": [],
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "references": [
+    "GUID:478a2357cc57436488a56e564b08d223"
+  ],
+  "rootNamespace": "",
+  "versionDefines": []
+}
