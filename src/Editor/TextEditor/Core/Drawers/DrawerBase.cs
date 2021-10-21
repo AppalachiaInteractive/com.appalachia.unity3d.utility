@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using System.Text;
-using Appalachia.CI.TextEditor.Core.Documents;
-using Appalachia.CI.TextEditor.Core.GUICache;
+using Appalachia.Utility.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.GUICache;
 using UnityEditor;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 
-namespace Appalachia.CI.TextEditor.Core.Drawers
+namespace Appalachia.Utility.TextEditor.Core.Drawers
 {
     [Serializable]
     public abstract class DrawerBase

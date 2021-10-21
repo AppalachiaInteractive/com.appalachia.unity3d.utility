@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.Utility.Editor.Preferences.Easy.Base
+namespace Appalachia.Utility.Preferences.Easy.Base
 {
     public abstract class EasyEditorPref<T> : EasyEditorPrefBase,
                                               IEquatable<EasyEditorPref<T>>,

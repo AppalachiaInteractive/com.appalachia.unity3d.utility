@@ -7,7 +7,7 @@ using UnityEngine.Device;
 
 #endregion
 
-namespace Appalachia.Utility.Editor.AutoSave.Configuration
+namespace Appalachia.Utility.AutoSave.Configuration
 {
     public static class AutoSaverConfiguration
     {

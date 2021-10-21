@@ -1,22 +1,22 @@
-using Appalachia.Utility.Colors;
+using Appalachia.Utility.src.Colors;
 using NUnit.Framework;
 using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
 
-namespace Appalachia.Utility.Tests
+namespace Appalachia.Utility.Colors
 {
     public class ColorTests
     {
         [SetUp]
         public static void Setup()
         {
-            Colors.Colors.ClearHexLookup();
+            src.Colors.Colors.ClearHexLookup();
         }
 
         [Test]
         public void TestColors()
         {
-            var aqua1 = Colors.Colors.Aquamarine1;
+            var aqua1 = src.Colors.Colors.Aquamarine1;
 
             Assert.AreApproximatelyEqual(
                 aqua1.r,
@@ -66,9 +66,9 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorEnumEquality(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorEnumEquality(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
-            var testValue = Colors.Colors.FromEnum(testEnum);
+            var testValue = src.Colors.Colors.FromEnum(testEnum);
 
             Assert.AreApproximatelyEqual(
                 referenceColor.r,
@@ -93,7 +93,7 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorBlendingHSV(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorBlendingHSV(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
             Color.RGBToHSV(referenceColor, out var h, out var s, out var v);
 
@@ -124,7 +124,7 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorBlendingRGB(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorBlendingRGB(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
             var black = new Color(0f, 0f, 0f, 0f);
             var blended = referenceColor.BlendRGB(black);
@@ -152,7 +152,7 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorBlendingRGBA(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorBlendingRGBA(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
             var black = new Color(0f, 0f, 0f, 0f);
             var blended = referenceColor.BlendRGBA(black);
@@ -211,7 +211,7 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorReferenceWrapper(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorReferenceWrapper(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
             var wrapper = referenceColor.ToRef();
             wrapper.ScaleR(0.1f);
@@ -400,7 +400,7 @@ namespace Appalachia.Utility.Tests
         }
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
-        public void TestColorHexReversabilityFull(Colors.Colors.Enum testEnum, Color referenceColor)
+        public void TestColorHexReversabilityFull(src.Colors.Colors.Enum testEnum, Color referenceColor)
         {
             var hexCode = referenceColor.ToHexCodeFull();
             var reverseColor = hexCode.ColorFromHex();
@@ -414,7 +414,7 @@ namespace Appalachia.Utility.Tests
 
         [TestCaseSource(typeof(ColorTestGenerator), nameof(ColorTestGenerator.ColorTestCases))]
         public void TestColorHexReversabilityShort(
-            Colors.Colors.Enum testEnum,
+            src.Colors.Colors.Enum testEnum,
             Color referenceColor)
         {
             var hexCode = referenceColor.ToHexCodeShort();

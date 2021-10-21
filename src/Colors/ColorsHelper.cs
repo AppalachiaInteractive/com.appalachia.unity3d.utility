@@ -4,7 +4,7 @@ using UnityEngine;
 
 #endregion
 
-namespace Appalachia.Utility.Colors
+namespace Appalachia.Utility.src.Colors
 {
     public static partial class Colors
     {

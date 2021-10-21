@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Appalachia.CI.TextEditor.Core.GUICache
+namespace Appalachia.Utility.TextEditor.Core.GUICache
 {
     public class GUIContentCache : GUICache<GUIContent>
     {

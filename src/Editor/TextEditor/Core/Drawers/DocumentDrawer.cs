@@ -1,8 +1,8 @@
 using System;
-using Appalachia.CI.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.Documents;
 using UnityEditor;
 
-namespace Appalachia.CI.TextEditor.Core.Drawers
+namespace Appalachia.Utility.TextEditor.Core.Drawers
 {
     [Serializable]
     public abstract class DocumentDrawer<TDocument> : DrawerBase

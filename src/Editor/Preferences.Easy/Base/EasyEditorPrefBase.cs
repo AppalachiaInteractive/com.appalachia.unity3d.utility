@@ -1,8 +1,8 @@
 using System;
-using Appalachia.Utility.Editor.Preferences.Easy.Provider;
+using Appalachia.Utility.Preferences.Easy.Provider;
 using UnityEditor;
 
-namespace Appalachia.Utility.Editor.Preferences.Easy.Base
+namespace Appalachia.Utility.Preferences.Easy.Base
 {
     public abstract class EasyEditorPrefBase
     {

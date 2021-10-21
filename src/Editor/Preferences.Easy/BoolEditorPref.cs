@@ -1,8 +1,8 @@
 using System;
-using Appalachia.Utility.Editor.Preferences.Easy.Base;
+using Appalachia.Utility.Preferences.Easy.Base;
 using UnityEditor;
 
-namespace Appalachia.Utility.Editor.Preferences.Easy
+namespace Appalachia.Utility.Preferences.Easy
 {
     public class BoolEditorPref : EasyEditorPref<bool>
     {

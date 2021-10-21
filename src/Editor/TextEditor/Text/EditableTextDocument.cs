@@ -1,6 +1,6 @@
-using Appalachia.CI.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.Documents;
 
-namespace Appalachia.CI.TextEditor.Text
+namespace Appalachia.Utility.TextEditor.Text
 {
     public class EditableTextDocument : EditableDocument<EditableTextDocument, TextDocumentDrawer>
     {

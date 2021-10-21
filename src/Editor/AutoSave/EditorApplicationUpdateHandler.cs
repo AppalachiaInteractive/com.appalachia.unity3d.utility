@@ -2,13 +2,13 @@
 
 #region
 
-using Appalachia.Utility.Editor.AutoSave.Configuration;
+using Appalachia.Utility.AutoSave.Configuration;
 using UnityEditor;
 using UnityEngine;
 
 #endregion
 
-namespace Appalachia.Utility.Editor.AutoSave
+namespace Appalachia.Utility.AutoSave
 {
     [InitializeOnLoad]
     internal static class EditorApplicationUpdateHandler

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
-namespace Appalachia.Utility.Editor.WakaTime
+namespace Appalachia.Utility.WakaTime
 {
     internal class Events
     {

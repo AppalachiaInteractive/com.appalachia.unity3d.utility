@@ -1,7 +1,7 @@
-using Appalachia.CI.TextEditor.Core.Drawers;
+using Appalachia.Utility.TextEditor.Core.Drawers;
 using UnityEditor;
 
-namespace Appalachia.CI.TextEditor.Text
+namespace Appalachia.Utility.TextEditor.Text
 {
     public class TextDocumentDrawer : DocumentDrawer<EditableTextDocument>
     {

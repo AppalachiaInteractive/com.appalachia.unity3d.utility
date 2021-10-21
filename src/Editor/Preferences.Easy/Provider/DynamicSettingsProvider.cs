@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Appalachia.Utility.Editor.Preferences.Easy.Base;
+using Appalachia.Utility.Preferences.Easy.Base;
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.Utility.Editor.Preferences.Easy.Provider
+namespace Appalachia.Utility.Preferences.Easy.Provider
 {
     public class DynamicSettingsProvider : SettingsProvider
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Appalachia.CI.TextEditor.Core.GUICache
+namespace Appalachia.Utility.TextEditor.Core.GUICache
 {
     [Serializable]
     public abstract class GUICache<T>

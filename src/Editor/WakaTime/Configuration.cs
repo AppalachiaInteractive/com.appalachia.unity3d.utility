@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
-namespace Appalachia.Utility.Editor.WakaTime
+namespace Appalachia.Utility.WakaTime
 {
     internal static class Configuration
     {

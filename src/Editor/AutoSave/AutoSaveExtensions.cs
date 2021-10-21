@@ -1,6 +1,6 @@
 #if UNITY_EDITOR
 
-namespace Appalachia.Utility.Editor.AutoSave
+namespace Appalachia.Utility.AutoSave
 {
     internal static class AutoSaveExtensions
     {

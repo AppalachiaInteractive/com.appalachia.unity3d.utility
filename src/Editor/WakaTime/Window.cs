@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.Utility.Editor.WakaTime
+namespace Appalachia.Utility.WakaTime
 {
     public class Window : EditorWindow
     {

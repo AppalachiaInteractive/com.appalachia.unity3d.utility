@@ -1,9 +1,9 @@
 using System;
-using Appalachia.Utility.Editor.Preferences.Easy.Base;
+using Appalachia.Utility.Preferences.Easy.Base;
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.Utility.Editor.Preferences.Easy
+namespace Appalachia.Utility.Preferences.Easy
 {
     public class EnumEditorPref<T> : EasyEditorPref<T>
         where T : Enum

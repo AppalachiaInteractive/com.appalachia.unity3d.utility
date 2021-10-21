@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Appalachia.CI.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.Documents;
 
-namespace Appalachia.CI.TextEditor.Core.Drawers
+namespace Appalachia.Utility.TextEditor.Core.Drawers
 {
     [Serializable]
     public abstract class HierarchyDocumentDrawer<T> : DocumentDrawer<T>

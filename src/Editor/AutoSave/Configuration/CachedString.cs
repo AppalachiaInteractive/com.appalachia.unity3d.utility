@@ -2,7 +2,7 @@
 
 using UnityEditor;
 
-namespace Appalachia.Utility.Editor.AutoSave.Configuration
+namespace Appalachia.Utility.AutoSave.Configuration
 {
     internal class CachedString : Cached<string, string>
     {

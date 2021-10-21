@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Appalachia.Utility.Colors
+namespace Appalachia.Utility.src.Colors
 {
     /// <summary>
     ///     Reference typed wrapper for <see cref="UnityEngine.Color" />.

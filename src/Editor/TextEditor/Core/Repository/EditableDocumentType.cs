@@ -1,6 +1,6 @@
 using System;
 
-namespace Appalachia.CI.TextEditor.Core.Repository
+namespace Appalachia.Utility.TextEditor.Core.Repository
 {
     internal class EditableDocumentType
     {

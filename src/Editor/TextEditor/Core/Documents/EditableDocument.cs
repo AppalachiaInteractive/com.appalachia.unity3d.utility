@@ -1,7 +1,7 @@
 using System;
-using Appalachia.CI.TextEditor.Core.Drawers;
+using Appalachia.Utility.TextEditor.Core.Drawers;
 
-namespace Appalachia.CI.TextEditor.Core.Documents
+namespace Appalachia.Utility.TextEditor.Core.Documents
 {
     [Serializable]
     public abstract class EditableDocument<TDocument, TDrawer> : EditableDocumentBase

@@ -1,4 +1,4 @@
-namespace Appalachia.Utility.Editor.WakaTime
+namespace Appalachia.Utility.WakaTime
 {
     internal static class Constants
     {

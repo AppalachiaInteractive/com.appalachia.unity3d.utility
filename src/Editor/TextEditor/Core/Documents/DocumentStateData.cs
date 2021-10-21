@@ -1,6 +1,6 @@
 using System;
 
-namespace Appalachia.CI.TextEditor.Core.Documents
+namespace Appalachia.Utility.TextEditor.Core.Documents
 {
     [Serializable]
     public class DocumentStateData

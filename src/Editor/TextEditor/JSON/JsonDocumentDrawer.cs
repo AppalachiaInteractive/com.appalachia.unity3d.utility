@@ -1,14 +1,14 @@
 using System;
 using System.Linq;
-using Appalachia.CI.TextEditor.Core.Drawers;
-using Appalachia.CI.TextEditor.Core.GUICache;
+using Appalachia.Utility.TextEditor.Core.Drawers;
+using Appalachia.Utility.TextEditor.Core.GUICache;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
 // ReSharper disable UnusedParameter.Global
 
-namespace Appalachia.CI.TextEditor.JSON
+namespace Appalachia.Utility.TextEditor.JSON
 {
     public class JsonDocumentDrawer : HierarchyDocumentDrawer<EditableJsonDocument>
     {

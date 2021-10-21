@@ -1,9 +1,9 @@
 using System;
-using Appalachia.CI.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Appalachia.CI.TextEditor.JSON
+namespace Appalachia.Utility.TextEditor.JSON
 {
     [Serializable]
     public class EditableJsonDocument : EditableDocument<EditableJsonDocument, JsonDocumentDrawer>

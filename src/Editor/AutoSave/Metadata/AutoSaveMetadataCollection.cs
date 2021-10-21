@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Appalachia.Utility.Editor.AutoSave.Metadata
+namespace Appalachia.Utility.AutoSave.Metadata
 {
     [Serializable]
     internal class AutoSaveMetadataCollection

@@ -1,10 +1,10 @@
 using System;
-using Appalachia.CI.TextEditor.Core.Documents;
-using Appalachia.CI.TextEditor.Core.Repository;
+using Appalachia.Utility.TextEditor.Core.Documents;
+using Appalachia.Utility.TextEditor.Core.Repository;
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.CI.TextEditor
+namespace Appalachia.Utility.TextEditor
 {
 // Adds a nice editor to edit JSON files as well as a simple text editor incase
 // the editor doesn't support the types you need. It works with strings, floats

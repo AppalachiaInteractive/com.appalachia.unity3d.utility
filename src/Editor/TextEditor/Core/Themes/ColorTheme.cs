@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Appalachia.CI.TextEditor.Core.Themes
+namespace Appalachia.Utility.TextEditor.Core.Themes
 {
     [Serializable]
     public class ColorTheme : ScriptableObject
