@@ -11,7 +11,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(method, flags, null, typeof(T0));
 
@@ -28,7 +28,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -54,7 +54,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -81,7 +81,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -109,7 +109,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -138,7 +138,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -170,7 +170,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -203,7 +203,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -237,7 +237,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -272,7 +272,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(
                 method,
@@ -306,7 +306,7 @@ namespace Appalachia.Utility.Reflection.Delegated
 
         public StaticFunction(
             string method,
-            BindingFlags flags = ReflectionExtensions.PrivateStatic)
+            BindingFlags flags = ReflectionExtensions.AllStatic)
         {
             var bestMethod = typeof(T).PrepareAndGetBestMethod(method, flags, null);
 

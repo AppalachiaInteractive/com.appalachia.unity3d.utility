@@ -1,6 +1,6 @@
 using Unity.Mathematics;
 
-namespace Appalachia.Utility.src.Constants
+namespace Appalachia.Utility.Constants
 {
     public struct double3c
     {

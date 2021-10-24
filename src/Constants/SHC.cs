@@ -1,4 +1,4 @@
-namespace Appalachia.Utility.src.Constants
+namespace Appalachia.Utility.Constants
 {
     public static class SHC
     {

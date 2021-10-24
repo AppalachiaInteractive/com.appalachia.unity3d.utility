@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
 
-namespace Appalachia.Utility.src.Constants.Icons
+namespace Appalachia.Utility.Constants.Icons
 {
     public static class EditorGUIIconGenerator
     {

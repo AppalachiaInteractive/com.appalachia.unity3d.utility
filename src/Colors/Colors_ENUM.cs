@@ -1,4 +1,4 @@
-namespace Appalachia.Utility.src.Colors
+namespace Appalachia.Utility.Colors
 {
     public static partial class Colors
     {

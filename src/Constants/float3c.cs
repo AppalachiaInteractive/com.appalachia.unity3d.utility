@@ -4,7 +4,7 @@
 
 using Unity.Mathematics;
 
-namespace Appalachia.Utility.src.Constants
+namespace Appalachia.Utility.Constants
 {
     public struct float3c
     {

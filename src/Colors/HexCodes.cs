@@ -4,7 +4,7 @@ using System.Globalization;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Appalachia.Utility.src.Colors
+namespace Appalachia.Utility.Colors
 {
     public static partial class Colors
     {

@@ -4,7 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace Appalachia.Utility.src.Colors
+namespace Appalachia.Utility.Colors
 {
     [Serializable]
     public class ColorPalette
