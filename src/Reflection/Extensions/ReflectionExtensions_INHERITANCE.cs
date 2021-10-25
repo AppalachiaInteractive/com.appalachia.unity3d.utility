@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Appalachia.Utility.Reflection.Extensions
 {
@@ -56,6 +57,53 @@ namespace Appalachia.Utility.Reflection.Extensions
             return typeof(T).GetAllConcreteInheritors();
         }
 
+        public static IEnumerable<Type> GetAllConcreteInheritorsWithDefaultConstructors(this Type t)
+        {
+            var inheritors = GetAllConcreteInheritors(t);
+
+            foreach (var inheritor in inheritors)
+            {
+                if (inheritor.HasPublicParameterlessConstructor())
+                {
+                    yield return inheritor;
+                }
+            }
+        }
+
+        public static IEnumerable<Type> GetAllConcreteInheritorsWithDefaultConstructors<T>()
+        {
+            return GetAllConcreteInheritorsWithDefaultConstructors(typeof(T));
+        }
+        
+        public static bool HasPublicParameterlessConstructor<T>()
+        {
+            return HasPublicParameterlessConstructor(typeof(T));
+        }
+        
+        public static bool HasPublicParameterlessConstructor(this Type t)
+        {
+            var constructors =
+                t.GetConstructors(BindingFlags.Default | BindingFlags.Public | BindingFlags.Instance);
+            
+            foreach (var constructor in constructors)
+            {
+                if (constructor.IsPublic)
+                {
+                    var parameters = constructor.GetParameters();
+
+                    if (parameters.Length == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        
+       
+
+        
         public static List<Type> GetAllInheritors(this Type t)
         {
             var l = TotalLookup;
