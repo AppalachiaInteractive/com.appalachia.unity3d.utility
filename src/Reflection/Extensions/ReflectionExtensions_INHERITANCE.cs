@@ -128,7 +128,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static List<Type> GetInheritors(Type t, bool concreteOnly)
         {
             var list = new List<Type>();
-            var types = GetAllTypes();
+            var types = GetAllTypes_CACHED();
 
             for (var i = 0; i < types.Length; i++)
             {

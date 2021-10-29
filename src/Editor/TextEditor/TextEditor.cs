@@ -33,7 +33,7 @@ namespace Appalachia.Utility.TextEditor
 
         private void OnDisable()
         {
-            _document.Dispose();
+            _document?.Dispose();
         }
 
         public override void OnInspectorGUI()

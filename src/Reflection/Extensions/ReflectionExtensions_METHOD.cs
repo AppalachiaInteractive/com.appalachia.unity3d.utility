@@ -16,7 +16,7 @@ namespace Appalachia.Utility.Reflection.Extensions
     {
         private static Dictionary<MethodBase, string> _cache;
         private static Dictionary<string, List<MethodInfo>> _tempsMethods;
-
+        
         public static string GetReadableName(this MethodBase method, string extensionMethodPrefix)
         {
             if (_cache == null)

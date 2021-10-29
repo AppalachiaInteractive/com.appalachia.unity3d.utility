@@ -91,7 +91,7 @@ namespace Appalachia.Utility.WakaTime
             CheckReloadStatus();
         }
 
-        [MenuItem(Constants.Window.MenuPath)]
+        [UnityEditor.MenuItem(Constants.Window.MenuPath)]
         private static void Init()
         {
             Configuration.RefreshPreferences();

@@ -710,7 +710,7 @@ public static class EditorGUIIcons
 
 #region UI Menu Items
 
-        [MenuItem(""Tools/EditorGUI Icons/Explore"", false, 22)]
+        [UnityEditor.MenuItem(""Appalachia/Tools/EditorGUI Icons/Explore"", false, 22)]
         internal static void ExploreEditorGUIIcons()
         {
             GetWindow<EditorGUIIconViewer>(false, ""EditorGUI Icons"", true);
@@ -1074,13 +1074,13 @@ public static class EditorGUIIcons
             _listBuilder.Clear();
         }
 
-        [MenuItem("Tools/EditorGUI Icons/" + resetButtonText, false, 15000)]
+        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tools.Base + "EditorGUI Icons/" + resetButtonText, false, 15000)]
         public static void ResetGeneratedIconUtilities()
         {
             WriteGeneratedIconFile(resetContent);
         }
 
-        [MenuItem("Tools/EditorGUI Icons/" + regenerateButtonText, false, 15001)]
+        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tools.Base + "EditorGUI Icons/" + regenerateButtonText, false, 15001)]
         public static void RegenerateIconUtilities()
         {
             RegenerateIconUtilities(true);

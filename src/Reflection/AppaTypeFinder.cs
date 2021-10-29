@@ -22,7 +22,7 @@ namespace Appalachia.Utility.Reflection
 
             var fieldCount = fieldNameHash.Count;
 
-            var types = ReflectionExtensions.GetAllTypes();
+            var types = ReflectionExtensions.GetAllTypes_CACHED();
 
             var matches = new List<AppaTypeFinderResult>();
 

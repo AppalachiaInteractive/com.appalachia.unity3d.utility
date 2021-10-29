@@ -12,7 +12,7 @@ namespace Appalachia.Utility.TextEditor.JSON
 {
     public class JsonDocumentDrawer : HierarchyDocumentDrawer<EditableJsonDocument>
     {
-        [MenuItem("Assets/Create/Text/JSON", priority = 200)]
+        [UnityEditor.MenuItem(PKG.Menu.Assets.Base + "Create/Text/JSON", priority = 200)]
         public static void CreateNew()
         {
             CreateNewFile(new JObject().ToString(), "json");

@@ -8,6 +8,24 @@ namespace Appalachia.Utility.Colors
 {
     public static partial class Colors
     {
+        public static bool CloseMatch(this Color color, Color other, float threshold = .001f, bool ignoreAlpha = false)
+        {
+            var indices = ignoreAlpha ? 3 : 4;
+            
+            for (var i = 0; i < indices; i++)
+            {
+                var low = other[i] - threshold;
+                var high = other[i] + threshold;
+
+                if ((color[i] < low) || (color[i] > high))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
         public static ColorRef ToRef(this Color c)
         {
             return c;

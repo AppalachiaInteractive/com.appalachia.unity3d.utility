@@ -24,7 +24,10 @@
   "dependencies": {
     "com.unity.test-framework": "1.1.29",
     "com.unity.mathematics": "1.2.4",
-    "com.unity.editorcoroutines": "1.0.0"
+    "com.unity.editorcoroutines": "1.0.0",
+    "com.unity.burst": "1.6.1",
+    "com.unity.collections": "1.0.0-pre.6",
+    "com.unity.jobs": "0.11.0-preview.6"
   },
   "scripts": {
     "preversion": "bash ~/com.appalachia/appa/appa package unity3d preversion",
@@ -37,6 +40,5 @@
     "prepublishOnly": "bash ~/com.appalachia/appa/appa package unity3d prepublishOnly",
     "publish": "bash ~/com.appalachia/appa/appa package unity3d publish",
     "postpublish": "bash ~/com.appalachia/appa/appa package unity3d postpublish"
-  },
-  "exports": null
+  }
 }
