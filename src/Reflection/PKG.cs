@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Reflection
 {
     internal static partial class PKG
     {
-        public const int Priority = -500000;
+        public const int Priority = -490000;
         public const string Name = "Reflection";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
