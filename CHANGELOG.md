@@ -12,9 +12,15 @@
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| e7c94022fed36a8987646c649a8617ce55aedd67 | 2021-10-31 | Chris Schubert | Updating package dependencies for all packages |
 
 
- ## Tag: `v0.1.4, origin/main`
+ ## Tag: `v0.1.5`
+| Hash | Date | Author | Changes |
+|------|------|--------|---------|
+
+
+ ## Tag: `v0.1.4`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
 | 0140805cc1190023cb3186cad48bdcfe8afe5ab7 | 2021-10-31 | Chris Schubert | Refactoring menus and adding application manager setup |
