@@ -1,12 +1,4 @@
 ```
-[31m  ______     __  __     __  __     __    __     ______     ______    
-[33m /\  ___\   /\ \_\ \   /\ \/\ \   /\ "-./  \   /\  == \   /\  __ \   
-[32m \ \ \____  \ \  __ \  \ \ \_\ \  \ \ \-./\ \  \ \  __<   \ \  __ \  
-[36m  \ \_____\  \ \_\ \_\  \ \_____\  \ \_\ \ \_\  \ \_____\  \ \_\ \_\ 
-[34m   \/_____/   \/_/\/_/   \/_____/   \/_/  \/_/   \/_____/   \/_/\/_/ 
-                                                                    
-C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
-[1;32;49m Let's go!  [0m
  ________   ___  ___   ________   ________    ________   _______    ________      
 |\   ____\ |\  \|\  \ |\   __  \ |\   ___  \ |\   ____\ |\  ___ \  |\   ____\     
 \ \  \___| \ \  \\\  \\ \  \|\  \\ \  \\ \  \\ \  \___| \ \   __/| \ \  \___|_    
@@ -22,9 +14,15 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 |------|------|--------|---------|
 
 
- ## Tag: `v0.2.0`
+ ## Tag: `v0.2.1`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+
+
+ ## Tag: `v0.2.0, origin/main`
+| Hash | Date | Author | Changes |
+|------|------|--------|---------|
+| ca1278111c6a6f5f92209fdd23001ac9fc0e87ee | 2021-10-31 | Chris Schubert | Updating changelog and releaselog |
 | 78eb130ceeb43d09f1810a8c71a5ea93fb0554d5 | 2021-10-31 | Chris Schubert | Updating to 0.2 for packaging simplicity |
 
 
