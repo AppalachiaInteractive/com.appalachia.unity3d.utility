@@ -1,4 +1,12 @@
 ```
+[31m  ______     __  __     __  __     __    __     ______     ______    
+[33m /\  ___\   /\ \_\ \   /\ \/\ \   /\ "-./  \   /\  == \   /\  __ \   
+[32m \ \ \____  \ \  __ \  \ \ \_\ \  \ \ \-./\ \  \ \  __<   \ \  __ \  
+[36m  \ \_____\  \ \_\ \_\  \ \_____\  \ \_\ \ \_\  \ \_____\  \ \_\ \_\ 
+[34m   \/_____/   \/_/\/_/   \/_____/   \/_/  \/_/   \/_____/   \/_/\/_/ 
+                                                                    
+C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
+[1;32;49m Let's go!  [0m
  ________   ___  ___   ________   ________    ________   _______    ________      
 |\   ____\ |\  \|\  \ |\   __  \ |\   ___  \ |\   ____\ |\  ___ \  |\   ____\     
 \ \  \___| \ \  \\\  \\ \  \|\  \\ \  \\ \  \\ \  \___| \ \   __/| \ \  \___|_    
@@ -12,12 +20,24 @@
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
-| e7c94022fed36a8987646c649a8617ce55aedd67 | 2021-10-31 | Chris Schubert | Updating package dependencies for all packages |
+
+
+ ## Tag: `v0.2.0`
+| Hash | Date | Author | Changes |
+|------|------|--------|---------|
+| 78eb130ceeb43d09f1810a8c71a5ea93fb0554d5 | 2021-10-31 | Chris Schubert | Updating to 0.2 for packaging simplicity |
+
+
+ ## Tag: `v0.1.6`
+| Hash | Date | Author | Changes |
+|------|------|--------|---------|
 
 
  ## Tag: `v0.1.5`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| fa4cc0976fbba5333d32737023e8f8bef7500d34 | 2021-10-31 | Chris Schubert | Updating changelog and releaselog |
+| e7c94022fed36a8987646c649a8617ce55aedd67 | 2021-10-31 | Chris Schubert | Updating package dependencies for all packages |
 
 
  ## Tag: `v0.1.4`
