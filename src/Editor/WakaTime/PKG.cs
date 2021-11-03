@@ -7,7 +7,7 @@ namespace Appalachia.Utility.WakaTime
 {
     internal static partial class PKG
     {
-        public const int Priority = -495000;
+        public const int Priority = -429000;
         public const string Name = "WakaTime";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";

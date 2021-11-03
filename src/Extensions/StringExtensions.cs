@@ -10,7 +10,7 @@ using UnityEngine;
 
 #endregion
 
-namespace Appalachia.Core.Extensions
+namespace Appalachia.Utility.Extensions
 {
     public static class StringExtensions
     {
@@ -256,13 +256,30 @@ namespace Appalachia.Core.Extensions
             return stringBuilder.ToString();
         }
 
+        public static string LinuxToWindowsPath(this string path)
+        {
+            if (Path.IsPathRooted(path))
+            {
+                var builder = new StringBuilder(path);
+
+                // /c/Program Files
+                // C:\Program Files
+
+                builder[0] = char.ToUpperInvariant(builder[1]);
+                builder[1] = ':';
+                path = builder.ToString();
+            }
+
+            return path.Replace("/", "\\");
+        }
+
         public static string WindowsToLinuxPath(this string path)
         {
             if (Path.IsPathRooted(path))
             {
                 var builder = new StringBuilder(path);
 
-                // C:\Program Files\
+                // C:\Program Files
                 // /c/Program Files
 
                 builder[1] = char.ToLowerInvariant(builder[0]);

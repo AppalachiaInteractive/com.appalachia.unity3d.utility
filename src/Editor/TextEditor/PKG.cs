@@ -7,7 +7,7 @@ namespace Appalachia.Utility.TextEditor
 {
     internal static partial class PKG
     {
-        public const int Priority = -496000;
+        public const int Priority = -430000;
         public const string Name = "TextEditor";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";

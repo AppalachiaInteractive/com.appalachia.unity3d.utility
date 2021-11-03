@@ -1,14 +1,14 @@
 ﻿#region
 
+using UnityEditor;
 using UnityEngine;
 #if UNITY_EDITOR
-using UnityEditor;
 
 #endif
 
 #endregion
 
-namespace Appalachia.Core.Extensions
+namespace Appalachia.Utility.Extensions
 {
     public static class RendererExtensions
     {

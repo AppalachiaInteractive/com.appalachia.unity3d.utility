@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Appalachia.Core.Extensions
+namespace Appalachia.Utility.Extensions
 {
     public static class RectExtensions
     {

@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Preferences.Easy
 {
     internal static partial class PKG
     {
-        public const int Priority = -497000;
+        public const int Priority = -431000;
         public const string Name = "Preferences/Easy";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";

@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Logging
 {
     internal static partial class PKG
     {
-        public const int Priority = -491000;
+        public const int Priority = -425000;
         public const string Name = "Logging";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";

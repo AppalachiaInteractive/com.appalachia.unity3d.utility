@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Constants
 {
     internal static partial class PKG
     {
-        public const int Priority = -499000;
+        public const int Priority = -433000;
         public const string Name = "Constants";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";

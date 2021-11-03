@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Appalachia.Core.Extensions
+namespace Appalachia.Utility.Extensions
 {
     public static class EnumExtension
     {
