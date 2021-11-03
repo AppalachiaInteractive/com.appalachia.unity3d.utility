@@ -84,6 +84,18 @@ namespace Appalachia.Utility.Colors
         public Color Third => Get((int) (1f * (SIZE / 3f)) - 1);
         public Color TwoThirds => Get((int) (2f * (SIZE / 3f)) - 1);
 
+        public Color Gradient(float time, bool clamp = true)
+        {
+            if (clamp)
+            {
+                time = Mathf.Clamp01(time);
+            }
+            
+            var index = (int) ((time * SIZE) % SIZE);
+
+            return Get(index);
+        }
+        
         public Color Get(int index)
         {
             index %= SIZE;

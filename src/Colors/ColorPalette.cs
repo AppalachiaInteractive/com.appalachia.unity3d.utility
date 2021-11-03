@@ -39,9 +39,31 @@ namespace Appalachia.Utility.Colors
         public ColorPaletteSubset highlight;
         public ColorPaletteSubset notable;
         public ColorPaletteSubset ui;
+        public ColorPaletteSubset neutral;
+        public ColorPaletteSubset badToGood;
+        public ColorPaletteSubset badToNeutral;
+        public ColorPaletteSubset neutralToGood;
+        public ColorPaletteSubset neutralToBad;
+        public ColorPaletteSubset goodToNeutral;
+        public ColorPaletteSubset goodToBad;
 
         private IEnumerable<ColorPaletteSubset> subsets =>
-            new[] {disabled, ui, bad, good, notable, highlight};
+            new[]
+            {
+                disabled,
+                ui,
+                bad,
+                good,
+                notable,
+                highlight,
+                neutral,
+                badToGood,
+                badToNeutral,
+                neutralToGood,
+                neutralToBad,
+                goodToNeutral,
+                goodToBad,
+            };
 
         public bool Draw()
         {
@@ -230,6 +252,19 @@ namespace Appalachia.Utility.Colors
                 new Color(116.0f / 255.0f, 070.0f / 255.0f, 184.0f / 255.0f, 1.0f),
                 new Color(128.0f / 255.0f, 255.0f / 255.0f, 219.0f / 255.0f, 1.0f)
             );
+            
+            p.neutral = new ColorPaletteSubset(
+                "Neutral",
+                new Color(181.6f / 255.0f, 179.2f / 255.0f, 172.0f / 255.0f, 1.0f),
+                new Color(249.7f / 255.0f, 246.4f / 255.0f, 236.5f / 255.0f, 1.0f)
+            );
+            
+            p.badToGood = new ColorPaletteSubset("Bad To Good",     p.bad.Middle, p.good.Middle);
+            p.badToNeutral = new ColorPaletteSubset("Bad To Neutral",  p.bad.Middle, p.neutral.Middle);
+            p.goodToBad = new ColorPaletteSubset("Good To Bad",     p.good.Middle, p.bad.Middle);
+            p.goodToNeutral = new ColorPaletteSubset("Good To Neutral", p.good.Middle, p.neutral.Middle);
+            p.neutralToBad = new ColorPaletteSubset("Neutral To Bad",  p.neutral.Middle, p.bad.Middle);
+            p.neutralToGood = new ColorPaletteSubset("Neutral To Good", p.neutral.Middle, p.good.Middle);
         }
 
 #region Plumbing

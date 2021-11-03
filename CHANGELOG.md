@@ -1,12 +1,6 @@
 ```
-[31m  ______     __  __     __  __     __    __     ______     ______    
-[33m /\  ___\   /\ \_\ \   /\ \/\ \   /\ "-./  \   /\  == \   /\  __ \   
-[32m \ \ \____  \ \  __ \  \ \ \_\ \  \ \ \-./\ \  \ \  __<   \ \  __ \  
-[36m  \ \_____\  \ \_\ \_\  \ \_____\  \ \_\ \ \_\  \ \_____\  \ \_\ \_\ 
-[34m   \/_____/   \/_/\/_/   \/_____/   \/_/  \/_/   \/_____/   \/_/\/_/ 
-                                                                    
 C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
-[1;32;49m Let's go!  [0m
+ Let's go!  
  ________   ___  ___   ________   ________    ________   _______    ________      
 |\   ____\ |\  \|\  \ |\   __  \ |\   ___  \ |\   ____\ |\  ___ \  |\   ____\     
 \ \  \___| \ \  \\\  \\ \  \|\  \\ \  \\ \  \\ \  \___| \ \   __/| \ \  \___|_    
@@ -20,6 +14,7 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 3db1f923043c4fe8732a389f2e599bac9e6a8a14 | 2021-11-01 | Chris Schubert | Updating changelog and releaselog |
 | 8c2e304fa78c3bdf8a51348d07fdd0b528301a86 | 2021-11-01 | Chris Schubert | Updating changelog and releaselog |
 | 5042f4d072205bacf5e76edf6f8dc94fac5ccf41 | 2021-11-01 | Chris Schubert | Updating changelog and releaselog |
 | 1535d548214ae1b3beed333b3e3a38015483f7a7 | 2021-11-01 | Chris Schubert | Updating changelog and releaselog |

@@ -293,9 +293,8 @@ namespace Appalachia.Core.Extensions
             foreach (var obj in source)
             {
                 action(obj);
+                yield return obj;
             }
-
-            return source;
         }
 
         /// <summary>Perform an action on each item.</summary>
@@ -307,9 +306,8 @@ namespace Appalachia.Core.Extensions
             foreach (var obj in source)
             {
                 action(obj, num++);
+                yield return obj;
             }
-
-            return source;
         }
 
         /// <summary>Add an item to the beginning of a collection.</summary>

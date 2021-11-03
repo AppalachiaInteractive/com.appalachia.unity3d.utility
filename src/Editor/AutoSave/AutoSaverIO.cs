@@ -43,7 +43,7 @@ namespace Appalachia.Utility.AutoSave
         {
             var savePath = AutoSaverConfiguration.GetSaveDirectory();
 
-            var files = Directory.GetFiles(savePath)
+            var files = Directory.EnumerateFiles(savePath)
                                  .Select(f => f.Replace('\\', '/'))
                                  .Where(f => f.EndsWith(".unity"))
                                  .ToArray();
