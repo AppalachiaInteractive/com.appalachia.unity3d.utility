@@ -10,22 +10,26 @@ namespace Appalachia.Utility.AutoSave
     {
         public static void Execute()
         {
-            SaveCurrentScene();
+            var scene = SceneManager.GetActiveScene();
+
+            if (!scene.isDirty)
+            {
+                return;
+            }
+
+            SaveCurrentScene(scene);
             OrganizeExistingSaves();
         }
 
-        private static void SaveCurrentScene()
+        public static string GetAutoSaveFilePath(AutoSaveMetadata metadata, string relativeSavePath)
         {
-            var scene = SceneManager.GetActiveScene();
-            var newSave = new AutoSaveMetadata(scene);
+            var saveNameIdentifier = AutoSaverConfiguration.FileName;
+            var autosaveFileName = metadata.GetSaveFileName(saveNameIdentifier);
 
-            var relativeSavePath = AutoSaverConfiguration.GetRelativeSaveDirectory();
+            var filename = $"{autosaveFileName}.unity";
+            var finalOutputPath = "{0}{1}".Format(relativeSavePath, filename);
 
-            var saveFilePath = GetAutoSaveFilePath(newSave, relativeSavePath);
-
-            AutoSaverIO.SaveScene(scene, saveFilePath);
-
-            AutoSaverConfiguration.LastSave = AutoSaverConfiguration.EditorTimer;
+            return finalOutputPath;
         }
 
         private static void OrganizeExistingSaves()
@@ -55,15 +59,17 @@ namespace Appalachia.Utility.AutoSave
             }
         }
 
-        public static string GetAutoSaveFilePath(AutoSaveMetadata metadata, string relativeSavePath)
+        private static void SaveCurrentScene(Scene scene)
         {
-            var saveNameIdentifier = AutoSaverConfiguration.FileName;
-            var autosaveFileName = metadata.GetSaveFileName(saveNameIdentifier);
+            var newSave = new AutoSaveMetadata(scene);
 
-            var filename = $"{autosaveFileName}.unity";
-            var finalOutputPath = "{0}{1}".Format(relativeSavePath, filename);
+            var relativeSavePath = AutoSaverConfiguration.GetRelativeSaveDirectory();
 
-            return finalOutputPath;
+            var saveFilePath = GetAutoSaveFilePath(newSave, relativeSavePath);
+
+            AutoSaverIO.SaveScene(scene, saveFilePath);
+
+            AutoSaverConfiguration.LastSave = AutoSaverConfiguration.EditorTimer;
         }
     }
 }

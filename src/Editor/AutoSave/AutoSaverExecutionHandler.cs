@@ -2,6 +2,7 @@
 
 #region
 
+using System.Diagnostics;
 using Appalachia.Utility.AutoSave.Configuration;
 using UnityEditor;
 using UnityEngine;
@@ -11,12 +12,12 @@ using UnityEngine;
 namespace Appalachia.Utility.AutoSave
 {
     [InitializeOnLoad]
-    internal static class EditorApplicationUpdateHandler
+    internal static class AutoSaverExecutionHandler
     {
         private static float? _launchTime;
         private static float _editorTimer;
 
-        static EditorApplicationUpdateHandler()
+        static AutoSaverExecutionHandler()
         {
             EditorApplication.update -= OnEditorApplicationUpdate;
             EditorApplication.update += OnEditorApplicationUpdate;
@@ -24,7 +25,27 @@ namespace Appalachia.Utility.AutoSave
 
         public static void OnEditorApplicationUpdate()
         {
+            if (Debugger.IsAttached)
+            {
+                return;
+            }
+            
             if (!AutoSaverConfiguration.Enable)
+            {
+                return;
+            }
+
+            if (UnityEditor.BuildPipeline.isBuildingPlayer)
+            {
+                return;
+            }
+            
+            if (EditorApplication.isCompiling)
+            {
+                return;
+            }
+
+            if (EditorApplication.isUpdating)
             {
                 return;
             }

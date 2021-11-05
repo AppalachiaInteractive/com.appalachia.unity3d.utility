@@ -15,6 +15,8 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| b7cb950888238c67591b4a3d52525267783e57b3 | 2021-11-03 | Chris Schubert | Committing before testing the package v. repo switch |
+| 347d2252175f47ba2be1576100b416bc83a5d394 | 2021-11-02 | Chris Schubert | Updating changelog and releaselog |
 | dbd22f21ea64266c8f7a9a37d41bcb4933f4ed2d | 2021-11-02 | Chris Schubert | Updating changelog and releaselog |
 | c3f5f96f1644414a52fdc268f341ae8c427b97eb | 2021-11-02 | Chris Schubert | Updating changelog and releaselog |
 | be3f93d3441f6c9d103408a48166b71f3ba22c3c | 2021-11-02 | Chris Schubert | Updating changelog and releaselog |

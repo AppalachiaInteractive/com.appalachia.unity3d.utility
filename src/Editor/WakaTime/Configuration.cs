@@ -33,16 +33,18 @@ namespace Appalachia.Utility.WakaTime
                 {
                     if (WakaTimePathAuto)
                     {
-                        if (string.IsNullOrWhiteSpace(_wakaTimePath))
+                        if (string.IsNullOrWhiteSpace(_wakaTimePath) || !Directory.Exists(_wakaTimePath))
                         {
-                            var basePath = Application.dataPath;
-                            var parentBasePath = new DirectoryInfo(basePath).Parent;
+                            var basePath = Application.dataPath.Replace("Assets", string.Empty);
+                         
+                            var parentBasePath = new DirectoryInfo(basePath);
 
                             var files = Directory.EnumerateFileSystemEntries(
-                                parentBasePath.FullName,
-                                "cli.py",
-                                SearchOption.AllDirectories
-                            );
+                                                      parentBasePath.FullName,
+                                                      "cli.py",
+                                                      SearchOption.AllDirectories
+                                                  )
+                                                 .Where(p => p.ToLowerInvariant().Contains("wakatime"));
 
                             _wakaTimePath = files.First();
                         }
