@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Interpolation
 {
     internal static partial class PKG
     {
-        public const int Priority = -426000;
+        public const int Priority = -425000;
         public const string Name = "Interpolation";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
