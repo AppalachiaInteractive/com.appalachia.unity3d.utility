@@ -154,9 +154,15 @@ namespace Appalachia.Utility.Execution
                     public const string Base = Root + nameof(Settings) + "/" + Name + "/";
                 }               
                 
-                public static partial class Packages
+                public static partial class Tasks
                 { 
                     public const int Priority = Settings.Priority + 10000;
+                    public const string Base = Root + nameof(Tasks) + "/" + Name + "/";
+                }               
+                
+                public static partial class Packages
+                { 
+                    public const int Priority = Tasks.Priority + 10000;
                     public const string Base = Root + nameof(Packages) + "/" + Name + "/";
                 }                          
                 
@@ -190,7 +196,6 @@ namespace Appalachia.Utility.Execution
 
 // DO NOT MODIFY: END
 // MODIFICATIONS ALLOWED: START
-
 
 // MODIFICATIONS ALLOWED: END
 // DO NOT MODIFY: START        

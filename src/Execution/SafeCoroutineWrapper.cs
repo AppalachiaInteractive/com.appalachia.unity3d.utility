@@ -297,7 +297,7 @@ namespace Appalachia.Utility.Execution
         }
 
         [UnityEditor.MenuItem(
-            PKG.Menu.Appalachia.Tools.Base + "Cancel All",
+            PKG.Menu.Appalachia.Tasks.Base + "Cancel All",
             true,
             priority = PKG.Menu.Appalachia.Tools.Priority
         )]
@@ -306,7 +306,7 @@ namespace Appalachia.Utility.Execution
             return SafeCoroutineManager.instance.Count > 0;
         }
 
-        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tools.Base + "Cancel All", priority = PKG.Menu.Appalachia.Tools.Priority)]
+        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tasks.Base + "Cancel All", priority = PKG.Menu.Appalachia.Tools.Priority)]
         private static void CancelAll()
         {
             Debug.LogWarning("Cancelling all executing coroutines from the Editor menu.");
@@ -317,6 +317,8 @@ namespace Appalachia.Utility.Execution
             {
                 routine.Cancel();
             }
+
+            routines.Clear();
         }
 #endif
     }

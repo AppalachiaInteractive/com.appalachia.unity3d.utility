@@ -1,6 +1,4 @@
 ```
-C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
- Let's go!  
  ______   ______   __       ______   ______   ______   ______    
 /\  == \ /\  ___\ /\ \     /\  ___\ /\  __ \ /\  ___\ /\  ___\   
 \ \  __< \ \  __\ \ \ \____\ \  __\ \ \  __ \\ \___  \\ \  __\   
@@ -15,6 +13,7 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 1105f3068f55a8df83c78cb1fe095e4aecd6b1de | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | 8ac4839d24e832ffc5ddceed7003eef18eac12eb | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | 3b3f68e850d743ec244a57a7ae86db2c6aaf55d1 | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | cb8794fe06cc44a1ebf1ec15907210c01f66d0a5 | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
