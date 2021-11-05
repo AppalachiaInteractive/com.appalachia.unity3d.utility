@@ -216,6 +216,9 @@ namespace Appalachia.Utility.Execution
                 }
                 catch (Exception ex)
                 {
+                    Debug.LogError($"Coroutine [{ProcessKey}] threw an exception! [{ex.Message}]");
+                    Debug.LogException(ex);
+                    
                     _exception = ex;
 
                     try
@@ -224,7 +227,7 @@ namespace Appalachia.Utility.Execution
                     }
                     catch (Exception ex2)
                     {
-                        Debug.LogError("Error in error handler for coroutine");
+                        Debug.LogError($"Coroutine [{ProcessKey}] threw ANOTHER an exception! [{ex2.Message}]");
                         Debug.LogException(ex2);
                     }
 

@@ -14,6 +14,7 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| cb8794fe06cc44a1ebf1ec15907210c01f66d0a5 | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | fe82bc4c42f2e7c977852847c81b9d23c21868f0 | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | 62c8d39c59d928dfd49479c1ab12645757e4902b | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
 | de05271f8cc85dbb53ef64ec75c5c2b06a2b1d5e | 2021-11-05 | Chris Schubert | Updating changelog and releaselog |
