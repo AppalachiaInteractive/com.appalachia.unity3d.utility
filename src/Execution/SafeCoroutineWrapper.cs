@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -57,7 +56,7 @@ namespace Appalachia.Utility.Execution
         private Coroutine _coroutine;
         private double _startTime;
 #if UNITY_EDITOR
-        private EditorCoroutine _editorCoroutine;
+        private Unity.EditorCoroutines.Editor.EditorCoroutine _editorCoroutine;
 #endif
         private Exception _exception;
 
@@ -79,28 +78,6 @@ namespace Appalachia.Utility.Execution
 
         public string ProcessKey => _processKey;
 
-        private bool ShouldAutoCancel
-        {
-            get
-            {
-#if UNITY_EDITOR
-
-                if (UnityEditor.EditorApplication.isCompiling)
-                {
-                    return true;
-                }
-
-                if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-                    return true;
-                }
-
-#endif
-
-                return false;
-            }
-        }
-
         public void Cancel()
         {
             _isCancellationInProgress = true;
@@ -115,27 +92,16 @@ namespace Appalachia.Utility.Execution
 #endif
         }
 
-#if UNITY_EDITOR
-
-        public void ExecuteAsEditorCoroutine()
-        {
-            _editorCoroutine =
-                EditorCoroutineUtility.StartCoroutine(Execute(), SafeCoroutineManager.instance);
-
-            Application.quitting += AutoCancel;
-        }
-#endif
-
         public void ExecuteAsRuntimeCoroutine()
         {
             _coroutine = SafeCoroutineManager.instance.StartCoroutine(Execute());
 
-            Application.quitting += AutoCancel;
+            RegisterAutoCancelEvents();
         }
 
         public void ExecuteSynchronous()
         {
-            Application.quitting += AutoCancel;
+            RegisterAutoCancelEvents();
 
             var enumeration = Execute();
 
@@ -144,8 +110,10 @@ namespace Appalachia.Utility.Execution
             }
         }
 
-        private void AutoCancel()
+        private void AutoCancel(string reason)
         {
+            Debug.LogWarning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
+
             _isCancellationInProgress = true;
             _wasCancelled = true;
             _wasAutoCancelled = true;
@@ -153,7 +121,7 @@ namespace Appalachia.Utility.Execution
 #if UNITY_EDITOR
             if (_editorCoroutine != null)
             {
-                EditorCoroutineUtility.StopCoroutine(_editorCoroutine);
+                Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StopCoroutine(_editorCoroutine);
             }
 #endif
             if (_coroutine != null)
@@ -191,11 +159,6 @@ namespace Appalachia.Utility.Execution
             {
                 try
                 {
-                    if (ShouldAutoCancel)
-                    {
-                        AutoCancel();
-                    }
-
                     if (_isCancellationInProgress)
                     {
                         _wasCancelled = true;
@@ -218,7 +181,7 @@ namespace Appalachia.Utility.Execution
                 {
                     Debug.LogError($"Coroutine [{ProcessKey}] threw an exception! [{ex.Message}]");
                     Debug.LogException(ex);
-                    
+
                     _exception = ex;
 
                     try
@@ -227,7 +190,9 @@ namespace Appalachia.Utility.Execution
                     }
                     catch (Exception ex2)
                     {
-                        Debug.LogError($"Coroutine [{ProcessKey}] threw ANOTHER an exception! [{ex2.Message}]");
+                        Debug.LogError(
+                            $"Coroutine [{ProcessKey}] threw ANOTHER an exception! [{ex2.Message}]"
+                        );
                         Debug.LogException(ex2);
                     }
 
@@ -253,9 +218,35 @@ namespace Appalachia.Utility.Execution
             }
         }
 
+        private void OnApplicationQuit()
+        {
+            AutoCancel("Application Quit");
+        }
+
+        private void OnCompilationFinished(object context)
+        {
+            AutoCancel("Compilation Finished");
+        }
+
+        private void OnCompilationStarted(object context)
+        {
+            AutoCancel("Compilation Started");
+        }
+
         private void OnCompleteInternal()
         {
-            Application.quitting -= AutoCancel;
+            UnregisterAutoCancelEvents();
+        }
+
+        private void RegisterAutoCancelEvents()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.quitting += OnApplicationQuit;
+            UnityEditor.Compilation.CompilationPipeline.compilationStarted += OnCompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.compilationFinished += OnCompilationFinished;
+#endif
+            Application.quitting += OnApplicationQuit;
         }
 
         private bool ShouldTimeout()
@@ -275,5 +266,35 @@ namespace Appalachia.Utility.Execution
 
             return false;
         }
+
+        private void UnregisterAutoCancelEvents()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnityEditor.EditorApplication.quitting -= OnApplicationQuit;
+            UnityEditor.Compilation.CompilationPipeline.compilationStarted -= OnCompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.compilationFinished -= OnCompilationFinished;
+#endif
+            Application.quitting -= OnApplicationQuit;
+        }
+
+#if UNITY_EDITOR
+
+        private void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
+        {
+            AutoCancel(obj.ToString());
+        }
+
+        public void ExecuteAsEditorCoroutine()
+        {
+            _editorCoroutine =
+                Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(
+                    Execute(),
+                    SafeCoroutineManager.instance
+                );
+
+            RegisterAutoCancelEvents();
+        }
+#endif
     }
 }
