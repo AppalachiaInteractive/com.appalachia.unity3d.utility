@@ -295,6 +295,29 @@ namespace Appalachia.Utility.Execution
 
             RegisterAutoCancelEvents();
         }
+
+        [UnityEditor.MenuItem(
+            PKG.Menu.Appalachia.Tools.Base + "Cancel All",
+            true,
+            priority = PKG.Menu.Appalachia.Tools.Priority
+        )]
+        private static bool CancelAllValidate()
+        {
+            return SafeCoroutineManager.instance.Count > 0;
+        }
+
+        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tools.Base + "Cancel All", priority = PKG.Menu.Appalachia.Tools.Priority)]
+        private static void CancelAll()
+        {
+            Debug.LogWarning("Cancelling all executing coroutines from the Editor menu.");
+            
+            var routines = SafeCoroutineManager.instance.GetAll();
+
+            foreach (var routine in routines)
+            {
+                routine.Cancel();
+            }
+        }
 #endif
     }
 }

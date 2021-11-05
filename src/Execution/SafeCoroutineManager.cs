@@ -42,5 +42,12 @@ namespace Appalachia.Utility.Execution
         {
             _executing.Remove(wrapper);
         }
+
+        public int Count => _executing?.Count ?? 0;
+
+        internal List<SafeCoroutineWrapper> GetAll()
+        {
+            return _executing;
+        }
     }
 }
