@@ -7,7 +7,7 @@ namespace Appalachia.Utility.Execution
     public static class IEnumeratorExtensions
     {
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
-        public static SafeCoroutineWrapper ToSafe(
+        public static SafeCoroutineWrapper AsSafe(
             this IEnumerator enumerator,
             string processKey = null,
             SafeCoroutineWrapper.OnSuccess onSuccess = null,
@@ -30,7 +30,7 @@ namespace Appalachia.Utility.Execution
         }
 
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
-        public static SafeCoroutineWrapper ToSafe(
+        public static SafeCoroutineWrapper AsSafe(
             this UnityEditor.PackageManager.Requests.Request request,
             string processKey = null,
             SafeCoroutineWrapper.OnSuccess onSuccess = null,
@@ -52,6 +52,15 @@ namespace Appalachia.Utility.Execution
                 callerFilePath,
                 callerLineNumber
             );
+        }
+
+        [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
+        public static SafeCoroutineWrapper AsNonCancellable(
+            this SafeCoroutineWrapper request)
+        {
+            request.SetNonCancellable();
+
+            return request;
         }
 
         private static IEnumerator RequestToEnumerator(UnityEditor.PackageManager.Requests.Request request)

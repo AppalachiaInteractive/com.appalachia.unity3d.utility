@@ -48,6 +48,7 @@ namespace Appalachia.Utility.Execution
         private bool _isExecuting;
         private bool _wasAutoCancelled;
         private bool _wasCancelled;
+        private bool _rejectsCancellation;
 
         private bool _wasExecuted;
         private Coroutine _coroutine;
@@ -125,6 +126,11 @@ namespace Appalachia.Utility.Execution
 
         private void AutoCancel(string reason)
         {
+            if (_isCancellationInProgress)
+            {
+                return;
+            }
+            
             Debug.LogWarning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
 
             _isCancellationInProgress = true;
@@ -174,6 +180,16 @@ namespace Appalachia.Utility.Execution
                 {
                     if (_isCancellationInProgress)
                     {
+                        if (_rejectsCancellation)
+                        {
+                            Debug.LogWarning($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
+                            while (enumerator.MoveNext())
+                            {
+                            }
+                            
+                            Debug.Log($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
+                        }
+                        
                         _wasCancelled = true;
                         _isCancellationInProgress = false;
                         break;
@@ -291,6 +307,11 @@ namespace Appalachia.Utility.Execution
             Application.quitting -= OnApplicationQuit;
         }
 
+        internal void SetNonCancellable()
+        {
+            _rejectsCancellation = true;
+        }
+        
 #if UNITY_EDITOR
 
         private void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
