@@ -40,7 +40,7 @@ namespace Appalachia.Utility.Extensions
 #if ENABLE_IL2CPP || NET_STANDARD_2_0
                 return (T[]) ArrayAccessor<T>.AotGetter(list);
 #else
-            return ArrayAccessor<T>.Getter(list);
+                return ArrayAccessor<T>.Getter(list);
 #endif
             }
         }

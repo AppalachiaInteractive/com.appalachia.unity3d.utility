@@ -43,10 +43,7 @@ namespace Appalachia.Utility.Execution
 
         private readonly double _timeoutSeconds;
         private readonly IEnumerator _enumerator;
-        private readonly OnError _onError;
-        private readonly OnSuccess _onSuccess;
         private readonly string _processKey;
-        private Action _coroutineQuit;
         private bool _isCancellationInProgress;
         private bool _isExecuting;
         private bool _wasAutoCancelled;
@@ -59,6 +56,8 @@ namespace Appalachia.Utility.Execution
         private Unity.EditorCoroutines.Editor.EditorCoroutine _editorCoroutine;
 #endif
         private Exception _exception;
+        private OnError _onError;
+        private OnSuccess _onSuccess;
 
         public bool HadErrors => exception != null;
 
@@ -108,6 +107,20 @@ namespace Appalachia.Utility.Execution
             while (enumeration.MoveNext())
             {
             }
+        }
+
+        public SafeCoroutineWrapper OnComplete(OnSuccess onSuccess)
+        {
+            _onSuccess = onSuccess;
+
+            return this;
+        }
+
+        public SafeCoroutineWrapper OnFailure(OnError onError)
+        {
+            _onError = onError;
+
+            return this;
         }
 
         private void AutoCancel(string reason)
@@ -306,11 +319,14 @@ namespace Appalachia.Utility.Execution
             return SafeCoroutineManager.instance.Count > 0;
         }
 
-        [UnityEditor.MenuItem(PKG.Menu.Appalachia.Tasks.Base + "Cancel All", priority = PKG.Menu.Appalachia.Tools.Priority)]
+        [UnityEditor.MenuItem(
+            PKG.Menu.Appalachia.Tasks.Base + "Cancel All",
+            priority = PKG.Menu.Appalachia.Tools.Priority
+        )]
         private static void CancelAll()
         {
             Debug.LogWarning("Cancelling all executing coroutines from the Editor menu.");
-            
+
             var routines = SafeCoroutineManager.instance.GetAll();
 
             foreach (var routine in routines)

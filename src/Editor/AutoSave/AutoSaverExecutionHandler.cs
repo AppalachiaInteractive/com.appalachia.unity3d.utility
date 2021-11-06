@@ -14,32 +14,43 @@ namespace Appalachia.Utility.AutoSave
     [InitializeOnLoad]
     internal static class AutoSaverExecutionHandler
     {
-        private static float? _launchTime;
-        private static float _editorTimer;
-
         static AutoSaverExecutionHandler()
         {
             EditorApplication.update -= OnEditorApplicationUpdate;
             EditorApplication.update += OnEditorApplicationUpdate;
+
+            UnityEditor.Compilation.CompilationPipeline.compilationStarted +=
+                o => _compilationDisabled = true;
+            UnityEditor.Compilation.CompilationPipeline.compilationFinished +=
+                o => _compilationDisabled = false;
         }
+
+        private static bool _compilationDisabled;
+        private static float _editorTimer;
+        private static float? _launchTime;
 
         public static void OnEditorApplicationUpdate()
         {
+            if (_compilationDisabled)
+            {
+                return;
+            }
+
             if (Debugger.IsAttached)
             {
                 return;
             }
-            
+
             if (!AutoSaverConfiguration.Enable)
             {
                 return;
             }
 
-            if (UnityEditor.BuildPipeline.isBuildingPlayer)
+            if (BuildPipeline.isBuildingPlayer)
             {
                 return;
             }
-            
+
             if (EditorApplication.isCompiling)
             {
                 return;
@@ -62,8 +73,7 @@ namespace Appalachia.Utility.AutoSave
 
             if (_launchTime != null)
             {
-                AutoSaverConfiguration.LastSave +=
-                    AutoSaverConfiguration.EditorTimer - _launchTime.Value;
+                AutoSaverConfiguration.LastSave += AutoSaverConfiguration.EditorTimer - _launchTime.Value;
                 _launchTime = null;
             }
 
