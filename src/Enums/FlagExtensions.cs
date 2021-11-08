@@ -6,7 +6,7 @@ namespace Appalachia.Utility.Enums
     public static class FlagExtensions
     {
         [Pure]
-        public static T ClearFlag<T>(this T value, T flag)
+        public static T UnsetFlag<T>(this T value, T flag)
             where T : Enum
         {
             if (value.IsUnsignedEnum())

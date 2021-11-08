@@ -29,6 +29,18 @@ namespace Appalachia.Utility.Reflection.Delegated
 
             return (Action) Delegate.CreateDelegate(typeof(Action), bestMethod);
         }
+        
+        public static Action CreateDelegate(
+            string typeNameWithNamespace,
+            string methodName,
+            BindingFlags flags = ReflectionExtensions.AllStatic)
+        {
+            var type = ReflectionExtensions.GetByName(typeNameWithNamespace);
+            
+            var bestMethod = type.PrepareAndGetBestMethod(methodName, flags, null);
+
+            return (Action) Delegate.CreateDelegate(typeof(Action), bestMethod);
+        }
     }
 
     public class StaticRoutine<T>
