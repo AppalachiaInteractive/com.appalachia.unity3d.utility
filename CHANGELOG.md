@@ -14,14 +14,11 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 1018a4c2677b9da6d87dd061082b5811c7373c32 | 2021-11-09 | Chris Schubert | Adding logging contexts, performance tuning extensions, disposable helpers, debugger stepthroughs |
+| f4e4a6075575ef40591b26ba3617488b25868e48 | 2021-11-08 | Chris Schubert | Updating changelog and releaselog |
 | fdd5de4c906f8bab1171e03696547041b3d65151 | 2021-11-08 | Chris Schubert | Debugger stepthrough for logging |
 | a639c4c88135a57127fd671cef3dcce2276ee6b9 | 2021-11-08 | Chris Schubert | New logging library, moving RichText into constants and adding in some cross-util references. |
 | bc4c3dce274146f4138d7bbc0222f6aef7fee295 | 2021-11-07 | Chris Schubert | Fixing shader includes and automatic references for resources |
-
-
- ## Tag: `v0.2.0`
-| Hash | Date | Author | Changes |
-|------|------|--------|---------|
 | 8d2c0b76410baddc4716f766c09795351d8d5ff6 | 2021-11-06 | Chris Schubert | Updating changelog and releaselog |
 | 87b2f81a8f84e66c53a0e863bf3b34c37e4c0dea | 2021-11-06 | Chris Schubert | Updating changelog and releaselog |
 | bfdb097230c5300fd9bfd6e3d95b7d6ad4b30cbd | 2021-11-06 | Chris Schubert | Updating changelog and releaselog |
