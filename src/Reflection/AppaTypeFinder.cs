@@ -17,7 +17,6 @@ namespace Appalachia.Utility.Reflection
             IEnumerable<string> fieldNames,
             Type inheritsFrom = null)
         {
-            
             var fieldNameHash = new HashSet<string>(fieldNames);
 
             var fieldCount = fieldNameHash.Count;
@@ -55,7 +54,7 @@ namespace Appalachia.Utility.Reflection
                 }
             }
 
-            matches.Sort((a, b) => a.likelihood.CompareTo(b.likelihood));
+            matches.Sort((a, b) => -1 * a.likelihood.CompareTo(b.likelihood));
 
             return matches;
         }

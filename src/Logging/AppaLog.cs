@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Appalachia.Utility.Logging.Contexts;
 using Appalachia.Utility.Logging.Formatters;
 using Unity.Profiling;
 using UnityEngine;
@@ -27,12 +28,16 @@ namespace Appalachia.Utility.Logging
 
         private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
         private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
-
         private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
         private static readonly ProfilerMarker _PRF_Warning = new ProfilerMarker(_PRF_PFX + nameof(Warning));
 
         private static readonly ProfilerMarker _PRF_LogInternal =
             new ProfilerMarker(_PRF_PFX + nameof(LogInternal));
+
+        private static readonly ProfilerMarker
+            _PRF_Critical = new ProfilerMarker(_PRF_PFX + nameof(Critical));
+
+        private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
 
         private static readonly ProfilerMarker _PRF_LogLevelToLogType =
             new ProfilerMarker(_PRF_PFX + nameof(LogLevelToLogType));
@@ -53,25 +58,57 @@ namespace Appalachia.Utility.Logging
 
         #region Menu Items
 
-        [UnityEditor.MenuItem(MENU_BASE, false, MENU_PRIORITY+0)]
+        [UnityEditor.MenuItem(MENU_BASE, false, MENU_PRIORITY + 0)]
         private static void Test()
         {
             var line = 58;
-            LogInternal(LogLevel.Fatal, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+1);
+            LogInternal(LogLevel.Fatal, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + 1);
 
-            LogInternal(LogLevel.Critical, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+3);
+            LogInternal(
+                LogLevel.Critical,
+                "Testing 1 2 3...",
+                null,
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + 3
+            );
 
-            LogInternal(LogLevel.Exception, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+5);
+            LogInternal(
+                LogLevel.Exception,
+                "Testing 1 2 3...",
+                null,
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + 5
+            );
 
-            LogInternal(LogLevel.Error, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+7);
+            LogInternal(LogLevel.Error, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + 7);
 
-            LogInternal(LogLevel.Warn, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+9);
-  
-            LogInternal(LogLevel.Info, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+11);
- 
-            LogInternal(LogLevel.Debug, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+13);
-            
-            LogInternal(LogLevel.Trace, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line+15);
+            LogInternal(LogLevel.Warn, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + 9);
+
+            LogInternal(LogLevel.Info, "Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + 11);
+
+            LogInternal(
+                LogLevel.Debug,
+                "Testing 1 2 3...",
+                null,
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + 13
+            );
+
+            LogInternal(
+                LogLevel.Trace,
+                "Testing 1 2 3...",
+                null,
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + 15
+            );
         }
 
         #endregion
@@ -103,7 +140,7 @@ namespace Appalachia.Utility.Logging
             [CallerFilePath] string filePath = null,
             [CallerLineNumber] int lineNumber = 0)
         {
-            using (_PRF_Warning.Auto())
+            using (_PRF_Critical.Auto())
             {
                 LogInternal(LogLevel.Critical, message, context, logIf, memberName, filePath, lineNumber);
             }
@@ -154,7 +191,59 @@ namespace Appalachia.Utility.Logging
         /// <summary>
         ///     <para>Logs an exception to the console.</para>
         /// </summary>
-        /// <param name="message">String or object to be converted to string representation for display.</param>
+        /// <param name="exception">String for display.</param>
+        /// <param name="context">Object to which the message applies.</param>
+        /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
+        public static void Exception(
+            string exception,
+            Object context = null,
+            bool logIf = true,
+            [CallerMemberName] string memberName = null,
+            [CallerFilePath] string filePath = null,
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            using (_PRF_Exception.Auto())
+            {
+                LogInternal(LogLevel.Exception, exception, context, logIf, memberName, filePath, lineNumber);
+            }
+        }
+
+        /// <summary>
+        ///     <para>Logs an exception to the console.</para>
+        /// </summary>
+        /// <param name="message">String to prepend the exception message with.</param>
+        /// <param name="exception">Exception to be converted to string representation for display.</param>
+        /// <param name="context">Object to which the message applies.</param>
+        /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
+        public static void Exception(
+            string message,
+            Exception exception,
+            Object context = null,
+            bool logIf = true,
+            [CallerMemberName] string memberName = null,
+            [CallerFilePath] string filePath = null,
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            using (_PRF_Exception.Auto())
+            {
+                LogInternal(
+                    LogLevel.Exception,
+                    $"{message}\n{exception}",
+                    context,
+                    logIf,
+                    memberName,
+                    filePath,
+                    lineNumber
+                );
+            }
+        }
+
+        /// <summary>
+        ///     <para>Logs an exception to the console.</para>
+        /// </summary>
+        /// <param name="exception">Exception to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
         [DebuggerStepperBoundary]
@@ -169,7 +258,7 @@ namespace Appalachia.Utility.Logging
             using (_PRF_Exception.Auto())
             {
                 LogInternal(
-                    LogLevel.Critical,
+                    LogLevel.Exception,
                     exception.ToString(),
                     context,
                     logIf,
@@ -195,7 +284,7 @@ namespace Appalachia.Utility.Logging
             [CallerFilePath] string filePath = null,
             [CallerLineNumber] int lineNumber = 0)
         {
-            using (_PRF_Warning.Auto())
+            using (_PRF_Fatal.Auto())
             {
                 LogInternal(LogLevel.Fatal, message, context, logIf, memberName, filePath, lineNumber);
             }
@@ -360,5 +449,14 @@ namespace Appalachia.Utility.Logging
                 }
             }
         }
+
+        #region Nested Types
+
+        public static class Context
+        {
+            public static AppaLogContextBase MenuEvent => Contexts.MenuEvent.Instance;
+        }
+
+        #endregion
     }
 }

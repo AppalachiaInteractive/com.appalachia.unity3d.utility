@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Appalachia.Utility.TextEditor.Core.GUICache
@@ -13,7 +14,7 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
             return Color.clear;
         }
 
-        public static implicit operator Color(GUIColorCache value)
+        [DebuggerStepThrough] public static implicit operator Color(GUIColorCache value)
         {
             return value.Value;
         }

@@ -724,7 +724,7 @@ public static class EditorGUIIcons
         {
             EditorGUILayout.LabelField(text, EditorStyles.whiteLargeLabel);
 
-            using (new GUILayout.HorizontalScope())
+            using (APPAGUI.Horizontal())
             {
                 EditorGUILayout.LabelField(subheader, EditorStyles.whiteMiniLabel);
 

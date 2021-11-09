@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Profiling;
 
 #endregion
 
@@ -11,49 +12,37 @@ namespace Appalachia.Utility.Extensions
 {
     public static class EnumerableExtensions
     {
-        /// <summary>
-        ///     Returns <c>true</c> if the list is either null or empty. Otherwise <c>false</c>.
-        /// </summary>
-        /// <param name="list">The list.</param>
-        public static bool IsNullOrEmpty<T>(this IList<T> list)
-        {
-            if (list != null)
-            {
-                return list.Count == 0;
-            }
+        #region Profiling And Tracing Markers
 
-            return true;
-        }
+        private const string _PRF_PFX = nameof(EnumerableExtensions) + ".";
 
-        public static Dictionary<TKey, TValue> BuildLookup<TKey, TValue>(
-            this IEnumerable<TValue> values,
-            Func<TValue, TKey> keySelector)
-        {
-            var dictionary = new Dictionary<TKey, TValue>();
+        private static readonly ProfilerMarker
+            _PRF_AddRange = new ProfilerMarker(_PRF_PFX + nameof(AddRange));
 
-            foreach (var value in values)
-            {
-                var key = keySelector(value);
-                dictionary.Add(key, value);
-            }
+        private static readonly ProfilerMarker _PRF_AddRange2 =
+            new ProfilerMarker(_PRF_PFX + nameof(AddRange2));
 
-            return dictionary;
-        }
+        private static readonly ProfilerMarker _PRF_BuildLookup =
+            new ProfilerMarker(_PRF_PFX + nameof(ToLookup));
 
-        public static Dictionary<TValue, int> BuildReverseIndexLookup<TValue>(this IEnumerable<TValue> values)
-        {
-            var dictionary = new Dictionary<TValue, int>();
+        private static readonly ProfilerMarker _PRF_BuildReverseIndexLookup =
+            new ProfilerMarker(_PRF_PFX + nameof(ToReverseIndexLookup));
 
-            var count = -1;
+        private static readonly ProfilerMarker _PRF_IsNullOrEmpty =
+            new ProfilerMarker(_PRF_PFX + nameof(IsNullOrEmpty));
 
-            foreach (var value in values)
-            {
-                count += 1;
-                dictionary.Add(value, count);
-            }
+        private static readonly ProfilerMarker _PRF_MostFrequent =
+            new ProfilerMarker(_PRF_PFX + nameof(MostFrequent));
 
-            return dictionary;
-        }
+        private static readonly ProfilerMarker
+            _PRF_Populate = new ProfilerMarker(_PRF_PFX + nameof(Populate));
+
+        private static readonly ProfilerMarker _PRF_RemoveRange =
+            new ProfilerMarker(_PRF_PFX + nameof(RemoveRange));
+
+        private static readonly ProfilerMarker _PRF_Slice = new ProfilerMarker(_PRF_PFX + nameof(Slice));
+
+        private static readonly ProfilerMarker _PRF_Sort = new ProfilerMarker(_PRF_PFX + nameof(Sort));
 
         /*/// <summary>Convert a colletion to a HashSet.</summary>
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
@@ -61,10 +50,58 @@ namespace Appalachia.Utility.Extensions
             return new(source);
         }*/
 
-        /// <summary>Convert a colletion to a HashSet.</summary>
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer)
+        private static readonly ProfilerMarker _PRF_ToHashSet =
+            new ProfilerMarker(_PRF_PFX + nameof(ToHashSet));
+
+        #endregion
+
+        /// <summary>Adds a collection to a hashset.</summary>
+        /// <param name="hashSet">The hashset.</param>
+        /// <param name="range">The collection.</param>
+        public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> range)
         {
-            return new(source, comparer);
+            using (_PRF_AddRange.Auto())
+            {
+                foreach (var obj in range)
+                {
+                    hashSet.Add(obj);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Adds the elements of the specified collection to the end of the IList&lt;T&gt;.
+        /// </summary>
+        public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
+        {
+            using (_PRF_AddRange.Auto())
+            {
+                if (list is List<T>)
+                {
+                    ((List<T>) list).AddRange(collection);
+                }
+                else
+                {
+                    foreach (var obj in collection)
+                    {
+                        list.Add(obj);
+                    }
+                }
+            }
+        }
+
+        /// <summary>Adds a collection to a hashset.</summary>
+        /// <param name="hashSet">The hashset.</param>
+        /// <param name="range">The collection.</param>
+        public static void AddRange2<T>(this HashSet<T> hashSet, IEnumerable<T> range)
+        {
+            using (_PRF_AddRange2.Auto())
+            {
+                foreach (var obj in range)
+                {
+                    hashSet.Add(obj);
+                }
+            }
         }
 
         /// <summary>
@@ -310,6 +347,97 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        /// <summary>
+        ///     Returns <c>true</c> if the list is either null or empty. Otherwise <c>false</c>.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        public static bool IsNullOrEmpty<T>(this IList<T> list)
+        {
+            using (_PRF_IsNullOrEmpty.Auto())
+            {
+                if (list != null)
+                {
+                    return list.Count == 0;
+                }
+
+                return true;
+            }
+        }
+
+        public static TValue MostFrequent<TList, TValue>(
+            this IEnumerable<TList> list,
+            Func<TList, TValue> selector)
+        {
+            using (_PRF_MostFrequent.Auto())
+            {
+                var counts = new Dictionary<TValue, int>();
+
+                foreach (var value in list)
+                {
+                    var selection = selector(value);
+
+                    if (selection == null)
+                    {
+                        continue;
+                    }
+
+                    if (!counts.ContainsKey(selection))
+                    {
+                        counts.Add(selection, 1);
+                    }
+                    else
+                    {
+                        counts[selection] += 1;
+                    }
+                }
+
+                return counts.OrderByDescending(c => c.Value).FirstOrDefault().Key;
+            }
+        }
+
+        public static IEnumerable<TValue> OrderByFrequencyDescending<TList, TValue>(
+            this IEnumerable<TList> list,
+            Func<TList, TValue> selector)
+        {
+            var counts = new Dictionary<TValue, int>();
+
+            foreach (var value in list)
+            {
+                var selection = selector(value);
+
+                if (selection == null)
+                {
+                    continue;
+                }
+
+                if (!counts.ContainsKey(selection))
+                {
+                    counts.Add(selection, 1);
+                }
+                else
+                {
+                    counts[selection] += 1;
+                }
+            }
+
+            return counts.OrderByDescending(c => c.Value).Select(c => c.Key);
+        }
+
+        /// <summary>Sets all items in the list to the given value.</summary>
+        /// <param name="list">The list.</param>
+        /// <param name="item">The value.</param>
+        public static void Populate<T>(this IList<T> list, T item)
+        {
+            using (_PRF_Populate.Auto())
+            {
+                var count = list.Count;
+                for (var index = 0; index < count; ++index)
+                {
+                    list[index] = item;
+                }
+            }
+        }
+
         /// <summary>Add an item to the beginning of a collection.</summary>
         /// <param name="source">The collection.</param>
         /// <param name="prepend">Func to create the item to prepend.</param>
@@ -550,143 +678,44 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static IEnumerable<TValue> OrderByFrequencyDescending<TList, TValue>(
-            this IEnumerable<TList> list,
-            Func<TList, TValue> selector)
-        {
-            var counts = new Dictionary<TValue, int>();
-
-            foreach (var value in list)
-            {
-                var selection = selector(value);
-
-                if (selection == null)
-                {
-                    continue;
-                }
-
-                if (!counts.ContainsKey(selection))
-                {
-                    counts.Add(selection, 1);
-                }
-                else
-                {
-                    counts[selection] += 1;
-                }
-            }
-
-            return counts.OrderByDescending(c => c.Value).Select(c => c.Key);
-        }
-
-        public static TValue MostFrequent<TList, TValue>(
-            this IEnumerable<TList> list,
-            Func<TList, TValue> selector)
-        {
-            var counts = new Dictionary<TValue, int>();
-
-            foreach (var value in list)
-            {
-                var selection = selector(value);
-
-                if (selection == null)
-                {
-                    continue;
-                }
-
-                if (!counts.ContainsKey(selection))
-                {
-                    counts.Add(selection, 1);
-                }
-                else
-                {
-                    counts[selection] += 1;
-                }
-            }
-
-            return counts.OrderByDescending(c => c.Value).FirstOrDefault().Key;
-        }
-
-        /// <summary>Adds a collection to a hashset.</summary>
-        /// <param name="hashSet">The hashset.</param>
-        /// <param name="range">The collection.</param>
-        public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> range)
-        {
-            foreach (var obj in range)
-            {
-                hashSet.Add(obj);
-            }
-        }
-
-        /// <summary>
-        ///     Adds the elements of the specified collection to the end of the IList&lt;T&gt;.
-        /// </summary>
-        public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
-        {
-            if (list is List<T>)
-            {
-                ((List<T>) list).AddRange(collection);
-            }
-            else
-            {
-                foreach (var obj in collection)
-                {
-                    list.Add(obj);
-                }
-            }
-        }
-
-        /// <summary>Adds a collection to a hashset.</summary>
-        /// <param name="hashSet">The hashset.</param>
-        /// <param name="range">The collection.</param>
-        public static void AddRange2<T>(this HashSet<T> hashSet, IEnumerable<T> range)
-        {
-            foreach (var obj in range)
-            {
-                hashSet.Add(obj);
-            }
-        }
-
-        /// <summary>Sets all items in the list to the given value.</summary>
-        /// <param name="list">The list.</param>
-        /// <param name="item">The value.</param>
-        public static void Populate<T>(this IList<T> list, T item)
-        {
-            var count = list.Count;
-            for (var index = 0; index < count; ++index)
-            {
-                list[index] = item;
-            }
-        }
-
         /// <summary>Adds a collection to a hashset.</summary>
         /// <param name="hashSet">The hashset.</param>
         /// <param name="range">The collection.</param>
         public static void RemoveRange<T>(this HashSet<T> hashSet, IEnumerable<T> range)
         {
-            foreach (var obj in range)
+            using (_PRF_RemoveRange.Auto())
             {
-                hashSet.Remove(obj);
+                foreach (var obj in range)
+                {
+                    hashSet.Remove(obj);
+                }
             }
         }
 
         public static void Slice<T>(this IList<T> values, int slices, int sliceCount, Action<T> sliceAction)
         {
-            for (var i = 0; i < values.Count; i++)
+            using (_PRF_Slice.Auto())
             {
-                if ((i % slices) == sliceCount)
+                for (var i = 0; i < values.Count; i++)
                 {
-                    sliceAction(values[i]);
+                    if ((i % slices) == sliceCount)
+                    {
+                        sliceAction(values[i]);
+                    }
                 }
             }
         }
 
         public static void Slice<T>(this T[] values, int slices, int sliceCount, Action<T> sliceAction)
         {
-            for (var i = 0; i < values.Length; i++)
+            using (_PRF_Slice.Auto())
             {
-                if ((i % slices) == sliceCount)
+                for (var i = 0; i < values.Length; i++)
                 {
-                    sliceAction(values[i]);
+                    if ((i % slices) == sliceCount)
+                    {
+                        sliceAction(values[i]);
+                    }
                 }
             }
         }
@@ -694,17 +723,26 @@ namespace Appalachia.Utility.Extensions
         /// <summary>Sorts an IList</summary>
         public static void Sort<T>(this IList<T> list, Comparison<T> comparison)
         {
-            if (list is List<T>)
+            using (_PRF_Sort.Auto())
             {
-                ((List<T>) list).Sort(comparison);
-            }
-            else
-            {
-                var objList = new List<T>(list);
-                objList.Sort(comparison);
-                for (var index = 0; index < list.Count; ++index)
+                var listType = list.GetType();
+
+                if (listType == typeof(List<T>))
                 {
-                    list[index] = objList[index];
+                    ((List<T>) list).Sort(comparison);
+                }
+                else if (listType == typeof(T[]))
+                {
+                    Array.Sort((T[]) list, comparison);
+                }
+                else
+                {
+                    var objList = new List<T>(list);
+                    objList.Sort(comparison);
+                    for (var index = 0; index < list.Count; ++index)
+                    {
+                        list[index] = objList[index];
+                    }
                 }
             }
         }
@@ -712,18 +750,72 @@ namespace Appalachia.Utility.Extensions
         /// <summary>Sorts an IList</summary>
         public static void Sort<T>(this IList<T> list)
         {
-            if (list is List<T>)
+            using (_PRF_Sort.Auto())
             {
-                ((List<T>) list).Sort();
-            }
-            else
-            {
-                var objList = new List<T>(list);
-                objList.Sort();
-                for (var index = 0; index < list.Count; ++index)
+                var listType = list.GetType();
+
+                if (listType == typeof(List<T>))
                 {
-                    list[index] = objList[index];
+                    ((List<T>) list).Sort();
                 }
+                else if (listType == typeof(T[]))
+                {
+                    Array.Sort((T[]) list);
+                }
+                else
+                {
+                    var objList = new List<T>(list);
+                    objList.Sort();
+                    for (var index = 0; index < list.Count; ++index)
+                    {
+                        list[index] = objList[index];
+                    }
+                }
+            }
+        }
+
+        /// <summary>Convert a colletion to a HashSet.</summary>
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer)
+        {
+            using (_PRF_ToHashSet.Auto())
+            {
+                return new(source, comparer);
+            }
+        }
+
+        public static Dictionary<TKey, TValue> ToLookup<TKey, TValue>(
+            this IEnumerable<TValue> values,
+            Func<TValue, TKey> keySelector)
+        {
+            using (_PRF_BuildLookup.Auto())
+            {
+                var dictionary = new Dictionary<TKey, TValue>();
+
+                foreach (var value in values)
+                {
+                    var key = keySelector(value);
+                    dictionary.Add(key, value);
+                }
+
+                return dictionary;
+            }
+        }
+
+        public static Dictionary<TValue, int> ToReverseIndexLookup<TValue>(this IEnumerable<TValue> values)
+        {
+            using (_PRF_BuildReverseIndexLookup.Auto())
+            {
+                var dictionary = new Dictionary<TValue, int>();
+
+                var count = -1;
+
+                foreach (var value in values)
+                {
+                    count += 1;
+                    dictionary.Add(value, count);
+                }
+
+                return dictionary;
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Appalachia.Utility.Logging;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -131,7 +132,7 @@ namespace Appalachia.Utility.Execution
                 return;
             }
             
-           Debug.LogWarning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
+            AppaLog.Warning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
 
             _isCancellationInProgress = true;
             _wasCancelled = true;
@@ -182,12 +183,12 @@ namespace Appalachia.Utility.Execution
                     {
                         if (_rejectsCancellation)
                         {
-                            Debug.LogWarning($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
+                            AppaLog.Warning($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
                             while (enumerator.MoveNext())
                             {
                             }
                             
-                            Debug.Log($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
+                            AppaLog.Info($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
                         }
                         
                         _wasCancelled = true;

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Appalachia.Utility.Colors
@@ -16,12 +17,12 @@ namespace Appalachia.Utility.Colors
             color = c;
         }
 
-        public static implicit operator Color(ColorRef c)
+        [DebuggerStepThrough] public static implicit operator Color(ColorRef c)
         {
             return c.color;
         }
 
-        public static implicit operator ColorRef(Color c)
+        [DebuggerStepThrough] public static implicit operator ColorRef(Color c)
         {
             return new(c);
         }

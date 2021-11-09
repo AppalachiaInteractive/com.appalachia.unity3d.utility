@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Appalachia.Utility.TextEditor.Core.GUICache
@@ -13,7 +14,7 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
             return new GUILayoutOption[0];
         }
 
-        public static implicit operator GUILayoutOption[](GUILayoutOptionsCache value)
+        [DebuggerStepThrough] public static implicit operator GUILayoutOption[](GUILayoutOptionsCache value)
         {
             return value.Value;
         }

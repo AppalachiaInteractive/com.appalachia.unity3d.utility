@@ -29,6 +29,24 @@ namespace Appalachia.Utility.Logging.Formatters
             string filePath,
             int lineNumber);
 
+        private static Dictionary<LogLevel, string> InitializeLogLevelStringLookup(
+            Func<LogLevel, string> adjustment)
+        {
+            using (_PRF_InitializeLogLevelStringLookup.Auto())
+            {
+                var lookup = new Dictionary<LogLevel, string>();
+
+                foreach (var value in Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>())
+                {
+                    var adjustmentValue = adjustment(value);
+
+                    lookup.Add(value, adjustmentValue);
+                }
+
+                return lookup;
+            }
+        }
+
         public object FormatLogMessage(
             LogLevel level,
             object content,
@@ -39,30 +57,6 @@ namespace Appalachia.Utility.Logging.Formatters
             var prefix = GetLogPrefix(level, memberName, filePath, lineNumber);
 
             return $"{prefix}{content}";
-        }
-
-        protected string GetLogLevelString(LogLevel level, Func<LogLevel, string> adjustment)
-        {
-            _logLevelStrings ??= InitializeLogLevelStringLookup(adjustment);
-
-            return _logLevelStrings[level];
-        }
-        
-        private static Dictionary<LogLevel, string> InitializeLogLevelStringLookup(Func<LogLevel, string> adjustment)
-        {
-            using (_PRF_InitializeLogLevelStringLookup.Auto())
-            {
-                var lookup = new Dictionary<LogLevel, string>();
-
-                foreach (var value in Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>())
-                {
-                    var adjustmentValue = adjustment(value);
-                    
-                    lookup.Add(value, adjustmentValue);
-                }
-
-                return lookup;
-            }
         }
 
         protected string GetFileNameFromPathInternal(string filePath, Func<string, string> adjustment)
@@ -87,6 +81,13 @@ namespace Appalachia.Utility.Logging.Formatters
 
                 return fileName;
             }
+        }
+
+        protected string GetLogLevelString(LogLevel level, Func<LogLevel, string> adjustment)
+        {
+            _logLevelStrings ??= InitializeLogLevelStringLookup(adjustment);
+
+            return _logLevelStrings[level];
         }
     }
 }

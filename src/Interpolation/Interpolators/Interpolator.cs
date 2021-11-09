@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Appalachia.Utility.Interpolation.Modes;
 using UnityEngine;
 
@@ -62,12 +63,12 @@ namespace Appalachia.Utility.Interpolation.Interpolators
             return Update(ref this, dt, InterpolationFactory.GetInterpolation(i));
         }
 
-        public static implicit operator float(Interpolator i)
+        [DebuggerStepThrough] public static implicit operator float(Interpolator i)
         {
             return i.value;
         }
 
-        public override string ToString()
+        [DebuggerStepThrough] public override string ToString()
         {
             return value.ToString();
         }

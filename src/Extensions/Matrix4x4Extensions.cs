@@ -1,5 +1,6 @@
 #region
 
+using Appalachia.Utility.Logging;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ namespace Appalachia.Utility.Extensions
                 (len2 == 0f) ||
                 (c1 == -c2))
             {
-                Debug.LogWarning("Bad viewing vector");
+                AppaLog.Warning("Bad viewing vector");
                 return Quaternion.identity;
             }
 

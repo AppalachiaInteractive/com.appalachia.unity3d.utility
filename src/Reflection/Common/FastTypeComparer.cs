@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Appalachia.Utility.Reflection.Common
 {
@@ -7,12 +8,12 @@ namespace Appalachia.Utility.Reflection.Common
     {
         public static readonly FastTypeComparer Instance = new();
 
-        public bool Equals(Type x, Type y)
+        [DebuggerStepThrough] public bool Equals(Type x, Type y)
         {
             return (x == y) || (x == y);
         }
 
-        public int GetHashCode(Type obj)
+        [DebuggerStepThrough] public int GetHashCode(Type obj)
         {
             return obj.GetHashCode();
         }

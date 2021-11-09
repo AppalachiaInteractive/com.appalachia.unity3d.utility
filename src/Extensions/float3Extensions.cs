@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 
@@ -44,17 +45,17 @@ namespace Appalachia.Utility.Extensions
             return math.normalize(new quaternion(value));
         }
 
-        public static string ToStringF1(this float3 f)
+        [DebuggerStepThrough] public static string ToStringF1(this float3 f)
         {
             return $"({f.x:F1}),({f.y:F1}),({f.z:F1})";
         }
 
-        public static string ToStringF2(this float3 f)
+        [DebuggerStepThrough] public static string ToStringF2(this float3 f)
         {
             return $"({f.x:F2}),({f.y:F2}),({f.z:F2})";
         }
 
-        public static string ToStringF3(this float3 f)
+        [DebuggerStepThrough] public static string ToStringF3(this float3 f)
         {
             return $"({f.x:F3}),({f.y:F3}),({f.z:F3})";
         }

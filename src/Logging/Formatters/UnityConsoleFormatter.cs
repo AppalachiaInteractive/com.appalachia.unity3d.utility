@@ -27,7 +27,7 @@ namespace Appalachia.Utility.Logging.Formatters
                     filePath,
                     fn =>
                     {
-                        var italic = fn.Italic().Bold();
+                        var italic = fn.Bold();
                         var colored = italic.Color(ColorPalette.Default.classes.Middle);
 
                         return colored;

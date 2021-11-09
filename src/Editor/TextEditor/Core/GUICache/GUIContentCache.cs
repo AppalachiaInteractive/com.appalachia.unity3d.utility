@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Appalachia.Utility.TextEditor.Core.GUICache
@@ -13,7 +14,7 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
             return GUIContent.none;
         }
 
-        public static implicit operator GUIContent(GUIContentCache value)
+        [DebuggerStepThrough] public static implicit operator GUIContent(GUIContentCache value)
         {
             return value.Value;
         }

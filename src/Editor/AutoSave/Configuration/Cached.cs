@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 #if UNITY_EDITOR
 
 namespace Appalachia.Utility.AutoSave.Configuration
@@ -46,7 +48,7 @@ namespace Appalachia.Utility.AutoSave.Configuration
         protected abstract T Get(string key, TD defaultValue);
         protected abstract void Set(string key, T value);
 
-        public static implicit operator T(Cached<T, TD> d)
+        [DebuggerStepThrough] public static implicit operator T(Cached<T, TD> d)
         {
             return d.Current;
         }

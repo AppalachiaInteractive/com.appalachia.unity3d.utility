@@ -1,5 +1,6 @@
 #region
 
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Unity.Burst;
 using Unity.Mathematics;
@@ -492,7 +493,7 @@ namespace Appalachia.Utility.Extensions
             return rotation;
         }
 
-        public static string ToStringTRS(this float4x4 matrix)
+        [DebuggerStepThrough] public static string ToStringTRS(this float4x4 matrix)
         {
             var pos = matrix.GetPositionFromMatrix();
             var rotation = matrix.GetRotationFromMatrix();
