@@ -9,72 +9,9 @@ namespace Appalachia.Utility.Extensions
 {
     public static class Matrix4x4Extensions
     {
-        public static Bounds MatrixToBounds(this Matrix4x4 matrix)
+        public static Vector3 GetPositionFromMatrix(this Matrix4x4 matrix)
         {
-            var bounds = new Bounds
-            {
-                center = matrix.GetPositionFromMatrix(), size = matrix.GetScaleFromMatrix()
-            };
-
-            return bounds;
-        }
-
-        public static Bounds TranslateAndScaleBounds(this Matrix4x4 matrix, Bounds b)
-        {
-            var bounds = matrix.MatrixToBounds();
-
-            var size = bounds.size;
-
-            size.x *= b.size.x;
-            size.y *= b.size.y;
-            size.z *= b.size.z;
-
-            bounds.size = size;
-
-            return bounds;
-        }
-
-        public static float[] Matrix4x4ToFloatArray(this Matrix4x4 matrix4x4)
-        {
-            var floatArray = new float[16];
-
-            Matrix4x4ToFloatArray(matrix4x4, floatArray);
-
-            return floatArray;
-        }
-
-        public static Matrix4x4 Matrix4x4FromString(string matrixStr)
-        {
-            var matrix4x4 = new Matrix4x4();
-            var floatStrArray = matrixStr.Split(';');
-            for (var i = 0; i < floatStrArray.Length; i++)
-            {
-                matrix4x4[i / 4, i % 4] = float.Parse(floatStrArray[i]);
-            }
-
-            return matrix4x4;
-        }
-
-        public static Matrix4x4 SetPosition(this Matrix4x4 matrix, Vector3 position)
-        {
-            matrix.SetColumn(3, position);
-
-            return matrix;
-        }
-
-        public static Matrix4x4 SetRotation(this Matrix4x4 matrix, Quaternion rotation)
-        {
-            matrix.SetColumn(2, rotation.Forward());
-            matrix.SetColumn(1, rotation.Up());
-
-            return matrix;
-        }
-
-        public static Matrix4x4 SetScale(this Matrix4x4 matrix, Vector3 scale)
-        {
-            matrix.SetTRS(matrix.GetPositionFromMatrix(), matrix.GetRotationFromMatrix(), scale);
-
-            return matrix;
+            return matrix.GetColumn(3);
         }
 
         public static Quaternion GetRotationFromMatrix(this Matrix4x4 matrix)
@@ -99,22 +36,31 @@ namespace Appalachia.Utility.Extensions
             return Quaternion.LookRotation(c2, c1);
         }
 
-        public static string Matrix4x4ToString(Matrix4x4 matrix4x4)
-        {
-            var matrix4X4String = matrix4x4.ToString().Replace("\n", ";").Replace("\t", ";");
-            matrix4X4String = matrix4X4String.Substring(0, matrix4X4String.Length - 1);
-            return matrix4X4String;
-        }
-
-        public static Vector3 GetPositionFromMatrix(this Matrix4x4 matrix)
-        {
-            return matrix.GetColumn(3);
-        }
-
         public static Vector3 GetScaleFromMatrix(this Matrix4x4 matrix)
         {
             return new(matrix.GetColumn(0).magnitude, matrix.GetColumn(1).magnitude, matrix.GetColumn(2)
                .magnitude);
+        }
+
+        public static Matrix4x4 Matrix4x4FromString(string matrixStr)
+        {
+            var matrix4x4 = new Matrix4x4();
+            var floatStrArray = matrixStr.Split(';');
+            for (var i = 0; i < floatStrArray.Length; i++)
+            {
+                matrix4x4[i / 4, i % 4] = float.Parse(floatStrArray[i]);
+            }
+
+            return matrix4x4;
+        }
+
+        public static float[] Matrix4x4ToFloatArray(this Matrix4x4 matrix4x4)
+        {
+            var floatArray = new float[16];
+
+            Matrix4x4ToFloatArray(matrix4x4, floatArray);
+
+            return floatArray;
         }
 
         public static void Matrix4x4ToFloatArray(this Matrix4x4 matrix4x4, float[] floatArray)
@@ -137,6 +83,13 @@ namespace Appalachia.Utility.Extensions
             floatArray[15] = matrix4x4[3, 3];
         }
 
+        public static string Matrix4x4ToString(Matrix4x4 matrix4x4)
+        {
+            var matrix4X4String = matrix4x4.ToString().Replace("\n", ";").Replace("\t", ";");
+            matrix4X4String = matrix4X4String.Substring(0, matrix4X4String.Length - 1);
+            return matrix4X4String;
+        }
+
         public static void Matrix4x4ToTransform(this Transform transform, Matrix4x4 matrix)
         {
             transform.position = matrix.GetColumn(3);
@@ -146,6 +99,53 @@ namespace Appalachia.Utility.Extensions
                 matrix.GetColumn(2).magnitude
             );
             transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+        }
+
+        public static Bounds MatrixToBounds(this Matrix4x4 matrix)
+        {
+            var bounds = new Bounds
+            {
+                center = matrix.GetPositionFromMatrix(), size = matrix.GetScaleFromMatrix()
+            };
+
+            return bounds;
+        }
+
+        public static Matrix4x4 SetPosition(this Matrix4x4 matrix, Vector3 position)
+        {
+            matrix.SetColumn(3, position);
+
+            return matrix;
+        }
+
+        public static Matrix4x4 SetRotation(this Matrix4x4 matrix, Quaternion rotation)
+        {
+            matrix.SetColumn(2, rotation.Forward());
+            matrix.SetColumn(1, rotation.Up());
+
+            return matrix;
+        }
+
+        public static Matrix4x4 SetScale(this Matrix4x4 matrix, Vector3 scale)
+        {
+            matrix.SetTRS(matrix.GetPositionFromMatrix(), matrix.GetRotationFromMatrix(), scale);
+
+            return matrix;
+        }
+
+        public static Bounds TranslateAndScaleBounds(this Matrix4x4 matrix, Bounds b)
+        {
+            var bounds = matrix.MatrixToBounds();
+
+            var size = bounds.size;
+
+            size.x *= b.size.x;
+            size.y *= b.size.y;
+            size.z *= b.size.z;
+
+            bounds.size = size;
+
+            return bounds;
         }
     }
 }

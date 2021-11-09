@@ -131,7 +131,7 @@ namespace Appalachia.Utility.Execution
                 return;
             }
             
-            Debug.LogWarning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
+           Debug.LogWarning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
 
             _isCancellationInProgress = true;
             _wasCancelled = true;
@@ -346,7 +346,7 @@ namespace Appalachia.Utility.Execution
         )]
         private static void CancelAll()
         {
-            Debug.LogWarning("Cancelling all executing coroutines from the Editor menu.");
+           Debug.LogWarning("Cancelling all executing coroutines from the Editor menu.");
 
             var routines = SafeCoroutineManager.instance.GetAll();
 

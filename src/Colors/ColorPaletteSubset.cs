@@ -7,11 +7,54 @@ namespace Appalachia.Utility.Colors
     {
         public const int SIZE = 20;
 
-        public ColorPaletteSubset(string name)
+        private ColorPaletteSubset(string name)
         {
             this.name = name;
         }
 
+        public ColorPaletteSubset(string name, Color low, Color middle, Color high) : this(name)
+        {
+            var range1 = new Color(
+                Mathf.Clamp01(middle.r - low.r),
+                Mathf.Clamp01(middle.g - low.g),
+                Mathf.Clamp01(middle.b - low.b),
+                Mathf.Clamp01(middle.a - low.a)
+            );
+            
+            var range2 = new Color(
+                Mathf.Clamp01(high.r - middle.r),
+                Mathf.Clamp01(high.g - middle.g),
+                Mathf.Clamp01(high.b - middle.b),
+                Mathf.Clamp01(high.a - middle.a)
+            );
+
+            var step = 1f / (.5f * SIZE);
+
+            range1 *= step;
+            range2 *= step;
+
+            c00 = low;
+            c01 = c00 + range1;
+            c02 = c01 + range1;
+            c03 = c02 + range1;
+            c04 = c03 + range1;
+            c05 = c04 + range1;
+            c06 = c05 + range1;
+            c07 = c06 + range1;
+            c08 = c07 + range1;
+            c09 = c08 + range1;
+            c10 = middle;
+            c11 = c10 + range2;
+            c12 = c11 + range2;
+            c13 = c12 + range2;
+            c14 = c13 + range2;
+            c15 = c14 + range2;
+            c16 = c15 + range2;
+            c17 = c16 + range2;
+            c18 = c17 + range2;
+            c19 = c18 + range2;
+        }
+        
         public ColorPaletteSubset(string name, Color low, Color high) : this(name)
         {
             var range = new Color(

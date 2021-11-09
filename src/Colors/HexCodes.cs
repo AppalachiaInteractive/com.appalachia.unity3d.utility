@@ -20,11 +20,25 @@ namespace Appalachia.Utility.Colors
             _lookup.Clear();
         }
 
+        [Flags]
+        public enum HexCodeFormat
+        {
+            Default = 0,
+            IncludeNumberSign = 1 << 0,
+            IncludeAlpha = 1 << 1,
+            AlphaFirst = 1 << 2,
+            
+            RichText = IncludeNumberSign | IncludeAlpha,
+        }
+        
         public static string ToHexCode(
             this Color color,
-            bool includeNumberSign = true,
-            bool includeAlpha = false)
+            HexCodeFormat format)
         {
+            var includeNumberSign = (format | HexCodeFormat.IncludeNumberSign) == format;
+            var includeAlpha = (format | HexCodeFormat.IncludeAlpha) == format;
+            var alphaFirst = (format | HexCodeFormat.AlphaFirst) == format;
+                
             var rPart = (int) (color.r * 255f);
             var gPart = (int) (color.g * 255f);
             var bPart = (int) (color.b * 255f);
@@ -36,17 +50,20 @@ namespace Appalachia.Utility.Colors
             var b = $"{bPart:X2}";
             var a = includeAlpha ? $"{aPart:X2}" : string.Empty;
 
-            return $"{num}{a}{r}{g}{b}";
+            return alphaFirst ? $"{num}{a}{r}{g}{b}" : $"{num}{r}{g}{b}{a}";
         }
 
         public static string ToHexCodeShort(this Color color)
         {
-            return ToHexCode(color, false);
+            return ToHexCode(color, HexCodeFormat.Default);
         }
 
         public static string ToHexCodeFull(this Color color)
         {
-            return ToHexCode(color, true, true);
+            return ToHexCode(
+                color,
+                HexCodeFormat.IncludeNumberSign | HexCodeFormat.IncludeAlpha | HexCodeFormat.AlphaFirst
+            );
         }
 
         /// <inheritdoc cref="FromHexCode" />

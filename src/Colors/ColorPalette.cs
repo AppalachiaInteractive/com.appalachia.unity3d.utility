@@ -33,6 +33,8 @@ namespace Appalachia.Utility.Colors
         private static ColorPalette _default;
 
         private static StringBuilder _logBuilder;
+        public ColorPaletteSubset logTypes;
+        public ColorPaletteSubset classes;
         public ColorPaletteSubset bad;
         public ColorPaletteSubset disabled;
         public ColorPaletteSubset good;
@@ -63,6 +65,8 @@ namespace Appalachia.Utility.Colors
                 neutralToBad,
                 goodToNeutral,
                 goodToBad,
+                logTypes,
+                classes
             };
 
         public bool Draw()
@@ -265,6 +269,18 @@ namespace Appalachia.Utility.Colors
             p.goodToNeutral = new ColorPaletteSubset("Good To Neutral", p.good.Middle, p.neutral.Middle);
             p.neutralToBad = new ColorPaletteSubset("Neutral To Bad",  p.neutral.Middle, p.bad.Middle);
             p.neutralToGood = new ColorPaletteSubset("Neutral To Good", p.neutral.Middle, p.good.Middle);
+            
+            p.logTypes = new ColorPaletteSubset(
+                "Log Types",
+                new Color(255.0f / 255.0f, 010.0f / 255.0f, 000.0f / 255.0f, 1.0f),
+                new Color(255.0f / 255.0f, 220.0f / 255.0f, 030.0f / 255.0f, 1.0f)
+            );
+            
+            p.classes = new ColorPaletteSubset(
+                "Log Types",
+                new Color(013.0f / 255.0f, 071.0f / 255.0f, 161.0f / 255.0f, 1.0f),
+                new Color(128.0f / 255.0f, 255.0f / 255.0f, 219.0f / 255.0f, 1.0f)
+            );
         }
 
 #region Plumbing
