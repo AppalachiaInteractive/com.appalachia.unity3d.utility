@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Appalachia.Utility.Logging.Formatters;
 using Unity.Profiling;
@@ -78,6 +79,7 @@ namespace Appalachia.Utility.Logging
         /// <summary>
         ///     <para>Clears errors from the developer console.</para>
         /// </summary>
+        [DebuggerStepperBoundary]
         public static void ClearDeveloperConsole()
         {
             using (_PRF_ClearDeveloperConsole.Auto())
@@ -92,6 +94,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Critical(
             object message,
             Object context = null,
@@ -112,6 +115,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Debug(
             object message,
             Object context = null,
@@ -132,6 +136,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Error(
             object message,
             Object context = null,
@@ -152,6 +157,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Exception(
             Exception exception,
             Object context = null,
@@ -180,6 +186,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Fatal(
             object message,
             Object context = null,
@@ -200,6 +207,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Info(
             object message,
             Object context = null,
@@ -221,6 +229,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Log(
             LogLevel level,
             object message,
@@ -242,6 +251,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Trace(
             string message,
             Object context = null,
@@ -262,6 +272,7 @@ namespace Appalachia.Utility.Logging
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
+        [DebuggerStepperBoundary]
         public static void Warning(
             object message,
             Object context = null,
@@ -276,6 +287,7 @@ namespace Appalachia.Utility.Logging
             }
         }
 
+        [DebuggerStepperBoundary]
         private static void LogInternal(
             LogLevel level,
             object message,
