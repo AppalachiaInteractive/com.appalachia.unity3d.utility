@@ -14,6 +14,14 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 8c1f1e6ca6a192b4a5535fa1be5ead55cc593f47 | 2021-11-09 | Chris Schubert | Merge branch 'main' of https://github.com/AppalachiaInteractive/com.appalachia.unity3d.utility |
+| fe99bb28bdc02fe74eb1bdd4e01ecf402136f9dc | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
+| 3f2f268d8c4bd5453f65153b8cc71d2d934514a9 | 2021-11-09 | Chris Schubert | Update dev-requirements.txt |
+
+
+ ## Tag: `v0.2.0`
+| Hash | Date | Author | Changes |
+|------|------|--------|---------|
 | c78ece623bb57d554e578da5d3aa072ec960e79e | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
 | 1018a4c2677b9da6d87dd061082b5811c7373c32 | 2021-11-09 | Chris Schubert | Adding logging contexts, performance tuning extensions, disposable helpers, debugger stepthroughs |
 | f4e4a6075575ef40591b26ba3617488b25868e48 | 2021-11-08 | Chris Schubert | Updating changelog and releaselog |
