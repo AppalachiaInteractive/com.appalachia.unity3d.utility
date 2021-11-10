@@ -15,6 +15,7 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| c78ece623bb57d554e578da5d3aa072ec960e79e | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
 | 1018a4c2677b9da6d87dd061082b5811c7373c32 | 2021-11-09 | Chris Schubert | Adding logging contexts, performance tuning extensions, disposable helpers, debugger stepthroughs |
 | f4e4a6075575ef40591b26ba3617488b25868e48 | 2021-11-08 | Chris Schubert | Updating changelog and releaselog |
 | fdd5de4c906f8bab1171e03696547041b3d65151 | 2021-11-08 | Chris Schubert | Debugger stepthrough for logging |
