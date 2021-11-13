@@ -45,6 +45,7 @@ namespace Appalachia.Utility.Logging
             public LogFormat area;
             public LogFormat bootload;
             public LogFormat subArea;
+            public LogFormat maintenance;
 
             #endregion
         }
