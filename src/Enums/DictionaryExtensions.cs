@@ -7,11 +7,17 @@ namespace Appalachia.Utility.Enums
     {
         public static void PopulateEnumKeys<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
-            Func<TKey, TValue> creator)
+            Func<TKey, TValue> creator,
+            bool clear = false)
             where TKey : Enum
         {
             var keys = EnumValueManager.GetAllValues<TKey>();
 
+            if (clear)
+            {
+                dictionary.Clear();
+            }
+            
             for (var i = 0; i < keys.Length; i++)
             {
                 var key = keys[i];

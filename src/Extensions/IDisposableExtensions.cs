@@ -5,7 +5,11 @@ namespace Appalachia.Utility.Extensions
 {
     public static class IDisposableExtensions
     {
+        #region Constants and Static Readonly
+
         private static readonly ConditionalWeakTable<IDisposable, ReferenceCount> RefCounts = new();
+
+        #endregion
 
         /// <summary>
         ///     Extension method for IDisposable.
@@ -57,6 +61,8 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        #region Nested Types
+
         /// <summary>
         ///     Values in a ConditionalWeakTable need to be a reference type,
         ///     so box the refcount int in a class.
@@ -65,5 +71,7 @@ namespace Appalachia.Utility.Extensions
         {
             public int refCount;
         }
+
+        #endregion
     }
 }

@@ -132,7 +132,7 @@ namespace Appalachia.Utility.Execution
                 return;
             }
             
-            AppaLog.Warning($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
+            AppaLog.Warn($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
 
             _isCancellationInProgress = true;
             _wasCancelled = true;
@@ -183,7 +183,7 @@ namespace Appalachia.Utility.Execution
                     {
                         if (_rejectsCancellation)
                         {
-                            AppaLog.Warning($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
+                            AppaLog.Warn($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
                             while (enumerator.MoveNext())
                             {
                             }

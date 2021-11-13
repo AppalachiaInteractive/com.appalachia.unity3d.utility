@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Appalachia.Utility.Extensions.Cleaning;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 #endregion
 
@@ -14,6 +16,12 @@ namespace Appalachia.Utility.Extensions
 {
     public static class StringExtensions
     {
+        public enum EncodingPrefix
+        {
+            UnicodeDefault,
+            Underscore
+        }
+
         #region Profiling And Tracing Markers
 
         private const string _PRF_PFX = nameof(StringExtensions) + ".";
@@ -24,16 +32,40 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_EncodeUnicodePathToASCII =
             new ProfilerMarker(_PRF_PFX + nameof(EncodeUnicodePathToASCII));
 
-        #endregion
-
         private static char[]
             _npmPackageTrims = {'/', '\\', '.', ',', '"', '\'', ' ', '\t', '\n', '\r', '\0'};
 
         private static Dictionary<char, string> _encodingReplacements;
         private static Dictionary<EncodingPrefix, string> _encodingPrefixes;
-
         private static string[] _npmPackageRemovals = {".tgz", ".gz", ".tar", ".json", ".zip"};
         private static string[] _packagePaths;
+
+        private static readonly ProfilerMarker _PRF_CleanExtension =
+            new ProfilerMarker(_PRF_PFX + nameof(CleanExtension));
+
+        #endregion
+
+        private static StringCleanerWithContext<char[]> _extensionCleaner;
+
+        public static string CleanExtension(this string extension)
+        {
+            using (_PRF_CleanExtension.Auto())
+            {
+                if (_extensionCleaner == null)
+                {
+                    _extensionCleaner = new StringCleanerWithContext<char[]>(
+                        new[] {'.', ' ', '\t', ','},
+                        (cleaner, value) =>
+                        {
+                            var result = value.ToLowerInvariant().Trim(cleaner.context1);
+                            return result;
+                        }
+                    );
+                }
+
+                return _extensionCleaner.Clean(extension);
+            }
+        }
 
         public static bool Contains(this string source, string toCheck, StringComparison comparisonType)
         {
@@ -48,6 +80,61 @@ namespace Appalachia.Utility.Extensions
             }
 
             return str.IndexOf(ch) != -1;
+        }
+
+        public static void CopyToClipboard(this string s)
+        {
+            var te = new TextEditor {text = s};
+            te.SelectAll();
+            te.Copy();
+        }
+
+        public static string Cut(this string s, int chars)
+        {
+            var length = Mathf.Clamp(s.Length - chars, 0, s.Length);
+
+            return s.Substring(0, length);
+        }
+
+        public static StringBuilder Cut(this StringBuilder s, int chars)
+        {
+            var length = s.Length;
+            var targetLength = length - chars;
+
+            targetLength = Mathf.Clamp(targetLength, 0, length);
+
+            return s.Remove(targetLength - 1, chars);
+        }
+
+        public static string EncodeUnicodePathToASCII(this string path, EncodingPrefix prefix)
+        {
+            using (_PRF_EncodeUnicodePathToASCII.Auto())
+            {
+                SetupEncodingReplacements();
+
+                var prefixString = _encodingPrefixes[prefix];
+
+                var builder = new StringBuilder();
+
+                for (var i = 0; i < path.Length; i++)
+                {
+                    var character = path[i];
+
+                    if (_encodingReplacements.ContainsKey(character))
+                    {
+                        var replacementSuffix = _encodingReplacements[character];
+                        var replacement = $"{prefixString}{replacementSuffix}";
+
+                        builder.Append(replacement);
+                    }
+                    else
+                    {
+                        builder.Append(character);
+                    }
+                }
+
+                return builder.ToString();
+            }
         }
 
         public static bool IsNullOrWhitespace(this string str)
@@ -89,42 +176,21 @@ namespace Appalachia.Utility.Extensions
             return false;
         }
 
-        public static string Cut(this string s, int chars)
+        public static string LinuxToWindowsPath(this string path)
         {
-            var length = Mathf.Clamp(s.Length - chars, 0, s.Length);
-
-            return s.Substring(0, length);
-        }
-
-        public static string EncodeUnicodePathToASCII(this string path, EncodingPrefix prefix)
-        {
-            using (_PRF_EncodeUnicodePathToASCII.Auto())
+            if (Path.IsPathRooted(path))
             {
-                SetupEncodingReplacements();
+                var builder = new StringBuilder(path);
 
-                var prefixString = _encodingPrefixes[prefix];
+                // /c/Program Files
+                // C:\Program Files
 
-                var builder = new StringBuilder();
-
-                for (var i = 0; i < path.Length; i++)
-                {
-                    var character = path[i];
-
-                    if (_encodingReplacements.ContainsKey(character))
-                    {
-                        var replacementSuffix = _encodingReplacements[character];
-                        var replacement = $"{prefixString}{replacementSuffix}";
-
-                        builder.Append(replacement);
-                    }
-                    else
-                    {
-                        builder.Append(character);
-                    }
-                }
-
-                return builder.ToString();
+                builder[0] = char.ToUpperInvariant(builder[1]);
+                builder[1] = ':';
+                path = builder.ToString();
             }
+
+            return path.Replace("/", "\\");
         }
 
         public static string ParseNpmPackageVersion(this string path)
@@ -133,7 +199,7 @@ namespace Appalachia.Utility.Extensions
             {
                 return null;
             }
-            
+
             var lastIndex0 = path.LastIndexOf(":", StringComparison.Ordinal);
             var lastIndex1 = path.LastIndexOf("@", StringComparison.Ordinal);
             var lastIndex2 = path.LastIndexOf("-", StringComparison.Ordinal);
@@ -255,23 +321,23 @@ namespace Appalachia.Utility.Extensions
 
             return stringBuilder.ToString();
         }
-
-        public static string LinuxToWindowsPath(this string path)
+        
+        public static GameObject FindGameObjectByPath(string absolutePath)
         {
-            if (Path.IsPathRooted(path))
+            for (var i = 0; i < SceneManager.sceneCount; ++i)
             {
-                var builder = new StringBuilder(path);
-
-                // /c/Program Files
-                // C:\Program Files
-
-                builder[0] = char.ToUpperInvariant(builder[1]);
-                builder[1] = ':';
-                path = builder.ToString();
+                var scene = SceneManager.GetSceneAt(i);
+                
+                var gameObj = scene.FindGameObjectByPath(absolutePath);
+                if (gameObj)
+                {
+                    return gameObj;
+                }
             }
 
-            return path.Replace("/", "\\");
+            return null;
         }
+
 
         public static string WindowsToLinuxPath(this string path)
         {
@@ -288,23 +354,6 @@ namespace Appalachia.Utility.Extensions
             }
 
             return path.Replace("\\", "/");
-        }
-
-        public static StringBuilder Cut(this StringBuilder s, int chars)
-        {
-            var length = s.Length;
-            var targetLength = length - chars;
-
-            targetLength = Mathf.Clamp(targetLength, 0, length);
-
-            return s.Remove(targetLength - 1, chars);
-        }
-
-        public static void CopyToClipboard(this string s)
-        {
-            var te = new TextEditor {text = s};
-            te.SelectAll();
-            te.Copy();
         }
 
         private static void SetupEncodingReplacements()
@@ -358,15 +407,5 @@ namespace Appalachia.Utility.Extensions
                 _encodingReplacements.Add('~',  "007E"); // Tilde
             }
         }
-
-        #region Nested Types
-
-        public enum EncodingPrefix
-        {
-            UnicodeDefault,
-            Underscore
-        }
-
-        #endregion
     }
 }

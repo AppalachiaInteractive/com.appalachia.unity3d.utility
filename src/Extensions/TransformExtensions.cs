@@ -1,8 +1,12 @@
 #region
 
 using System;
+using System.Text;
 using Unity.Mathematics;
+using Unity.Profiling;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 #endregion
 
@@ -10,6 +14,32 @@ namespace Appalachia.Utility.Extensions
 {
     public static class TransformExtensions
     {
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(TransformExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_DestroyChildren =
+            new ProfilerMarker(_PRF_PFX + nameof(DestroyChildren));
+
+        private static readonly ProfilerMarker _PRF_FindInParents =
+            new ProfilerMarker(_PRF_PFX + nameof(FindInParents));
+
+        private static readonly ProfilerMarker
+            _PRF_FullPath = new ProfilerMarker(_PRF_PFX + nameof(FullPath));
+
+        private static readonly ProfilerMarker _PRF_GetPathRelativeTo =
+            new ProfilerMarker(_PRF_PFX + nameof(GetPathRelativeTo));
+
+        private static readonly ProfilerMarker _PRF_localToParentMatrix =
+            new ProfilerMarker(_PRF_PFX + nameof(localToParentMatrix));
+
+        private static readonly ProfilerMarker _PRF_SetMatrix4x4ToTransform =
+            new ProfilerMarker(_PRF_PFX + nameof(SetMatrix4x4ToTransform));
+
+        #endregion
+
+        #region Constants and Static Readonly
+
         private static readonly Matrix4x4 _matrix_trs_zero = Matrix4x4.TRS(
             Vector3.zero,
             Quaternion.identity,
@@ -18,30 +48,119 @@ namespace Appalachia.Utility.Extensions
 
         private static readonly Matrix4x4 _matrix_zero = Matrix4x4.zero;
 
+        #endregion
+
+        public static void DestroyChildren(this Transform transform)
+        {
+            using (_PRF_DestroyChildren.Auto())
+            {
+                if (transform == null)
+                {
+                    return;
+                }
+
+                for (var i = 0; i < transform.childCount; ++i)
+                {
+                    var child = transform.GetChild(i);
+
+                    // Deactivate first because destroy doesn't take effect until the end of the frame...
+                    child.gameObject.SetActive(false);
+                    Object.Destroy(child.gameObject);
+                }
+            }
+        }
+
+        public static T FindInParents<T>(this Transform transform, bool bIncludeSelf = true)
+            where T : Component
+        {
+            using (_PRF_FindInParents.Auto())
+            {
+                var current = bIncludeSelf ? transform : transform.parent;
+                for (; current != null; current = current.parent)
+                {
+                    var comp = current.GetComponent<T>();
+                    if (comp)
+                    {
+                        return comp;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        public static string FullPath(this Transform transform)
+        {
+            using (_PRF_FullPath.Auto())
+            {
+                var sb = new StringBuilder();
+
+                while (transform != null)
+                {
+                    sb.Insert(0, transform.name);
+                    sb.Insert(0, '/');
+                    transform = transform.parent;
+                }
+
+#if UNITY_EDITOR
+                if (transform && EditorUtility.IsPersistent(transform))
+                {
+                    sb.Append(" (Asset)");
+                }
+#endif
+
+                return sb.ToString();
+            }
+        }
+
+        public static string GetPathRelativeTo(this Transform transform, Transform parent)
+        {
+            using (_PRF_GetPathRelativeTo.Auto())
+            {
+                if (transform == parent)
+                {
+                    return "";
+                }
+
+                if (transform.IsChildOf(parent))
+                {
+                    return transform.FullPath().Substring(parent.FullPath().Length + 1);
+                }
+
+                return transform.FullPath();
+            }
+        }
+
         public static float4x4 localToParentMatrix(this Transform t)
         {
-            if (t.parent == null)
+            using (_PRF_localToParentMatrix.Auto())
             {
-                return float4x4.identity;
-            }
+                if (t.parent == null)
+                {
+                    return float4x4.identity;
+                }
 
-            return float4x4.TRS(t.localPosition, t.localRotation, t.localScale);
+                return float4x4.TRS(t.localPosition, t.localRotation, t.localScale);
+            }
         }
 
         public static void SetMatrix4x4ToTransform(this Transform t, Matrix4x4 matrix)
         {
-            if (matrix == _matrix_zero)
+            using (_PRF_SetMatrix4x4ToTransform.Auto())
             {
-                throw new NotSupportedException($"Default matrix for {t.gameObject.name}.");
-            }
+                if (matrix == _matrix_zero)
+                {
+                    throw new NotSupportedException($"Default matrix for {t.gameObject.name}.");
+                }
 
-            t.position = matrix.GetColumn(3);
-            t.localScale = new Vector3(
-                matrix.GetColumn(0).magnitude,
-                matrix.GetColumn(1).magnitude,
-                matrix.GetColumn(2).magnitude
-            );
-            t.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+                t.position = matrix.GetColumn(3);
+                t.localScale = new Vector3(
+                    matrix.GetColumn(0).magnitude,
+                    matrix.GetColumn(1).magnitude,
+                    matrix.GetColumn(2).magnitude
+                );
+                t.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+            }
         }
     }
 }

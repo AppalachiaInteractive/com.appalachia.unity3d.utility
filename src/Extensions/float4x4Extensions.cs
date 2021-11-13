@@ -110,25 +110,16 @@ namespace Appalachia.Utility.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [BurstCompile]
-        public static Bounds TranslateAndScaleBounds(this float4x4 matrix, Bounds b)
+        public static void float4x4ToTransform(this Transform transform, float4x4 matrix)
         {
-            var center = b.center;
-            var size = b.size;
+            transform.position = matrix.c3.xyz;
 
-            var matrixScale = matrix.GetScaleFromMatrix();
-
-            var newCenter = matrix.MultiplyPoint3x4(center);
-
-            float3 newSize;
-
-            newSize.x = matrixScale.x * size.x;
-            newSize.y = matrixScale.y * size.y;
-            newSize.z = matrixScale.z * size.z;
-
-            b.center = newCenter;
-            b.size = newSize;
-
-            return b;
+            transform.localScale = new float3(
+                math.length(matrix.c0),
+                math.length(matrix.c1),
+                math.length(matrix.c2)
+            );
+            transform.rotation = quaternion.LookRotation(matrix.c2.xyz, matrix.c1.xyz);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -140,9 +131,23 @@ namespace Appalachia.Utility.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [BurstCompile]
+        public static quaternion GetRotationFromMatrix(this float4x4 matrix)
+        {
+            return quaternion.LookRotation(matrix.c2.xyz, matrix.c1.xyz);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [BurstCompile]
         public static float3 GetScaleFromMatrix(this float4x4 matrix)
         {
             return new(math.length(matrix.c0), math.length(matrix.c1), math.length(matrix.c2));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [BurstCompile]
+        public static float4x4 Inverse(this float4x4 matrix)
+        {
+            return math.inverse(matrix);
         }
 
 /*
@@ -214,6 +219,18 @@ namespace Appalachia.Utility.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [BurstCompile]
+        public static quaternion MultiplyRotation(this float4x4 matrix, quaternion rotation)
+        {
+            var axis = rotation.value.xyz;
+
+            var rotated = matrix.MultiplyVector(axis);
+
+            rotation.value.xyz = rotated;
+            return rotation;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [BurstCompile]
         public static float3 MultiplyVector(this float4x4 matrix, float3 point)
         {
             float3 vector3;
@@ -229,13 +246,6 @@ namespace Appalachia.Utility.Extensions
                                  (matrix.c2.z * (double) point.z));
 
             return vector3;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [BurstCompile]
-        public static float4x4 Inverse(this float4x4 matrix)
-        {
-            return math.inverse(matrix);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -354,6 +364,18 @@ namespace Appalachia.Utility.Extensions
             return matrix;
         }
 
+        [DebuggerStepThrough]
+        public static string ToStringTRS(this float4x4 matrix)
+        {
+            var pos = matrix.GetPositionFromMatrix();
+            var rotation = matrix.GetRotationFromMatrix();
+            var scale = matrix.GetScaleFromMatrix();
+
+            return $"T [{pos.ToStringF1()}] | " +
+                   $"R [{rotation.ToEuler().ToStringF1()}] | " +
+                   $"S [{scale.ToStringF1()}]";
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [BurstCompile]
         public static float4x4 Transform(this float4x4 lhs, float4x4 rhs)
@@ -429,6 +451,29 @@ namespace Appalachia.Utility.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [BurstCompile]
+        public static Bounds TranslateAndScaleBounds(this float4x4 matrix, Bounds b)
+        {
+            var center = b.center;
+            var size = b.size;
+
+            var matrixScale = matrix.GetScaleFromMatrix();
+
+            var newCenter = matrix.MultiplyPoint3x4(center);
+
+            float3 newSize;
+
+            newSize.x = matrixScale.x * size.x;
+            newSize.y = matrixScale.y * size.y;
+            newSize.z = matrixScale.z * size.z;
+
+            b.center = newCenter;
+            b.size = newSize;
+
+            return b;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [BurstCompile]
         public static float4x4 TranslateOver(this float3 following, float4x4 baseOperation, bool local)
         {
             if (local)
@@ -472,50 +517,6 @@ namespace Appalachia.Utility.Extensions
             matrix4x4.c3.z = 0.0f;
             matrix4x4.c3.w = 1f;
             return matrix4x4;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [BurstCompile]
-        public static quaternion GetRotationFromMatrix(this float4x4 matrix)
-        {
-            return quaternion.LookRotation(matrix.c2.xyz, matrix.c1.xyz);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [BurstCompile]
-        public static quaternion MultiplyRotation(this float4x4 matrix, quaternion rotation)
-        {
-            var axis = rotation.value.xyz;
-
-            var rotated = matrix.MultiplyVector(axis);
-
-            rotation.value.xyz = rotated;
-            return rotation;
-        }
-
-        [DebuggerStepThrough] public static string ToStringTRS(this float4x4 matrix)
-        {
-            var pos = matrix.GetPositionFromMatrix();
-            var rotation = matrix.GetRotationFromMatrix();
-            var scale = matrix.GetScaleFromMatrix();
-
-            return $"T [{pos.ToStringF1()}] | " +
-                   $"R [{rotation.ToEuler().ToStringF1()}] | " +
-                   $"S [{scale.ToStringF1()}]";
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [BurstCompile]
-        public static void float4x4ToTransform(this Transform transform, float4x4 matrix)
-        {
-            transform.position = matrix.c3.xyz;
-
-            transform.localScale = new float3(
-                math.length(matrix.c0),
-                math.length(matrix.c1),
-                math.length(matrix.c2)
-            );
-            transform.rotation = quaternion.LookRotation(matrix.c2.xyz, matrix.c1.xyz);
         }
     }
 }

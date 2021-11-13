@@ -32,7 +32,7 @@ namespace Appalachia.Utility.Extensions
                 if (length < mb)
                 {
                     var major = length / kb;
-                    var minor = (length % kb) / (double)kb;
+                    var minor = (length % kb) / (double) kb;
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
@@ -42,7 +42,7 @@ namespace Appalachia.Utility.Extensions
                 if (length < gb)
                 {
                     var major = length / mb;
-                    var minor = (length % mb) / (double)mb;
+                    var minor = (length % mb) / (double) mb;
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
@@ -52,7 +52,7 @@ namespace Appalachia.Utility.Extensions
                 if (length < tb)
                 {
                     var major = length / gb;
-                    var minor = (length % gb) / (double)gb;
+                    var minor = (length % gb) / (double) gb;
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
@@ -61,7 +61,7 @@ namespace Appalachia.Utility.Extensions
                 else
                 {
                     var major = length / tb;
-                    var minor = (length % tb) / (double)tb;
+                    var minor = (length % tb) / (double) tb;
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 
 namespace Appalachia.Utility.Colors
@@ -69,6 +68,7 @@ namespace Appalachia.Utility.Colors
                 classes
             };
 
+#if UNITY_EDITOR
         public bool Draw()
         {
             var changed = false;
@@ -79,7 +79,7 @@ namespace Appalachia.Utility.Colors
                 var getter = getters[index];
 
                 var initialValue = getter();
-                var temp = EditorGUILayout.ColorField(label, initialValue);
+                var temp = UnityEditor.EditorGUILayout.ColorField(label, initialValue);
 
                 var thisChanged = temp != initialValue;
 
@@ -94,6 +94,7 @@ namespace Appalachia.Utility.Colors
 
             return changed;
         }
+#endif
 
         public ColorPalette Copy()
         {

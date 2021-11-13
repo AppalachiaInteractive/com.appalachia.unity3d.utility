@@ -7,6 +7,14 @@ namespace Appalachia.Utility.Execution
     public static class IEnumeratorExtensions
     {
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
+        public static SafeCoroutineWrapper AsNonCancellable(this SafeCoroutineWrapper request)
+        {
+            request.SetNonCancellable();
+
+            return request;
+        }
+
+        [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
         public static SafeCoroutineWrapper AsSafe(
             this IEnumerator enumerator,
             string processKey = null,
@@ -29,6 +37,8 @@ namespace Appalachia.Utility.Execution
             );
         }
 
+#if UNITY_EDITOR
+
         [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
         public static SafeCoroutineWrapper AsSafe(
             this UnityEditor.PackageManager.Requests.Request request,
@@ -41,7 +51,7 @@ namespace Appalachia.Utility.Execution
             [CallerLineNumber] int callerLineNumber = 0)
         {
             var enumerator = RequestToEnumerator(request);
-            
+
             return new SafeCoroutineWrapper(
                 enumerator,
                 processKey,
@@ -54,15 +64,6 @@ namespace Appalachia.Utility.Execution
             );
         }
 
-        [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
-        public static SafeCoroutineWrapper AsNonCancellable(
-            this SafeCoroutineWrapper request)
-        {
-            request.SetNonCancellable();
-
-            return request;
-        }
-
         private static IEnumerator RequestToEnumerator(UnityEditor.PackageManager.Requests.Request request)
         {
             while (!request.IsCompleted)
@@ -70,6 +71,6 @@ namespace Appalachia.Utility.Execution
                 yield return null;
             }
         }
-                                                     
+#endif
     }
 }

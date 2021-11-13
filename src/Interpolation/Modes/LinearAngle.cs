@@ -4,7 +4,7 @@ namespace Appalachia.Utility.Interpolation.Modes
     {
         public float Interpolate(float x, float y, float t)
         {
-            return InterpolationFactory.LinearAngle(x, y, t);
+            return InterpolatorFactory.LinearAngle(x, y, t);
         }
     }
 }

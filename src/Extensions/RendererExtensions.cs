@@ -1,10 +1,7 @@
 ﻿#region
 
-using UnityEditor;
 using UnityEngine;
-#if UNITY_EDITOR
 
-#endif
 
 #endregion
 
@@ -66,8 +63,8 @@ namespace Appalachia.Utility.Extensions
 
             if (save)
             {
-                PrefabUtility.SavePrefabAsset(prefab);
-                EditorUtility.SetDirty(prefab);
+                UnityEditor.PrefabUtility.SavePrefabAsset(prefab);
+                UnityEditor.EditorUtility.SetDirty(prefab);
             }
         }
 
@@ -75,13 +72,13 @@ namespace Appalachia.Utility.Extensions
         {
             var save = false;
 
-            var flags = GameObjectUtility.GetStaticEditorFlags(renderer.gameObject);
+            var flags = UnityEditor.GameObjectUtility.GetStaticEditorFlags(renderer.gameObject);
 
-            var contributeGI = flags.HasFlag(StaticEditorFlags.ContributeGI);
+            var contributeGI = flags.HasFlag(UnityEditor.StaticEditorFlags.ContributeGI);
 
             if (!contributeGI)
             {
-                GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, StaticEditorFlags.ContributeGI);
+                UnityEditor.GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, UnityEditor.StaticEditorFlags.ContributeGI);
                 save = true;
             }
 
@@ -91,7 +88,7 @@ namespace Appalachia.Utility.Extensions
                 save = true;
             }
 
-            var o = new SerializedObject(renderer);
+            var o = new UnityEditor.SerializedObject(renderer);
             var apply = false;
 
             var lightmapScale = o.FindProperty("m_ScaleInLightmap");

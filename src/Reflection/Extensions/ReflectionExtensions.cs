@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using Unity.Profiling;
-using UnityEditor;
 using UnityEngine;
 
 #endregion
@@ -210,7 +209,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         }
 
 #if UNITY_EDITOR
-        [InitializeOnLoadMethod]
+        [UnityEditor.InitializeOnLoadMethod]
 #else
         [RuntimeInitializeOnLoadMethod]
 #endif

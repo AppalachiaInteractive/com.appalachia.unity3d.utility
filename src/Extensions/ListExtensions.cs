@@ -103,6 +103,8 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        #region Nested Types
+
         private static class ArrayAccessor<T>
         {
 #if ENABLE_IL2CPP || NET_STANDARD_2_0
@@ -141,5 +143,7 @@ namespace Appalachia.Utility.Extensions
                 }
             }
         }
+
+        #endregion
     }
 }

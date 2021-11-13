@@ -60,7 +60,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
 
         public float Update(float dt, InterpolationMode i)
         {
-            return Update(ref this, dt, InterpolationFactory.GetInterpolation(i));
+            return Update(ref this, dt, InterpolatorFactory.GetInterpolator(i));
         }
 
         [DebuggerStepThrough] public static implicit operator float(Interpolator i)

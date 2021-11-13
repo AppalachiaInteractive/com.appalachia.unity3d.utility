@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.Profiling;
+using UnityEngine;
 
 namespace Appalachia.Utility.Logging.Formatters
 {
     public abstract class AppaLogFormatter
     {
-        #region Profiling And Tracing Markers
+        #region Profiling
 
         private const string _PRF_PFX = nameof(AppaLogFormatter) + ".";
 
@@ -20,11 +21,32 @@ namespace Appalachia.Utility.Logging.Formatters
 
         #endregion
 
+        protected AppaLogFormatter()
+        {
+            if (formats == null)
+            {
+                formats = UnityEngine.Resources.Load<AppaLogFormats>(AppaLogFormats.ADDRESS);
+            }
+
+            if (formats == null)
+            {
+                formats = ScriptableObject.CreateInstance<AppaLogFormats>();
+            }
+        }
+
+        #region Fields
+
+        protected AppaLogFormats formats;
+
         protected Dictionary<LogLevel, string> _logLevelStrings;
         protected Dictionary<string, string> _fileNames;
 
+        #endregion
+
         protected abstract string GetLogPrefix(
             LogLevel level,
+            string prefix,
+            string formattedPrefix,
             string memberName,
             string filePath,
             int lineNumber);
@@ -49,14 +71,23 @@ namespace Appalachia.Utility.Logging.Formatters
 
         public object FormatLogMessage(
             LogLevel level,
+            string prefix,
+            string formattedPrefix,
             object content,
             string memberName,
             string filePath,
             int lineNumber)
         {
-            var prefix = GetLogPrefix(level, memberName, filePath, lineNumber);
+            var fullPrefix = GetLogPrefix(level, prefix, formattedPrefix, memberName, filePath, lineNumber);
 
-            return $"{prefix}{content}";
+            var messageContent = AlterContent(content.ToString());
+            
+            return $"{fullPrefix}{messageContent}";
+        }
+
+        protected virtual string AlterContent(string content)
+        {
+            return content;
         }
 
         protected string GetFileNameFromPathInternal(string filePath, Func<string, string> adjustment)

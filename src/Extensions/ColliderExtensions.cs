@@ -9,8 +9,12 @@ namespace Appalachia.Utility.Extensions
 {
     public static class ColliderExtensions
     {
+        #region Constants and Static Readonly
+
         private const float FourThirds = 4.0f / 3.0f;
         private const float sphereInitial = FourThirds * Mathf.PI;
+
+        #endregion
 
         public static float GetVolume(this IEnumerable<Collider> colliders)
         {

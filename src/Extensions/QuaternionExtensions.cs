@@ -8,11 +8,6 @@ namespace Appalachia.Utility.Extensions
 {
     public static class QuaternionsExtensions
     {
-        public static bool Approximately(this Quaternion input, Quaternion other)
-        {
-            return input == other;
-        }
-
         public static Quaternion Anticipate(
             this Quaternion first,
             float elapsed,
@@ -23,6 +18,11 @@ namespace Appalachia.Utility.Extensions
                 ((anticipationDuration / elapsed) * (second.y - first.y)), second.z +
                 ((anticipationDuration / elapsed) * (second.z - first.z)), second.w +
                 ((anticipationDuration / elapsed) * (second.w - first.w)));
+        }
+
+        public static bool Approximately(this Quaternion input, Quaternion other)
+        {
+            return input == other;
         }
 
         public static Vector3 Back(this Quaternion quaternion)

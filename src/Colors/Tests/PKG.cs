@@ -7,10 +7,12 @@ namespace Appalachia.Utility.Colors
 {
     internal static partial class PKG
     {
-        public const int Priority = -236000;
+        public const int Priority = -246000;
         public const string Name = "Colors";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
+        public const string Version = "0.2.0";
+        public const string BuildDate = "2021-11-12T21:38:47.3591997Z";
         
         public static partial class Prefs
         {
@@ -30,14 +32,14 @@ namespace Appalachia.Utility.Colors
                 public const string Base =  "Assets/" + Prefix;
             }
 
-            public static partial class GameObject
+            public static partial class GameObjects
             {
                 public const int Priority = PKG.Priority;
                 public const string Base = "GameObject/" + Prefix;
                     
                 public static partial class Create
                 {
-                    public const int Priority = GameObject.Priority + 0;
+                    public const int Priority = GameObjects.Priority + 0;
                     public const string Base =  "GameObject/Create/" + Prefix;
                 }
             }

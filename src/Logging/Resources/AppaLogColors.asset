@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449315d29dbe48f0bf9b5a18a5444b6a, type: 3}
+  m_Name: AppaLogColors
+  m_EditorClassIdentifier: 
+  filename:
+    bold: 1
+    italic: 0
+    color: {r: 0.9, g: 0.85081965, b: 0.74754095, a: 1}
+  message:
+    bold: 0
+    italic: 1
+    color: {r: 0.85, g: 0.84300417, b: 0.8325103, a: 1}
+  contexts:
+    application:
+      bold: 1
+      italic: 0
+      color: {r: 0.34, g: 0.69999987, b: 0.85, a: 1}
+    area:
+      bold: 1
+      italic: 0
+      color: {r: 0.56, g: 0.595122, b: 0.8, a: 1}
+    bootload:
+      bold: 1
+      italic: 0
+      color: {r: 0.44941178, g: 0.7490196, b: 0.6575604, a: 1}
+    subArea:
+      bold: 1
+      italic: 0
+      color: {r: 0.533527, g: 0.74509805, b: 0.37254903, a: 1}
+  levels:
+    fatal:
+      bold: 1
+      italic: 1
+      color: {r: 1, g: 0, b: 0, a: 1}
+    critical:
+      bold: 1
+      italic: 0
+      color: {r: 1, g: 0, b: 0, a: 1}
+    exception:
+      bold: 1
+      italic: 0
+      color: {r: 1, g: 0, b: 0, a: 1}
+    error:
+      bold: 1
+      italic: 0
+      color: {r: 0.95, g: 0.32396314, b: 0.008755776, a: 1}
+    warn:
+      bold: 1
+      italic: 0
+      color: {r: 0.9333334, g: 0.60784316, b: 0, a: 1}
+    info:
+      bold: 1
+      italic: 0
+      color: {r: 0.50980395, g: 0.66293275, b: 0.7294118, a: 1}
+    debug:
+      bold: 1
+      italic: 0
+      color: {r: 0.8, g: 0.77939916, b: 0.72103006, a: 1}
+    trace:
+      bold: 1
+      italic: 0
+      color: {r: 0.5, g: 0.5, b: 0.5, a: 1}

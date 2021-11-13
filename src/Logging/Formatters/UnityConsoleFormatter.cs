@@ -6,7 +6,7 @@ namespace Appalachia.Utility.Logging.Formatters
 {
     public class UnityConsoleFormatter : AppaLogFormatter
     {
-        #region Profiling And Tracing Markers
+        #region Profiling
 
         private const string _PRF_PFX = nameof(UnityConsoleFormatter) + ".";
 
@@ -15,8 +15,15 @@ namespace Appalachia.Utility.Logging.Formatters
 
         #endregion
 
+        protected override string AlterContent(string content)
+        {
+            return formats.message.Format(content);
+        }
+
         protected override string GetLogPrefix(
             LogLevel level,
+            string prefix,
+            string formattedPrefix,
             string memberName,
             string filePath,
             int lineNumber)
@@ -25,13 +32,7 @@ namespace Appalachia.Utility.Logging.Formatters
             {
                 var fileName = GetFileNameFromPathInternal(
                     filePath,
-                    fn =>
-                    {
-                        var italic = fn.Bold();
-                        var colored = italic.Color(ColorPalette.Default.classes.Middle);
-
-                        return colored;
-                    }
+                    fn => formats.filename.Format(fn)
                 );
 
                 var logLevelString = GetLogLevelString(
@@ -39,42 +40,51 @@ namespace Appalachia.Utility.Logging.Formatters
                     l =>
                     {
                         var upper = l.ToString().ToUpperInvariant();
-                        string result;
+                        string logLevelResult;
 
                         switch (l)
                         {
                             case LogLevel.Fatal:
-                                result = upper.Bold().Color(ColorPalette.Default.bad.First);
+                                logLevelResult = formats.levels.fatal.Format(upper);
                                 break;
                             case LogLevel.Critical:
-                                result = upper.Bold().Color(ColorPalette.Default.bad.First);
+                                logLevelResult = formats.levels.critical.Format(upper);
                                 break;
                             case LogLevel.Exception:
-                                result = upper.Bold().Color(ColorPalette.Default.bad.Quarter);
+                                logLevelResult = formats.levels.exception.Format(upper);
                                 break;
                             case LogLevel.Error:
-                                result = upper.Bold().Color(ColorPalette.Default.bad.Middle);
+                                logLevelResult = formats.levels.error.Format(upper);
                                 break;
                             case LogLevel.Warn:
-                                result = upper.Bold().Color(ColorPalette.Default.bad.Last);
+                                logLevelResult = formats.levels.warn.Format(upper);
                                 break;
                             case LogLevel.Info:
-                                result = upper.Bold().Color(ColorPalette.Default.notable.Middle);
+                                logLevelResult = formats.levels.info.Format(upper);
                                 break;
                             case LogLevel.Debug:
-                                result = upper.Bold().Color(ColorPalette.Default.notable.ThreeQuarters);
+                                logLevelResult = formats.levels.debug.Format(upper);
                                 break;
                             default:
-                                result = upper.Bold();
+                                logLevelResult = formats.levels.trace.Format(upper);
                                 break;
                         }
 
-                        return result;
+                        return logLevelResult;
                     }
                 );
 
-                var prefix = $"{logLevelString} {fileName} ";
-                return prefix;
+                string result;
+                if (formattedPrefix != null)
+                {
+                    result = $"{logLevelString} {formattedPrefix} {fileName} ";
+                }
+                else
+                {
+                    result = $"{logLevelString} {fileName} ";
+                }
+
+                return result;
             }
         }
     }

@@ -11,6 +11,27 @@ namespace Appalachia.Utility.Extensions
 {
     public static class MeshExtensions
     {
+        public static Vector3 GetCenterOfMass(this IReadOnlyList<Mesh> meshes)
+        {
+            GetVolumeAndCenterOfMass(meshes, out _, out var centerOfMass);
+
+            return centerOfMass;
+        }
+
+        public static Vector3 GetCenterOfMass(this Mesh[] meshes)
+        {
+            GetVolumeAndCenterOfMass(meshes, out _, out var centerOfMass);
+
+            return centerOfMass;
+        }
+
+        public static Vector3 GetCenterOfMass(this Mesh mesh)
+        {
+            GetVolumeAndCenterOfMass(mesh, false, out _, true, out var centerOfMass);
+
+            return centerOfMass;
+        }
+
         public static float GetVolume(this IReadOnlyList<Renderer> renderers)
         {
             var meshes = renderers.Select(r => r.GetSharedMesh()).ToList();
@@ -63,27 +84,6 @@ namespace Appalachia.Utility.Extensions
             GetVolumeAndCenterOfMass(mesh, true, out var volume, false, out _);
 
             return volume;
-        }
-
-        public static Vector3 GetCenterOfMass(this IReadOnlyList<Mesh> meshes)
-        {
-            GetVolumeAndCenterOfMass(meshes, out _, out var centerOfMass);
-
-            return centerOfMass;
-        }
-
-        public static Vector3 GetCenterOfMass(this Mesh[] meshes)
-        {
-            GetVolumeAndCenterOfMass(meshes, out _, out var centerOfMass);
-
-            return centerOfMass;
-        }
-
-        public static Vector3 GetCenterOfMass(this Mesh mesh)
-        {
-            GetVolumeAndCenterOfMass(mesh, false, out _, true, out var centerOfMass);
-
-            return centerOfMass;
         }
 
         public static void GetVolumeAndCenterOfMass(

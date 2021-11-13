@@ -85,7 +85,7 @@ namespace Appalachia.Utility.Colors
         /// <exception cref="ArgumentException">The argument was not appropriate.</exception>
         /// <exception cref="ArgumentNullException">The argument was null.</exception>
         /// <returns>The color that the code represents.</returns>
-        public static Color FromHexCode(string hexCode)
+        public static Color FromHexCode(string hexCode, bool alphaLast = false)
         {
             if (hexCode == null)
             {
@@ -148,6 +148,13 @@ namespace Appalachia.Utility.Colors
             var green = int.Parse(greenPart, NumberStyles.HexNumber);
             var blue = int.Parse(bluePart,   NumberStyles.HexNumber);
 
+            if (alphaLast)
+            {
+                var temp = alpha;
+                alpha = red;
+                red = temp;
+            }
+            
             var result = new Color(red / 255f, green / 255f, blue / 255f, alpha / 255f);
 
             _lookup.Add(hexCode, result);

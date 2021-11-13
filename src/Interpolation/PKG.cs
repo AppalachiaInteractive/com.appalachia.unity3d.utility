@@ -7,10 +7,12 @@ namespace Appalachia.Utility.Interpolation
 {
     internal static partial class PKG
     {
-        public const int Priority = -425000;
+        public const int Priority = -423000;
         public const string Name = "Interpolation";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
+        public const string Version = "0.2.0";
+        public const string BuildDate = "2021-11-12T21:38:44.6751189Z";
         
         public static partial class Prefs
         {
@@ -30,14 +32,14 @@ namespace Appalachia.Utility.Interpolation
                 public const string Base =  "Assets/" + Prefix;
             }
 
-            public static partial class GameObject
+            public static partial class GameObjects
             {
                 public const int Priority = PKG.Priority;
                 public const string Base = "GameObject/" + Prefix;
                     
                 public static partial class Create
                 {
-                    public const int Priority = GameObject.Priority + 0;
+                    public const int Priority = GameObjects.Priority + 0;
                     public const string Base =  "GameObject/Create/" + Prefix;
                 }
             }

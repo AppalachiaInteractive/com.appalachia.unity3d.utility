@@ -4,7 +4,7 @@ namespace Appalachia.Utility.Interpolation.Modes
     {
         public float Interpolate(float v0, float v1, float t)
         {
-            return InterpolationFactory.EaseInQuad(v0, v1, t);
+            return InterpolatorFactory.EaseInQuad(v0, v1, t);
         }
     }
 }

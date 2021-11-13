@@ -10,6 +10,8 @@ namespace Appalachia.Utility.Extensions
 {
     public static class quaternionsExtensions
     {
+        #region Constants and Static Readonly
+
         public static readonly float3 _back = new(0f, 0f, -1f);
         public static readonly float3 _down = new(0f, -1f, 0f);
 
@@ -17,6 +19,8 @@ namespace Appalachia.Utility.Extensions
         public static readonly float3 _left = new(-1f, 0f, 0f);
         public static readonly float3 _right = new(1f, 0f, 0f);
         public static readonly float3 _up = new(0f, 1f, 0f);
+
+        #endregion
 
         public static quaternion Anticipate(
             this quaternion first,

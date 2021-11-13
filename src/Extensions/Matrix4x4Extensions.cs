@@ -30,7 +30,7 @@ namespace Appalachia.Utility.Extensions
                 (len2 == 0f) ||
                 (c1 == -c2))
             {
-                AppaLog.Warning("Bad viewing vector");
+                AppaLog.Warn("Bad viewing vector");
                 return Quaternion.identity;
             }
 
