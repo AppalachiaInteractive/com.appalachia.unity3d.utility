@@ -25,12 +25,14 @@ namespace Appalachia.Utility.Logging
 
         #endregion
 
+#if UNITY_EDITOR
         [Button]
         private void Test()
         {
             AppaLog.ClearDeveloperConsole();
             AppaLog.Test();
         }
+#endif
 
         #region Nested type: Contexts
 
