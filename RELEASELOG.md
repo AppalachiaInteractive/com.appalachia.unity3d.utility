@@ -15,5 +15,5 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
-| 8c1f1e6ca6a192b4a5535fa1be5ead55cc593f47 | 2021-11-09 | Chris Schubert | Merge branch 'main' of https://github.com/AppalachiaInteractive/com.appalachia.unity3d.utility |
-| fe99bb28bdc02fe74eb1bdd4e01ecf402136f9dc | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
+| 9e7c175414a1b24ca431477a94b95be2922b6c73 | 2021-11-13 | Chris Schubert | Adding private flag for repo filter. |
+| 1c6082b4cd99fa2fbc60519cd097e25a790becaf | 2021-11-13 | Chris Schubert | EXR to gitlfs |

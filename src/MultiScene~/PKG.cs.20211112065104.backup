@@ -1,0 +1,445 @@
+/*
+namespace Appalachia.Utility.MultiScene
+{
+    internal static class PKG
+    {
+        #region Constants and Static Readonly
+
+        public const int Priority = -421000;
+        public const string BuildDate = "2021-11-12T22:18:19.2935663Z";
+        public const string Name = "MultiScene";
+        public const string Prefix = Root + Name + "/";
+        public const string Root = "Appalachia/";
+        public const string Version = "0.2.0";
+
+        #endregion
+
+        #region Nested type: Menu
+
+        public static class Menu
+        {
+            #region Nested type: Appalachia
+
+            public static class Appalachia
+            {
+                #region Constants and Static Readonly
+
+                public const int Priority = PKG.Priority;
+
+                #endregion
+
+                #region Nested type: Add
+
+                public static class Add
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Components.Priority + 10000;
+                    public const string Base = Root + nameof(Add) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Behaviours
+
+                public static class Behaviours
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Appalachia.Priority;
+                    public const string Base = Root + nameof(Behaviours) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Components
+
+                public static class Components
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Behaviours.Priority + 10000;
+                    public const string Base = Root + nameof(Components) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Create
+
+                public static class Create
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Add.Priority + 10000;
+                    public const string Base = Root + nameof(Create) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Data
+
+                public static class Data
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Manage.Priority + 10000;
+                    public const string Base = Root + nameof(Data) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Debug
+
+                public static class Debug
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = External.Priority + 10000;
+                    public const string Base = Root + nameof(Debug) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: External
+
+                public static class External
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Packages.Priority + 10000;
+                    public const string Base = Root + nameof(External) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Gizmos
+
+                public static class Gizmos
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Debug.Priority + 10000;
+                    public const string Base = Root + nameof(Gizmos) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Jobs
+
+                public static class Jobs
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Tools.Priority + 10000;
+                    public const string Base = Root + nameof(Jobs) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Logging
+
+                public static class Logging
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Windows.Priority + 10000;
+                    public const string Base = Root + nameof(Logging) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Manage
+
+                public static class Manage
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Update.Priority + 10000;
+                    public const string Base = Root + nameof(Manage) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Packages
+
+                public static class Packages
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Tasks.Priority + 10000;
+                    public const string Base = Root + nameof(Packages) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: RootTools
+
+                public static class RootTools
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = 0;
+                    public const string Base = Root + "Tools/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Settings
+
+                public static class Settings
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Logging.Priority + 10000;
+                    public const string Base = Root + nameof(Settings) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: State
+
+                public static class State
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Data.Priority + 10000;
+                    public const string Base = Root + nameof(State) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Tasks
+
+                public static class Tasks
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Settings.Priority + 10000;
+                    public const string Base = Root + nameof(Tasks) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Timing
+
+                public static class Timing
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Jobs.Priority + 10000;
+                    public const string Base = Root + nameof(Timing) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Tools
+
+                public static class Tools
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = State.Priority + 100;
+                    public const string Base = Root + nameof(Tools) + "/" + Name + "/";
+
+                    #endregion
+
+                    #region Nested type: Disable
+
+                    public static class Disable
+                    {
+                        #region Constants and Static Readonly
+
+                        public const int Priority = Tools.Priority + 1;
+                        public const string Base = Tools.Base + nameof(Disable);
+
+                        #endregion
+                    }
+
+                    #endregion
+
+                    #region Nested type: Enable
+
+                    public static class Enable
+                    {
+                        #region Constants and Static Readonly
+
+                        public const int Priority = Tools.Priority + 0;
+                        public const string Base = Tools.Base + nameof(Enable);
+
+                        #endregion
+                    }
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Update
+
+                public static class Update
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Create.Priority + 10000;
+                    public const string Base = Root + nameof(Update) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Utility
+
+                public static class Utility
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Timing.Priority + 10000;
+                    public const string Base = Root + nameof(Utility) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Nested type: Windows
+
+                public static class Windows
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = Utility.Priority + 10000;
+                    public const string Base = Root + nameof(Windows) + "/" + Name + "/";
+
+                    #endregion
+                }
+
+                #endregion
+            }
+
+            #endregion
+
+            #region Nested type: Assets
+
+            public static class Assets
+            {
+                #region Constants and Static Readonly
+
+                public const int Priority = PKG.Priority;
+                public const string Base = "Assets/" + Prefix;
+
+                #endregion
+            }
+
+            #endregion
+
+            #region Nested type: CONTEXT
+
+            public static class CONTEXT
+            {
+                #region Constants and Static Readonly
+
+                public const int Priority = PKG.Priority;
+                public const string Mid = "/" + Prefix;
+                public const string Mid_short = "/" + Root;
+                public const string Start = "CONTEXT/";
+
+                #endregion
+            }
+
+            #endregion
+
+            #region Nested type: GameObjects
+
+            public static class GameObjects
+            {
+                #region Constants and Static Readonly
+
+                public const int Priority = PKG.Priority;
+                public const string Base = "GameObject/" + Prefix;
+
+                #endregion
+
+                #region Nested type: Create
+
+                public static class Create
+                {
+                    #region Constants and Static Readonly
+
+                    public const int Priority = GameObjects.Priority + 0;
+                    public const string Base = "GameObject/Create/" + Prefix;
+
+                    #endregion
+                }
+
+                #endregion
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: Prefs
+
+        public static class Prefs
+        {
+            #region Constants and Static Readonly
+
+            public const string Group = Prefix;
+
+            #endregion
+
+            #region Nested type: Gizmos
+
+            public static class Gizmos
+            {
+                #region Constants and Static Readonly
+
+                public const string Base = Group + "Gizmos/";
+
+                #endregion
+            }
+
+            #endregion
+        }
+
+        #endregion
+    }
+}
+
+*/
