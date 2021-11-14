@@ -1,6 +1,6 @@
 ```
 C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
- Let's go!  
+Let's go!  
  ________   ___  ___   ________   ________    ________   _______    ________      
 |\   ____\ |\  \|\  \ |\   __  \ |\   ___  \ |\   ____\ |\  ___ \  |\   ____\     
 \ \  \___| \ \  \\\  \\ \  \|\  \\ \  \\ \  \\ \  \___| \ \   __/| \ \  \___|_    
@@ -14,14 +14,11 @@ C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 652b29dc8a198c55e46c0099d23d5dd805c96a85 | 2021-11-13 | Chris Schubert | Additional logging contexts |
+| 0b70568dd58309449c2f109f3eaa1fcb62b3a43e | 2021-11-13 | Chris Schubert | Updating changelog and releaselog |
 | 9e7c175414a1b24ca431477a94b95be2922b6c73 | 2021-11-13 | Chris Schubert | Adding private flag for repo filter. |
 | 1c6082b4cd99fa2fbc60519cd097e25a790becaf | 2021-11-13 | Chris Schubert | EXR to gitlfs |
 | 6b5f8c311a3563c9e5532ebd7470b34bf3709852 | 2021-11-13 | Chris Schubert | Editor exclusions for runtime build, logging framework improvements, and mutli-scene framework |
-
-
- ## Tag: `v0.2.0`
-| Hash | Date | Author | Changes |
-|------|------|--------|---------|
 | 7f18f13dd7aca76e2bf9bf8b9538f46f5171ca49 | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
 | 8c1f1e6ca6a192b4a5535fa1be5ead55cc593f47 | 2021-11-09 | Chris Schubert | Merge branch 'main' of https://github.com/AppalachiaInteractive/com.appalachia.unity3d.utility |
 | fe99bb28bdc02fe74eb1bdd4e01ecf402136f9dc | 2021-11-09 | Chris Schubert | Updating changelog and releaselog |
