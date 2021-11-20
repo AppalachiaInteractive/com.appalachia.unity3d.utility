@@ -7,19 +7,12 @@ namespace Appalachia.Utility.Framing.Targets
 #if UNITY_EDITOR
     internal class SceneViewFrameable : IFrameable
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(SceneViewFrameable) + ".";
-        private static readonly ProfilerMarker _PRF_LookAt = new ProfilerMarker(_PRF_PFX + nameof(LookAt));
-
-        #endregion
-
         public SceneViewFrameable()
         {
             _sceneView = UnityEditor.SceneView.lastActiveSceneView;
         }
 
-        #region Fields
+        #region Fields and Autoproperties
 
         private readonly UnityEditor.SceneView _sceneView;
 
@@ -53,6 +46,13 @@ namespace Appalachia.Utility.Framing.Targets
                 }
             }
         }
+
+        #endregion
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(SceneViewFrameable) + ".";
+        private static readonly ProfilerMarker _PRF_LookAt = new ProfilerMarker(_PRF_PFX + nameof(LookAt));
 
         #endregion
     }

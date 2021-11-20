@@ -1,18 +1,43 @@
 // ReSharper disable All
 // DO NOT MODIFY: START
 
+using System.Resources;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
+[assembly: AssemblyTitle("Appalachia.Utility.Enums")]
+[assembly: AssemblyDescription("Utility classes with minimal dependencies to provide enhanced APIs for common tasks.")]
+[assembly: AssemblyCompany("Appalachia Interactive")]
+[assembly: AssemblyProduct("Keepers Of Creation")]
+[assembly: AssemblyCopyright("Copyright © Appalachia Interactive 2021")]
+[assembly: AssemblyTrademark("Keepers Of Creation")]
+[assembly: AssemblyCulture("")]
+[assembly: NeutralResourcesLanguage("en")]
+[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyFileVersion("0.2.0.0")]
 
 namespace Appalachia.Utility.Enums
 {
     internal static partial class PKG
     {
-        public const int Priority = -427000;
+        public const string AssemblyTitle = "Appalachia.Utility.Enums";
+        public const string AssemblyDescription = "Utility classes with minimal dependencies to provide enhanced APIs for common tasks.";
+        public const string AssemblyCompany = "Appalachia Interactive";
+        public const string AssemblyProduct = "Keepers Of Creation";
+        public const string AssemblyCopyright = "Copyright © Appalachia Interactive 2021";
+        public const string AssemblyTrademark = "Keepers Of Creation";
+        public const string AssemblyCulture = "";
+        public const string NeutralResourcesLanguage = "en";
+        public const string AssemblyVersion = "0.2.0.0";
+        public const string AssemblyFileVersion = "0.2.0.0";
+        public const int Priority = -420000;
         public const string Name = "Enums";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
         public const string Version = "0.2.0";
-        public const string BuildDate = "2021-11-12T21:38:44.6080571Z";
+        public const int VersionInt = 2000;
+        public const string BuildDate = "2021-11-19T00:01:26.2772277Z";
         
         public static partial class Prefs
         {
@@ -197,10 +222,57 @@ namespace Appalachia.Utility.Enums
         }
 
 // DO NOT MODIFY: END
-// MODIFICATIONS ALLOWED: START
+#region User Modifiable
 
-// MODIFICATIONS ALLOWED: END
-// DO NOT MODIFY: START        
+#endregion // User Modifiable
+
+// DO NOT MODIFY: START       
+
+        internal static int ConvertFromVersion(string version)
+        {
+            using (_PRF_ConvertFromVersion.Auto())
+            {
+                var parts = version.Split('.');
+
+                var majorString = parts[0];
+                var minorString = parts[1];
+                var patchString = parts[2];
+
+                var major = int.Parse(majorString);
+                var minor = int.Parse(minorString);
+                var patch = int.Parse(patchString);
+
+                var result = (major * 1_000_000) + (minor * 1_000) + patch;
+
+                return result;
+            }
+        }
+
+        internal static string ConvertToVersion(int version)
+        {
+            using (_PRF_ConvertToVersion.Auto())
+            {
+                var majorInt = version / 1_000_000;
+                var minorInt = (version / 1_000) % 1_000;
+                var patchInt = version % 1_000; 
+
+                var result = $"{majorInt}.{minorInt}.{patchInt}";
+
+                return result;
+            }
+        }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(PKG) + ".";
+
+        private static readonly Unity.Profiling.ProfilerMarker _PRF_ConvertToVersion =
+            new Unity.Profiling.ProfilerMarker(_PRF_PFX + nameof(ConvertToVersion));
+
+        private static readonly Unity.Profiling.ProfilerMarker _PRF_ConvertFromVersion =
+            new Unity.Profiling.ProfilerMarker(_PRF_PFX + nameof(ConvertFromVersion));
+
+        #endregion 
     }
 }
 // DO NOT MODIFY: END

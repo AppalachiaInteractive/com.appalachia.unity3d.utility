@@ -245,7 +245,7 @@ public static class EditorGUIIcons
 
 #region Layout
 
-#region Fields
+
 
         private static readonly GUILayoutOption[] _expandWidth = {GUILayout.ExpandWidth(true)};
         private GUILayoutOption[] _iconLayout = {GUILayout.Width(_defaultIconSize)};
@@ -359,7 +359,7 @@ public static class EditorGUIIcons
 
 #region Style
 
-#region Fields
+
 
         private GUIStyle _scrollViewStyle;
         private GUIStyle _iconStyle;
@@ -438,7 +438,7 @@ public static class EditorGUIIcons
 
 #region Content
 
-#region Fields
+
 
         private GUIContent _regenerateButtonContent;
         private GUIContent _resetButtonContent;

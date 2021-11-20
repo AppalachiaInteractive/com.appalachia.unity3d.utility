@@ -10,7 +10,11 @@ namespace Appalachia.Utility.Extensions.Cleaning
             this.context1 = context1;
         }
 
+        #region Fields and Autoproperties
+
         public T1 context1;
+
+        #endregion
     }
 
     public class StringCleanerWithContext<T1, T2> : StringCleanerBase<StringCleanerWithContext<T1, T2>>
@@ -25,8 +29,12 @@ namespace Appalachia.Utility.Extensions.Cleaning
             this.context2 = context2;
         }
 
+        #region Fields and Autoproperties
+
         public T1 context1;
         public T2 context2;
+
+        #endregion
     }
 
     public class
@@ -44,8 +52,12 @@ namespace Appalachia.Utility.Extensions.Cleaning
             this.context3 = context3;
         }
 
+        #region Fields and Autoproperties
+
         public T1 context1;
         public T2 context2;
         public T3 context3;
+
+        #endregion
     }
 }

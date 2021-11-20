@@ -20,17 +20,6 @@ namespace Appalachia.Utility.Colors
             _lookup.Clear();
         }
 
-        [Flags]
-        public enum HexCodeFormat
-        {
-            Default = 0,
-            IncludeNumberSign = 1 << 0,
-            IncludeAlpha = 1 << 1,
-            AlphaFirst = 1 << 2,
-            
-            RichText = IncludeNumberSign | IncludeAlpha,
-        }
-        
         public static string ToHexCode(
             this Color color,
             HexCodeFormat format)
@@ -92,19 +81,21 @@ namespace Appalachia.Utility.Colors
                 throw new ArgumentNullException(nameof(hexCode));
             }
 
-            if (_lookup == null)
+            _lookup ??= new Dictionary<string, Color>();
+
+            if (_lookup.ContainsKey(hexCode))
             {
-                _lookup = new Dictionary<string, Color>();
+                return _lookup[hexCode];
             }
 
-            hexCode = hexCode.Replace("#", "").ToUpperInvariant().Trim();
+            var cleanHexCode = hexCode.Replace("#", "").ToUpperInvariant().Trim();
 
-            if ((hexCode.Length != 6) && (hexCode.Length != 8))
+            if ((cleanHexCode.Length != 6) && (cleanHexCode.Length != 8))
             {
                 throw new ArgumentException($"{nameof(hexCode)} was not appropriate length.");
             }
 
-            foreach (var character in hexCode)
+            foreach (var character in cleanHexCode)
             {
                 if (!_hexChars.Contains(character))
                 {
@@ -114,50 +105,32 @@ namespace Appalachia.Utility.Colors
                 }
             }
 
-            if (_lookup.ContainsKey(hexCode))
+            var part1 = $"{cleanHexCode[0]}{cleanHexCode[1]}";
+            var part2 = $"{cleanHexCode[2]}{cleanHexCode[3]}";
+            var part3 = $"{cleanHexCode[4]}{cleanHexCode[5]}";
+            var part4 = $"{cleanHexCode[6]}{cleanHexCode[7]}";
+
+            var int1 = int.Parse(part1, NumberStyles.HexNumber);
+            var int2 = int.Parse(part2, NumberStyles.HexNumber);
+            var int3 = int.Parse(part3, NumberStyles.HexNumber);
+            var int4 = int.Parse(part4, NumberStyles.HexNumber);
+
+            var r = int1 / 255f;
+            var g = int2 / 255f;
+            var b = int3 / 255f;
+            var a = int4 / 255f;
+            
+            if (!alphaLast)
             {
-                return _lookup[hexCode];
-            }
-
-            var clean = new char[8];
-            for (var i = 0; i < 8; i++)
-            {
-                clean[i] = i < 2 ? 'F' : '0';
-            }
-
-            var offset = 0;
-
-            if (hexCode.Length == 6)
-            {
-                offset = 2;
-            }
-
-            for (var i = 0; (i + offset) < clean.Length; i++)
-            {
-                var character = hexCode[i];
-                clean[i + offset] = character;
-            }
-
-            var alphaPart = $"{clean[0]}{clean[1]}";
-            var redPart = $"{clean[2]}{clean[3]}";
-            var greenPart = $"{clean[4]}{clean[5]}";
-            var bluePart = $"{clean[6]}{clean[7]}";
-
-            var alpha = int.Parse(alphaPart, NumberStyles.HexNumber);
-            var red = int.Parse(redPart,     NumberStyles.HexNumber);
-            var green = int.Parse(greenPart, NumberStyles.HexNumber);
-            var blue = int.Parse(bluePart,   NumberStyles.HexNumber);
-
-            if (alphaLast)
-            {
-                var temp = alpha;
-                alpha = red;
-                red = temp;
+                var temp = a;
+                a = r;
+                r = temp;
             }
             
-            var result = new Color(red / 255f, green / 255f, blue / 255f, alpha / 255f);
+            var result = new Color(r, g, b, a);
 
-            _lookup.Add(hexCode, result);
+            _lookup.Add(hexCode,      result);
+            _lookup.Add(cleanHexCode, result);
 
             return result;
         }

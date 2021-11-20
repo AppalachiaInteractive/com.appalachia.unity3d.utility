@@ -17,39 +17,6 @@ namespace Appalachia.Utility.Logging
 {
     public static class AppaLog
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(AppaLog) + ".";
-
-#if UNITY_EDITOR
-        private static readonly ProfilerMarker _PRF_ClearDeveloperConsole =
-            new ProfilerMarker(_PRF_PFX + nameof(ClearDeveloperConsole));
-#endif
-
-        private static readonly ProfilerMarker _PRF_Debug = new ProfilerMarker(_PRF_PFX + nameof(Debug));
-        private static readonly ProfilerMarker _PRF_Error = new ProfilerMarker(_PRF_PFX + nameof(Error));
-
-        private static readonly ProfilerMarker _PRF_Exception =
-            new ProfilerMarker(_PRF_PFX + nameof(Exception));
-
-        private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
-        private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
-        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
-        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
-
-        private static readonly ProfilerMarker _PRF_LogInternal =
-            new ProfilerMarker(_PRF_PFX + nameof(LogInternal));
-
-        private static readonly ProfilerMarker
-            _PRF_Critical = new ProfilerMarker(_PRF_PFX + nameof(Critical));
-
-        private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
-
-        private static readonly ProfilerMarker _PRF_LogLevelToLogType =
-            new ProfilerMarker(_PRF_PFX + nameof(LogLevelToLogType));
-
-        #endregion
-
         #region Constants and Static Readonly
 
         private const int MENU_PRIORITY = PKG.Menu.Appalachia.Logging.Priority;
@@ -59,13 +26,9 @@ namespace Appalachia.Utility.Logging
 
         #endregion
 
-        #region Fields
-
         private static AppaLogFormatter _consoleLogFormatter;
 
         private static AppaLogFormatter _traceLogFormatter;
-
-        #endregion
 
         /// <summary>
         ///     <para>Logs a warning message to the console.</para>
@@ -514,14 +477,12 @@ namespace Appalachia.Utility.Logging
             public static AppaLogContextBase Application => Contexts.Application.Instance;
             public static AppaLogContextBase Area => Contexts.Area.Instance;
             public static AppaLogContextBase Bootload => Contexts.Bootload.Instance;
-            public static AppaLogContextBase SubArea => Contexts.SubArea.Instance;
 
             public static void Reset()
             {
                 Contexts.Application.Instance.Reset();
                 Contexts.Area.Instance.Reset();
                 Contexts.Bootload.Instance.Reset();
-                Contexts.SubArea.Instance.Reset();
             }
         }
 
@@ -545,7 +506,7 @@ namespace Appalachia.Utility.Logging
         }
 
         private const string LOG_DEBUGGER_STEPTHROUGH = "LOG_DEBUGGER_STEPTHROUGH";
-        
+
         [UnityEditor.MenuItem(MENU_DEBUGGER, false, MENU_PRIORITY + 100)]
         private static void DefineDebuggerStepthrough()
         {
@@ -706,7 +667,6 @@ namespace Appalachia.Utility.Logging
             Application.Instance.Test();
             Area.Instance.Test();
             Bootload.Instance.Test();
-            SubArea.Instance.Test();
         }
 
         #endregion
@@ -723,5 +683,38 @@ namespace Appalachia.Utility.Logging
             }
         }
 #endif
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(AppaLog) + ".";
+
+#if UNITY_EDITOR
+        private static readonly ProfilerMarker _PRF_ClearDeveloperConsole =
+            new ProfilerMarker(_PRF_PFX + nameof(ClearDeveloperConsole));
+#endif
+
+        private static readonly ProfilerMarker _PRF_Debug = new ProfilerMarker(_PRF_PFX + nameof(Debug));
+        private static readonly ProfilerMarker _PRF_Error = new ProfilerMarker(_PRF_PFX + nameof(Error));
+
+        private static readonly ProfilerMarker _PRF_Exception =
+            new ProfilerMarker(_PRF_PFX + nameof(Exception));
+
+        private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
+        private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
+        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
+        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
+
+        private static readonly ProfilerMarker _PRF_LogInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(LogInternal));
+
+        private static readonly ProfilerMarker
+            _PRF_Critical = new ProfilerMarker(_PRF_PFX + nameof(Critical));
+
+        private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
+
+        private static readonly ProfilerMarker _PRF_LogLevelToLogType =
+            new ProfilerMarker(_PRF_PFX + nameof(LogLevelToLogType));
+
+        #endregion
     }
 }

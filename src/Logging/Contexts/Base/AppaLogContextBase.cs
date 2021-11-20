@@ -11,27 +11,6 @@ namespace Appalachia.Utility.Logging.Contexts.Base
 {
     public abstract class AppaLogContextBase
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(AppaLogContextBase) + ".";
-
-        private static readonly ProfilerMarker
-            _PRF_Critical = new ProfilerMarker(_PRF_PFX + nameof(Critical));
-
-        private static readonly ProfilerMarker _PRF_Debug = new ProfilerMarker(_PRF_PFX + nameof(Debug));
-        private static readonly ProfilerMarker _PRF_Error = new ProfilerMarker(_PRF_PFX + nameof(Error));
-
-        private static readonly ProfilerMarker _PRF_Exception =
-            new ProfilerMarker(_PRF_PFX + nameof(Exception));
-
-        private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
-        private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
-        private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
-        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
-        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
-
-        #endregion
-
         protected AppaLogContextBase()
         {
             if (formats == null)
@@ -45,7 +24,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
             }
         }
 
-        #region Fields
+        #region Fields and Autoproperties
 
         protected AppaLogFormats formats;
 
@@ -54,8 +33,6 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         protected abstract string LogPrefix { get; }
 
         protected abstract string LogPrefixFormatted { get; }
-
-        protected abstract AppaLogFormats.LogFormat GetPrefixFormat();
 
         /// <summary>
         ///     <para>Logs a warning message to the console.</para>
@@ -355,7 +332,6 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         {
             using (_PRF_Warn.Auto())
             {
-               
                 AppaLog.LogInternal(
                     LogLevel.Warn,
                     LogPrefix,
@@ -391,5 +367,28 @@ namespace Appalachia.Utility.Logging.Contexts.Base
 
             Trace("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 8));
         }
+
+        protected abstract AppaLogFormats.LogFormat GetPrefixFormat();
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(AppaLogContextBase) + ".";
+
+        private static readonly ProfilerMarker
+            _PRF_Critical = new ProfilerMarker(_PRF_PFX + nameof(Critical));
+
+        private static readonly ProfilerMarker _PRF_Debug = new ProfilerMarker(_PRF_PFX + nameof(Debug));
+        private static readonly ProfilerMarker _PRF_Error = new ProfilerMarker(_PRF_PFX + nameof(Error));
+
+        private static readonly ProfilerMarker _PRF_Exception =
+            new ProfilerMarker(_PRF_PFX + nameof(Exception));
+
+        private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
+        private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
+        private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
+        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
+        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
+
+        #endregion
     }
 }

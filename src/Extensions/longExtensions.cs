@@ -4,7 +4,7 @@ namespace Appalachia.Utility.Extensions
 {
     public static class longExtensions
     {
-        #region Profiling And Tracing Markers
+        #region Profiling
 
         private const string _PRF_PFX = nameof(longExtensions) + ".";
 

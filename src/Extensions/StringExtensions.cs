@@ -22,15 +22,7 @@ namespace Appalachia.Utility.Extensions
             Underscore
         }
 
-        #region Profiling And Tracing Markers
-
-        private const string _PRF_PFX = nameof(StringExtensions) + ".";
-
-        private static readonly ProfilerMarker _PRF_SetupEncodingReplacements =
-            new ProfilerMarker(_PRF_PFX + nameof(SetupEncodingReplacements));
-
-        private static readonly ProfilerMarker _PRF_EncodeUnicodePathToASCII =
-            new ProfilerMarker(_PRF_PFX + nameof(EncodeUnicodePathToASCII));
+        #region Static Fields and Autoproperties
 
         private static char[]
             _npmPackageTrims = {'/', '\\', '.', ',', '"', '\'', ' ', '\t', '\n', '\r', '\0'};
@@ -40,12 +32,9 @@ namespace Appalachia.Utility.Extensions
         private static string[] _npmPackageRemovals = {".tgz", ".gz", ".tar", ".json", ".zip"};
         private static string[] _packagePaths;
 
-        private static readonly ProfilerMarker _PRF_CleanExtension =
-            new ProfilerMarker(_PRF_PFX + nameof(CleanExtension));
+        private static StringCleanerWithContext<char[]> _extensionCleaner;
 
         #endregion
-
-        private static StringCleanerWithContext<char[]> _extensionCleaner;
 
         public static string CleanExtension(this string extension)
         {
@@ -74,36 +63,48 @@ namespace Appalachia.Utility.Extensions
 
         public static bool Contains(this string str, char ch)
         {
-            if (str == null)
+            using (_PRF_Contains.Auto())
             {
-                return false;
-            }
+                if (str == null)
+                {
+                    return false;
+                }
 
-            return str.IndexOf(ch) != -1;
+                return str.IndexOf(ch) != -1;
+            }
         }
 
         public static void CopyToClipboard(this string s)
         {
-            var te = new TextEditor {text = s};
-            te.SelectAll();
-            te.Copy();
+            using (_PRF_CopyToClipboard.Auto())
+            {
+                var te = new TextEditor {text = s};
+                te.SelectAll();
+                te.Copy();
+            }
         }
 
         public static string Cut(this string s, int chars)
         {
-            var length = Mathf.Clamp(s.Length - chars, 0, s.Length);
+            using (_PRF_Cut.Auto())
+            {
+                var length = Mathf.Clamp(s.Length - chars, 0, s.Length);
 
-            return s.Substring(0, length);
+                return s.Substring(0, length);
+            }
         }
 
         public static StringBuilder Cut(this StringBuilder s, int chars)
         {
-            var length = s.Length;
-            var targetLength = length - chars;
+            using (_PRF_Cut.Auto())
+            {
+                var length = s.Length;
+                var targetLength = length - chars;
 
-            targetLength = Mathf.Clamp(targetLength, 0, length);
+                targetLength = Mathf.Clamp(targetLength, 0, length);
 
-            return s.Remove(targetLength - 1, chars);
+                return s.Remove(targetLength - 1, chars);
+            }
         }
 
         public static string EncodeUnicodePathToASCII(this string path, EncodingPrefix prefix)
@@ -137,223 +138,262 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static bool IsNullOrWhitespace(this string str)
+        public static GameObject FindGameObjectByPath(string absolutePath)
         {
-            if (!string.IsNullOrEmpty(str))
+            using (_PRF_FindGameObjectByPath.Auto())
             {
-                for (var index = 0; index < str.Length; ++index)
+                for (var i = 0; i < SceneManager.sceneCount; ++i)
                 {
-                    if (!char.IsWhiteSpace(str[index]))
+                    var scene = SceneManager.GetSceneAt(i);
+
+                    var gameObj = scene.FindGameObjectByPath(absolutePath);
+                    if (gameObj)
                     {
-                        return false;
+                        return gameObj;
                     }
                 }
-            }
 
-            return true;
+                return null;
+            }
+        }
+
+        public static bool IsNotNullOrEmpty(this string str)
+        {
+            using (_PRF_IsNotNullOrEmpty.Auto())
+            {
+                return !string.IsNullOrEmpty(str);
+            }
+        }
+
+        public static bool IsNotNullOrWhiteSpace(this string str)
+        {
+            using (_PRF_IsNotNullOrWhiteSpace.Auto())
+            {
+                return !string.IsNullOrWhiteSpace(str);
+            }
+        }
+
+        public static bool IsNullOrEmpty(this string str)
+        {
+            using (_PRF_IsNullOrEmpty.Auto())
+            {
+                return string.IsNullOrEmpty(str);
+            }
+        }
+
+        public static bool IsNullOrWhiteSpace(this string str)
+        {
+            using (_PRF_IsNullOrWhiteSpace.Auto())
+            {
+                return string.IsNullOrWhiteSpace(str);
+            }
         }
 
         public static bool IsPackagePath(this string path)
         {
-            if (_packagePaths == null)
+            using (_PRF_IsPackagePath.Auto())
             {
-                _packagePaths = new[]
+                if (_packagePaths == null)
                 {
-                    "Packages/", "Packages\\", "Library/PackageCache", "Library\\PackageCache",
-                };
-            }
-
-            for (var i = 0; i < _packagePaths.Length; i++)
-            {
-                var packagePath = _packagePaths[i];
-
-                if (path.Contains(packagePath))
-                {
-                    return true;
+                    _packagePaths = new[]
+                    {
+                        "Packages/", "Packages\\", "Library/PackageCache", "Library\\PackageCache",
+                    };
                 }
-            }
 
-            return false;
+                for (var i = 0; i < _packagePaths.Length; i++)
+                {
+                    var packagePath = _packagePaths[i];
+
+                    if (path.Contains(packagePath))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
 
         public static string LinuxToWindowsPath(this string path)
         {
-            if (Path.IsPathRooted(path))
+            using (_PRF_LinuxToWindowsPath.Auto())
             {
-                var builder = new StringBuilder(path);
+                if (Path.IsPathRooted(path))
+                {
+                    var builder = new StringBuilder(path);
 
-                // /c/Program Files
-                // C:\Program Files
+                    // /c/Program Files
+                    // C:\Program Files
 
-                builder[0] = char.ToUpperInvariant(builder[1]);
-                builder[1] = ':';
-                path = builder.ToString();
+                    builder[0] = char.ToUpperInvariant(builder[1]);
+                    builder[1] = ':';
+                    path = builder.ToString();
+                }
+
+                return path.Replace("/", "\\");
             }
-
-            return path.Replace("/", "\\");
         }
 
         public static string ParseNpmPackageVersion(this string path)
         {
-            if (path == null)
+            using (_PRF_ParseNpmPackageVersion.Auto())
             {
-                return null;
+                if (path == null)
+                {
+                    return null;
+                }
+
+                var lastIndex0 = path.LastIndexOf(":", StringComparison.Ordinal);
+                var lastIndex1 = path.LastIndexOf("@", StringComparison.Ordinal);
+                var lastIndex2 = path.LastIndexOf("-", StringComparison.Ordinal);
+
+                var maxIndex = Mathf.Max(lastIndex0, lastIndex1, lastIndex2);
+
+                if (maxIndex < 0)
+                {
+                    return null;
+                }
+
+                var substring = path.Substring(maxIndex + 1);
+
+                var removed = substring;
+                for (var i = 0; i < _npmPackageRemovals.Length; i++)
+                {
+                    var remove = _npmPackageRemovals[i];
+
+                    removed = removed.Replace(remove, string.Empty);
+                }
+
+                var final = removed.Trim(_npmPackageTrims);
+
+                return final;
             }
-
-            var lastIndex0 = path.LastIndexOf(":", StringComparison.Ordinal);
-            var lastIndex1 = path.LastIndexOf("@", StringComparison.Ordinal);
-            var lastIndex2 = path.LastIndexOf("-", StringComparison.Ordinal);
-
-            var maxIndex = Mathf.Max(lastIndex0, lastIndex1, lastIndex2);
-
-            if (maxIndex < 0)
-            {
-                return null;
-            }
-
-            var substring = path.Substring(maxIndex + 1);
-
-            var removed = substring;
-            for (var i = 0; i < _npmPackageRemovals.Length; i++)
-            {
-                var remove = _npmPackageRemovals[i];
-
-                removed = removed.Replace(remove, string.Empty);
-            }
-
-            var final = removed.Trim(_npmPackageTrims);
-
-            return final;
         }
 
         public static string SeperateWords(this string value)
         {
-            var caps = 0;
-            for (var i = 1; i < value.Length; i++)
+            using (_PRF_SeperateWords.Auto())
             {
-                if (char.IsUpper(value[i]))
+                var caps = 0;
+                for (var i = 1; i < value.Length; i++)
                 {
-                    caps += 1;
+                    if (char.IsUpper(value[i]))
+                    {
+                        caps += 1;
+                    }
                 }
-            }
 
-            if (caps == 0)
-            {
-                return value;
-            }
-
-            var chars = new char[value.Length + caps];
-
-            var outIndex = 0;
-
-            for (var i = 0; i < value.Length; i++)
-            {
-                var character = value[i];
-
-                if ((i > 0) && char.IsUpper(character))
+                if (caps == 0)
                 {
-                    chars[outIndex] = ' ';
+                    return value;
+                }
+
+                var chars = new char[value.Length + caps];
+
+                var outIndex = 0;
+
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var character = value[i];
+
+                    if ((i > 0) && char.IsUpper(character))
+                    {
+                        chars[outIndex] = ' ';
+                        outIndex += 1;
+                    }
+
+                    chars[outIndex] = character;
                     outIndex += 1;
                 }
 
-                chars[outIndex] = character;
-                outIndex += 1;
+                return new string(chars);
             }
-
-            return new string(chars);
         }
 
         public static string SplitPascalCase(this string input)
         {
-            switch (input)
+            using (_PRF_SplitPascalCase.Auto())
             {
-                case "":
-                case null:
-                    return input;
-                default:
-                    var stringBuilder = new StringBuilder(input.Length);
-                    if (char.IsLetter(input[0]))
-                    {
-                        stringBuilder.Append(char.ToUpper(input[0]));
-                    }
-                    else
-                    {
-                        stringBuilder.Append(input[0]);
-                    }
-
-                    for (var index = 1; index < input.Length; ++index)
-                    {
-                        var c = input[index];
-                        if (char.IsUpper(c) && !char.IsUpper(input[index - 1]))
+                switch (input)
+                {
+                    case "":
+                    case null:
+                        return input;
+                    default:
+                        var stringBuilder = new StringBuilder(input.Length);
+                        if (char.IsLetter(input[0]))
                         {
-                            stringBuilder.Append(' ');
+                            stringBuilder.Append(char.ToUpper(input[0]));
+                        }
+                        else
+                        {
+                            stringBuilder.Append(input[0]);
                         }
 
-                        stringBuilder.Append(c);
-                    }
+                        for (var index = 1; index < input.Length; ++index)
+                        {
+                            var c = input[index];
+                            if (char.IsUpper(c) && !char.IsUpper(input[index - 1]))
+                            {
+                                stringBuilder.Append(' ');
+                            }
 
-                    return stringBuilder.ToString();
+                            stringBuilder.Append(c);
+                        }
+
+                        return stringBuilder.ToString();
+                }
             }
         }
 
         public static string ToTitleCase(this string input)
         {
-            var stringBuilder = new StringBuilder();
-            for (var index = 0; index < input.Length; ++index)
+            using (_PRF_ToTitleCase.Auto())
             {
-                var ch = input[index];
-                if ((ch == '_') && ((index + 1) < input.Length))
+                var stringBuilder = new StringBuilder();
+                for (var index = 0; index < input.Length; ++index)
                 {
-                    var upper = input[index + 1];
-                    if (char.IsLower(upper))
+                    var ch = input[index];
+                    if ((ch == '_') && ((index + 1) < input.Length))
                     {
-                        upper = char.ToUpper(upper, CultureInfo.InvariantCulture);
+                        var upper = input[index + 1];
+                        if (char.IsLower(upper))
+                        {
+                            upper = char.ToUpper(upper, CultureInfo.InvariantCulture);
+                        }
+
+                        stringBuilder.Append(upper);
+                        ++index;
                     }
+                    else
+                    {
+                        stringBuilder.Append(ch);
+                    }
+                }
 
-                    stringBuilder.Append(upper);
-                    ++index;
-                }
-                else
-                {
-                    stringBuilder.Append(ch);
-                }
+                return stringBuilder.ToString();
             }
-
-            return stringBuilder.ToString();
         }
-        
-        public static GameObject FindGameObjectByPath(string absolutePath)
-        {
-            for (var i = 0; i < SceneManager.sceneCount; ++i)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                
-                var gameObj = scene.FindGameObjectByPath(absolutePath);
-                if (gameObj)
-                {
-                    return gameObj;
-                }
-            }
-
-            return null;
-        }
-
 
         public static string WindowsToLinuxPath(this string path)
         {
-            if (Path.IsPathRooted(path))
+            using (_PRF_WindowsToLinuxPath.Auto())
             {
-                var builder = new StringBuilder(path);
+                if (Path.IsPathRooted(path))
+                {
+                    var builder = new StringBuilder(path);
 
-                // C:\Program Files
-                // /c/Program Files
+                    // C:\Program Files
+                    // /c/Program Files
 
-                builder[1] = char.ToLowerInvariant(builder[0]);
-                builder[0] = '/';
-                path = builder.ToString();
+                    builder[1] = char.ToLowerInvariant(builder[0]);
+                    builder[0] = '/';
+                    path = builder.ToString();
+                }
+
+                return path.Replace("\\", "/");
             }
-
-            return path.Replace("\\", "/");
         }
 
         private static void SetupEncodingReplacements()
@@ -407,5 +447,64 @@ namespace Appalachia.Utility.Extensions
                 _encodingReplacements.Add('~',  "007E"); // Tilde
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(StringExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_IsNotNullOrEmpty =
+            new ProfilerMarker(_PRF_PFX + nameof(IsNotNullOrEmpty));
+
+        private static readonly ProfilerMarker _PRF_IsNotNullOrWhiteSpace =
+            new ProfilerMarker(_PRF_PFX + nameof(IsNotNullOrWhiteSpace));
+
+        private static readonly ProfilerMarker _PRF_CleanExtension =
+            new ProfilerMarker(_PRF_PFX + nameof(CleanExtension));
+
+        private static readonly ProfilerMarker _PRF_SetupEncodingReplacements =
+            new ProfilerMarker(_PRF_PFX + nameof(SetupEncodingReplacements));
+
+        private static readonly ProfilerMarker _PRF_EncodeUnicodePathToASCII =
+            new ProfilerMarker(_PRF_PFX + nameof(EncodeUnicodePathToASCII));
+
+        private static readonly ProfilerMarker
+            _PRF_Contains = new ProfilerMarker(_PRF_PFX + nameof(Contains));
+
+        private static readonly ProfilerMarker _PRF_CopyToClipboard =
+            new ProfilerMarker(_PRF_PFX + nameof(CopyToClipboard));
+
+        private static readonly ProfilerMarker _PRF_Cut = new ProfilerMarker(_PRF_PFX + nameof(Cut));
+
+        private static readonly ProfilerMarker _PRF_FindGameObjectByPath =
+            new ProfilerMarker(_PRF_PFX + nameof(FindGameObjectByPath));
+
+        private static readonly ProfilerMarker _PRF_IsPackagePath =
+            new ProfilerMarker(_PRF_PFX + nameof(IsPackagePath));
+
+        private static readonly ProfilerMarker _PRF_LinuxToWindowsPath =
+            new ProfilerMarker(_PRF_PFX + nameof(LinuxToWindowsPath));
+
+        private static readonly ProfilerMarker _PRF_ParseNpmPackageVersion =
+            new ProfilerMarker(_PRF_PFX + nameof(ParseNpmPackageVersion));
+
+        private static readonly ProfilerMarker _PRF_SeperateWords =
+            new ProfilerMarker(_PRF_PFX + nameof(SeperateWords));
+
+        private static readonly ProfilerMarker _PRF_SplitPascalCase =
+            new ProfilerMarker(_PRF_PFX + nameof(SplitPascalCase));
+
+        private static readonly ProfilerMarker _PRF_ToTitleCase =
+            new ProfilerMarker(_PRF_PFX + nameof(ToTitleCase));
+
+        private static readonly ProfilerMarker _PRF_WindowsToLinuxPath =
+            new ProfilerMarker(_PRF_PFX + nameof(WindowsToLinuxPath));
+
+        private static readonly ProfilerMarker _PRF_IsNullOrWhiteSpace =
+            new ProfilerMarker(_PRF_PFX + nameof(IsNullOrWhiteSpace));
+
+        private static readonly ProfilerMarker _PRF_IsNullOrEmpty =
+            new ProfilerMarker(_PRF_PFX + nameof(IsNullOrEmpty));
+
+        #endregion
     }
 }

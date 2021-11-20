@@ -2,7 +2,6 @@
 
 using UnityEngine;
 
-
 #endregion
 
 namespace Appalachia.Utility.Extensions
@@ -78,7 +77,10 @@ namespace Appalachia.Utility.Extensions
 
             if (!contributeGI)
             {
-                UnityEditor.GameObjectUtility.SetStaticEditorFlags(renderer.gameObject, UnityEditor.StaticEditorFlags.ContributeGI);
+                UnityEditor.GameObjectUtility.SetStaticEditorFlags(
+                    renderer.gameObject,
+                    UnityEditor.StaticEditorFlags.ContributeGI
+                );
                 save = true;
             }
 

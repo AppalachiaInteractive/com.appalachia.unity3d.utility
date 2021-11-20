@@ -7,22 +7,7 @@ namespace Appalachia.Utility.Framing.Targets
 {
     public class FrameableFactory
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(FrameableFactory) + ".";
-
-        private static readonly ProfilerMarker _PRF_GetFrameView =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFrameView));
-
-        private static readonly ProfilerMarker
-            _PRF_Register = new ProfilerMarker(_PRF_PFX + nameof(Register));
-
-        private static readonly ProfilerMarker _PRF_Initialize =
-            new ProfilerMarker(_PRF_PFX + nameof(Initialize));
-
-        #endregion
-
-        #region Fields
+        #region Static Fields and Autoproperties
 
         private static Dictionary<FrameTarget, Func<IFrameable>> _generators;
 
@@ -71,5 +56,20 @@ namespace Appalachia.Utility.Framing.Targets
                 _generators ??= new Dictionary<FrameTarget, Func<IFrameable>>();
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(FrameableFactory) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetFrameView =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFrameView));
+
+        private static readonly ProfilerMarker
+            _PRF_Register = new ProfilerMarker(_PRF_PFX + nameof(Register));
+
+        private static readonly ProfilerMarker _PRF_Initialize =
+            new ProfilerMarker(_PRF_PFX + nameof(Initialize));
+
+        #endregion
     }
 }

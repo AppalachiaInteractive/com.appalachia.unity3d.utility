@@ -141,13 +141,17 @@ namespace Appalachia.Utility.Execution
 #if UNITY_EDITOR
             if (_editorCoroutine != null)
             {
+                AppaLog.Info($"Auto-cancel of [{ProcessKey}]: cancelling editor co-routine.");
                 Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StopCoroutine(_editorCoroutine);
             }
 #endif
             if (_coroutine != null)
             {
+                AppaLog.Info($"Auto-cancel of [{ProcessKey}]: cancelling runtime co-routine.");
                 SafeCoroutineManager.instance.StopCoroutine(_coroutine);
             }
+            
+            CheckForCancellationRejection();
         }
 
         private void CheckTimeout()
@@ -181,15 +185,7 @@ namespace Appalachia.Utility.Execution
                 {
                     if (_isCancellationInProgress)
                     {
-                        if (_rejectsCancellation)
-                        {
-                            AppaLog.Warn($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
-                            while (enumerator.MoveNext())
-                            {
-                            }
-                            
-                            AppaLog.Info($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
-                        }
+                        CheckForCancellationRejection();
                         
                         _wasCancelled = true;
                         _isCancellationInProgress = false;
@@ -245,6 +241,19 @@ namespace Appalachia.Utility.Execution
 
                 OnCompleteInternal();
                 SafeCoroutineManager.instance.Completed(this);
+            }
+        }
+
+        private void CheckForCancellationRejection()
+        {
+            if (_rejectsCancellation)
+            {
+                AppaLog.Warn($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
+                while (enumerator.MoveNext())
+                {
+                }
+
+                AppaLog.Info($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
             }
         }
 

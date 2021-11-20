@@ -7,21 +7,21 @@ namespace Appalachia.Utility.Logging
 {
     public class AppaLogFormats : ScriptableObject
     {
+        #region Constants and Static Readonly
+
         public const string ADDRESS = "AppaLogColors";
-        
-        #region Fields
 
-        [BoxGroup("General")]
-        public LogFormat filename;
+        #endregion
 
-        [BoxGroup("General")]
-        public LogFormat message;
-        
-        [BoxGroup("Contexts")]
-        public Contexts contexts;
-        
-        [BoxGroup("Levels")]
-        public LogLevel levels;
+        #region Fields and Autoproperties
+
+        [BoxGroup("Contexts")] public Contexts contexts;
+
+        [BoxGroup("General")] public LogFormat filename;
+
+        [BoxGroup("General")] public LogFormat message;
+
+        [BoxGroup("Levels")] public LogLevel levels;
 
         #endregion
 
@@ -39,13 +39,13 @@ namespace Appalachia.Utility.Logging
         [Serializable]
         public struct Contexts
         {
-            #region Fields
+            #region Fields and Autoproperties
 
             public LogFormat application;
             public LogFormat area;
             public LogFormat bootload;
-            public LogFormat subArea;
             public LogFormat maintenance;
+            public LogFormat subArea;
 
             #endregion
         }
@@ -57,7 +57,7 @@ namespace Appalachia.Utility.Logging
         [Serializable, InlineProperty, LabelWidth(100)]
         public struct LogFormat
         {
-            #region Fields
+            #region Fields and Autoproperties
 
             [OnValueChanged(nameof(Validate))]
             [HorizontalGroup("Format", .15f)]
@@ -111,16 +111,16 @@ namespace Appalachia.Utility.Logging
         [Serializable]
         public struct LogLevel
         {
-            #region Fields
+            #region Fields and Autoproperties
 
-            [PropertyOrder(00)] public LogFormat fatal;
             [PropertyOrder(10)] public LogFormat critical;
-            [PropertyOrder(20)] public LogFormat exception;
-            [PropertyOrder(30)] public LogFormat error;            
-            [PropertyOrder(40)] public LogFormat warn;
-            [PropertyOrder(50)] public LogFormat info;
             [PropertyOrder(60)] public LogFormat debug;
+            [PropertyOrder(30)] public LogFormat error;
+            [PropertyOrder(20)] public LogFormat exception;
+            [PropertyOrder(00)] public LogFormat fatal;
+            [PropertyOrder(50)] public LogFormat info;
             [PropertyOrder(70)] public LogFormat trace;
+            [PropertyOrder(40)] public LogFormat warn;
 
             #endregion
         }

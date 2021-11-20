@@ -19,6 +19,8 @@ namespace Appalachia.Utility.TextEditor.Core.Repository
         {
             EditableDocumentTypes = new List<EditableDocumentType>();
             RegisterExtension<EditableJsonDocument>("json");
+            RegisterExtension<EditableJsonDocument>("appauj");
+            RegisterExtension<EditableJsonDocument>("appaudcs");
         }
 
         public static EditableDocumentBase Load(string path)

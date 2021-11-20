@@ -17,7 +17,7 @@ namespace Appalachia.Utility.Extensions
 {
     public static class ListExtensions
     {
-        #region Profiling And Tracing Markers
+        #region Profiling
 
         private const string _PRF_PFX = nameof(ListExtensions) + ".";
 
@@ -103,6 +103,8 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        #region Nested type: ArrayAccessor
+
         #region Nested Types
 
         private static class ArrayAccessor<T>
@@ -143,6 +145,8 @@ namespace Appalachia.Utility.Extensions
                 }
             }
         }
+
+        #endregion
 
         #endregion
     }

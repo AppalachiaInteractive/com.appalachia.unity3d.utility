@@ -9,23 +9,11 @@ namespace Appalachia.Utility.Logging.Formatters
 {
     public abstract class AppaLogFormatter
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(AppaLogFormatter) + ".";
-
-        private static readonly ProfilerMarker _PRF_GetFileNameFromPathInternal =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFileNameFromPathInternal));
-
-        private static readonly ProfilerMarker _PRF_InitializeLogLevelStringLookup =
-            new ProfilerMarker(_PRF_PFX + nameof(InitializeLogLevelStringLookup));
-
-        #endregion
-
         protected AppaLogFormatter()
         {
             if (formats == null)
             {
-                formats = UnityEngine.Resources.Load<AppaLogFormats>(AppaLogFormats.ADDRESS);
+                formats = Resources.Load<AppaLogFormats>(AppaLogFormats.ADDRESS);
             }
 
             if (formats == null)
@@ -34,7 +22,7 @@ namespace Appalachia.Utility.Logging.Formatters
             }
         }
 
-        #region Fields
+        #region Fields and Autoproperties
 
         protected AppaLogFormats formats;
 
@@ -42,32 +30,6 @@ namespace Appalachia.Utility.Logging.Formatters
         protected Dictionary<string, string> _fileNames;
 
         #endregion
-
-        protected abstract string GetLogPrefix(
-            LogLevel level,
-            string prefix,
-            string formattedPrefix,
-            string memberName,
-            string filePath,
-            int lineNumber);
-
-        private static Dictionary<LogLevel, string> InitializeLogLevelStringLookup(
-            Func<LogLevel, string> adjustment)
-        {
-            using (_PRF_InitializeLogLevelStringLookup.Auto())
-            {
-                var lookup = new Dictionary<LogLevel, string>();
-
-                foreach (var value in Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>())
-                {
-                    var adjustmentValue = adjustment(value);
-
-                    lookup.Add(value, adjustmentValue);
-                }
-
-                return lookup;
-            }
-        }
 
         public object FormatLogMessage(
             LogLevel level,
@@ -81,9 +43,17 @@ namespace Appalachia.Utility.Logging.Formatters
             var fullPrefix = GetLogPrefix(level, prefix, formattedPrefix, memberName, filePath, lineNumber);
 
             var messageContent = AlterContent(content.ToString());
-            
+
             return $"{fullPrefix}{messageContent}";
         }
+
+        protected abstract string GetLogPrefix(
+            LogLevel level,
+            string prefix,
+            string formattedPrefix,
+            string memberName,
+            string filePath,
+            int lineNumber);
 
         protected virtual string AlterContent(string content)
         {
@@ -120,5 +90,35 @@ namespace Appalachia.Utility.Logging.Formatters
 
             return _logLevelStrings[level];
         }
+
+        private static Dictionary<LogLevel, string> InitializeLogLevelStringLookup(
+            Func<LogLevel, string> adjustment)
+        {
+            using (_PRF_InitializeLogLevelStringLookup.Auto())
+            {
+                var lookup = new Dictionary<LogLevel, string>();
+
+                foreach (var value in Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>())
+                {
+                    var adjustmentValue = adjustment(value);
+
+                    lookup.Add(value, adjustmentValue);
+                }
+
+                return lookup;
+            }
+        }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(AppaLogFormatter) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetFileNameFromPathInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFileNameFromPathInternal));
+
+        private static readonly ProfilerMarker _PRF_InitializeLogLevelStringLookup =
+            new ProfilerMarker(_PRF_PFX + nameof(InitializeLogLevelStringLookup));
+
+        #endregion
     }
 }

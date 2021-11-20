@@ -9,20 +9,20 @@ namespace Appalachia.Utility.Framing
         {
             _targets = new List<GameObject> {gameObject};
         }
-        
+
         public FramedSet(IEnumerable<GameObject> gameObjects)
         {
             _targets = new List<GameObject>();
 
             _targets.AddRange(gameObjects);
         }
-        
+
         public FramedSet()
         {
             _targets = new List<GameObject>();
         }
 
-        #region Fields
+        #region Fields and Autoproperties
 
         private readonly List<GameObject> _targets;
 

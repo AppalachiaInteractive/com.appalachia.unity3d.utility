@@ -10,6 +10,8 @@ namespace Appalachia.Utility.Extensions
             return new InverseScope(marker);
         }
 
+        #region Nested type: InverseScope
+
         #region Nested Types
 
         internal readonly struct InverseScope : IDisposable
@@ -22,10 +24,16 @@ namespace Appalachia.Utility.Extensions
 
             internal readonly ProfilerMarker m_Ptr;
 
+            #endregion
+
+            #region IDisposable Members
+
             public void Dispose()
             {
                 m_Ptr.Begin();
             }
+
+            #endregion
         }
 
         #endregion

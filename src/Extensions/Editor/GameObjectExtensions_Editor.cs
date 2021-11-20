@@ -134,7 +134,11 @@ namespace Appalachia.Utility.Extensions
                     return _assetGUIDLookup[hashCode];
                 }
 
-                if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(go, out var assetGUID, out long _))
+                if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
+                    go,
+                    out var assetGUID,
+                    out long _
+                ))
                 {
                     _assetGUIDLookup.Add(hashCode, assetGUID);
 

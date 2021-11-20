@@ -14,7 +14,7 @@ namespace Appalachia.Utility.Extensions
             Transform parent = null)
         {
             var operation = assetPrefab.InstantiateAsync();
-            
+
             operation.Completed += handle =>
             {
                 if (handle.Status != AsyncOperationStatus.Failed)

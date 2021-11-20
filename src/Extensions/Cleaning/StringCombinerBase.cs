@@ -9,19 +9,6 @@ namespace Appalachia.Utility.Extensions.Cleaning
     {
         public delegate string ExecuteClean(T instance, string input1, string input2);
 
-        #region Profiling And Tracing Markers
-
-        private const string _PRF_PFX = nameof(StringCombinerBase<T>) + ".";
-
-        private static readonly ProfilerMarker _PRF_Clean = new(_PRF_PFX + nameof(Clean));
-
-        private static readonly ProfilerMarker _PRF_StringCombinerBase =
-            new(_PRF_PFX + nameof(StringCombinerBase<T>));
-
-        private static readonly ProfilerMarker _PRF_Clean_Action = new(_PRF_PFX + nameof(Clean) + ".Action");
-
-        #endregion
-
         protected StringCombinerBase(ExecuteClean action, int capacity = 100)
         {
             using (_PRF_StringCombinerBase.Auto())
@@ -32,10 +19,14 @@ namespace Appalachia.Utility.Extensions.Cleaning
             }
         }
 
+        #region Fields and Autoproperties
+
         public StringBuilder builder;
 
         private Dictionary<string, Dictionary<string, string>> _lookup;
         private ExecuteClean _action;
+
+        #endregion
 
         public string Clean(string input1, string input2)
         {
@@ -70,5 +61,18 @@ namespace Appalachia.Utility.Extensions.Cleaning
                 return result;
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(StringCombinerBase<T>) + ".";
+
+        private static readonly ProfilerMarker _PRF_Clean = new(_PRF_PFX + nameof(Clean));
+
+        private static readonly ProfilerMarker _PRF_StringCombinerBase =
+            new(_PRF_PFX + nameof(StringCombinerBase<T>));
+
+        private static readonly ProfilerMarker _PRF_Clean_Action = new(_PRF_PFX + nameof(Clean) + ".Action");
+
+        #endregion
     }
 }

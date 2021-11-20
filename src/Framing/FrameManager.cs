@@ -10,34 +10,13 @@ namespace Appalachia.Utility.Framing
 {
     internal static class FrameManager
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(FrameManager) + ".";
-
-        private static readonly ProfilerMarker _PRF_Initialize =
-            new ProfilerMarker(_PRF_PFX + nameof(Initialize));
-
-        private static readonly ProfilerMarker _PRF_GetLookAtDirection =
-            new ProfilerMarker(_PRF_PFX + nameof(GetLookAtDirection));
-
-        private static readonly ProfilerMarker _PRF_ExpandBoundsToFitObject =
-            new ProfilerMarker(_PRF_PFX + nameof(ExpandBoundsToFitObject));
-
-        private static readonly ProfilerMarker _PRF_GetFramingForBounds =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFramingForBounds));
-
-        private static readonly ProfilerMarker _PRF_CalculateFraming =
-            new ProfilerMarker(_PRF_PFX + nameof(CalculateFraming));
-
-        #endregion
-
         #region Constants and Static Readonly
 
         private const float QUAT_ROT_CHECK = 1023.5f / 1024.0f;
 
         #endregion
 
-        #region Fields
+        #region Static Fields and Autoproperties
 
         private static List<FramingInput> _inputs;
         private static List<Vector3> framingVectorForwards;
@@ -70,8 +49,8 @@ namespace Appalachia.Utility.Framing
                 var viewRotation = viewTransform.rotation;
                 var aggregatedBounds = new Bounds();
 
-                bool isUI = false;
-                
+                var isUI = false;
+
                 for (var i = 0; i < set.targets.Count; i++)
                 {
                     var go = set.targets[i];
@@ -90,7 +69,13 @@ namespace Appalachia.Utility.Framing
                     isUI |= subIsUI;
                 }
 
-                var parameters = GetFramingForBounds(_inputs, adjustViewingAngle, viewRotation, aggregatedBounds, isUI);
+                var parameters = GetFramingForBounds(
+                    _inputs,
+                    adjustViewingAngle,
+                    viewRotation,
+                    aggregatedBounds,
+                    isUI
+                );
 
                 view.LookAt(parameters.position, parameters.direction, parameters.size, perspective);
             }
@@ -154,7 +139,7 @@ namespace Appalachia.Utility.Framing
         private static Vector3 GetLookAtDirection(Camera c, Transform t, FramingDirection dir, bool isUI)
         {
             var current = c.transform.forward;
-            
+
             using (_PRF_GetLookAtDirection.Auto())
             {
                 return dir switch
@@ -181,5 +166,26 @@ namespace Appalachia.Utility.Framing
                 _inputs.Clear();
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(FrameManager) + ".";
+
+        private static readonly ProfilerMarker _PRF_Initialize =
+            new ProfilerMarker(_PRF_PFX + nameof(Initialize));
+
+        private static readonly ProfilerMarker _PRF_GetLookAtDirection =
+            new ProfilerMarker(_PRF_PFX + nameof(GetLookAtDirection));
+
+        private static readonly ProfilerMarker _PRF_ExpandBoundsToFitObject =
+            new ProfilerMarker(_PRF_PFX + nameof(ExpandBoundsToFitObject));
+
+        private static readonly ProfilerMarker _PRF_GetFramingForBounds =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFramingForBounds));
+
+        private static readonly ProfilerMarker _PRF_CalculateFraming =
+            new ProfilerMarker(_PRF_PFX + nameof(CalculateFraming));
+
+        #endregion
     }
 }

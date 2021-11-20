@@ -22,7 +22,7 @@ namespace Appalachia.Utility.Constants
 
         public static string Color(this string value, Color color)
         {
-            var hex = color.ToHexCode(Colors.Colors.HexCodeFormat.RichText);
+            var hex = color.ToHexCode(HexCodeFormat.RichText);
 
             return FormatElementValue(COLOR, hex, value);
         }

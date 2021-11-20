@@ -12,7 +12,7 @@ namespace Appalachia.Utility.Extensions
 {
     public static class EnumerableExtensions
     {
-        #region Profiling And Tracing Markers
+        #region Profiling
 
         private const string _PRF_PFX = nameof(EnumerableExtensions) + ".";
 
@@ -58,7 +58,7 @@ namespace Appalachia.Utility.Extensions
         /// <summary>Adds a collection to a hashset.</summary>
         /// <param name="hashSet">The hashset.</param>
         /// <param name="range">The collection.</param>
-        public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> range)
+        public static HashSet<T> AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> range)
         {
             using (_PRF_AddRange.Auto())
             {
@@ -66,13 +66,15 @@ namespace Appalachia.Utility.Extensions
                 {
                     hashSet.Add(obj);
                 }
+
+                return hashSet;
             }
         }
 
         /// <summary>
         ///     Adds the elements of the specified collection to the end of the IList&lt;T&gt;.
         /// </summary>
-        public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
+        public static IList<T> AddRange<T>(this IList<T> list, IEnumerable<T> collection)
         {
             using (_PRF_AddRange.Auto())
             {
@@ -87,20 +89,19 @@ namespace Appalachia.Utility.Extensions
                         list.Add(obj);
                     }
                 }
+                
+                return list;
             }
         }
 
         /// <summary>Adds a collection to a hashset.</summary>
         /// <param name="hashSet">The hashset.</param>
         /// <param name="range">The collection.</param>
-        public static void AddRange2<T>(this HashSet<T> hashSet, IEnumerable<T> range)
+        public static HashSet<T> AddRange2<T>(this HashSet<T> hashSet, IEnumerable<T> range)
         {
             using (_PRF_AddRange2.Auto())
             {
-                foreach (var obj in range)
-                {
-                    hashSet.Add(obj);
-                }
+                return AddRange(hashSet, range);
             }
         }
 

@@ -61,6 +61,8 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        #region Nested type: ReferenceCount
+
         #region Nested Types
 
         /// <summary>
@@ -70,6 +72,8 @@ namespace Appalachia.Utility.Extensions
         private class ReferenceCount
         {
             public int refCount;
+
+            #endregion
         }
 
         #endregion

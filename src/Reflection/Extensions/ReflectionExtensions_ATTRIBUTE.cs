@@ -100,7 +100,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             }
         }
 
-        public static T GetAttribute_CACHE<T>(this MemberInfo type, bool inherit)
+        public static T GetAttribute_CACHE<T>(this MemberInfo type, bool inherit = false)
             where T : Attribute
         {
             using (_PRF_GetAttributeCached.Auto())
@@ -110,41 +110,15 @@ namespace Appalachia.Utility.Reflection.Extensions
             }
         }
 
-        public static T GetAttribute_CACHE<T>(this MemberInfo type)
-            where T : Attribute
-        {
-            using (_PRF_GetAttributeCached.Auto())
-            {
-                return type.GetAttribute_CACHE<T>(false);
-            }
-        }
-
-        public static Attribute[] GetAttributes_CACHE(this MemberInfo type)
-        {
-            using (_PRF_GetAttributesCached.Auto())
-            {
-                return type.GetAttributesCached_INTERNAL<Attribute>(false);
-            }
-        }
-
-        public static Attribute[] GetAttributes_CACHE(this MemberInfo type, bool inherit)
+        public static Attribute[] GetAttributes_CACHE(this MemberInfo type, bool inherit = false)
         {
             using (_PRF_GetAttributesCached.Auto())
             {
                 return type.GetAttributesCached_INTERNAL<Attribute>(inherit);
             }
         }
-
-        public static T[] GetAttributes_CACHE<T>(this MemberInfo type)
-            where T : Attribute
-        {
-            using (_PRF_GetAttributesCached.Auto())
-            {
-                return type.GetAttributesCached_INTERNAL<T>(false);
-            }
-        }
-
-        public static T[] GetAttributes_CACHE<T>(this MemberInfo type, bool inherit)
+        
+        public static T[] GetAttributes_CACHE<T>(this MemberInfo type, bool inherit = false)
             where T : Attribute
         {
             using (_PRF_GetAttributesCached.Auto())
@@ -152,17 +126,8 @@ namespace Appalachia.Utility.Reflection.Extensions
                 return type.GetAttributesCached_INTERNAL<T>(inherit);
             }
         }
-
-        public static bool HasAttribute<T>(this MemberInfo member)
-            where T : Attribute
-        {
-            using (_PRF_HasAttribute.Auto())
-            {
-                return member.IsDefined(typeof(T), false);
-            }
-        }
-
-        public static bool HasAttribute<T>(this MemberInfo member, bool inherit)
+        
+        public static bool HasAttribute<T>(this MemberInfo member, bool inherit = false)
             where T : Attribute
         {
             using (_PRF_HasAttribute.Auto())

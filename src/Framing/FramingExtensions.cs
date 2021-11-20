@@ -12,21 +12,11 @@ namespace Appalachia.Utility.Framing
 {
     public static class FramingExtensions
     {
-        #region Profiling
+        #region Static Fields and Autoproperties
 
-        private const string _PRF_PFX = nameof(FramingExtensions) + ".";
-
-        private static readonly ProfilerMarker _PRF_Frame = new ProfilerMarker(_PRF_PFX + nameof(Frame));
-
-        private static readonly ProfilerMarker _PRF_GetRenderingBounds =
-            new ProfilerMarker(_PRF_PFX + nameof(GetRenderingBounds));
-
-        #endregion
-
-        #region Fields
+        private static Dictionary<int, bool> _cachedIsUI;
 
         private static Dictionary<int, Bounds> _cachedBounds;
-        private static Dictionary<int, bool> _cachedIsUI;
         private static Dictionary<int, int> _cachedChildCount;
         private static Dictionary<int, Matrix4x4> _cachedMatrices;
 
@@ -188,5 +178,15 @@ namespace Appalachia.Utility.Framing
             _cachedChildCount ??= new Dictionary<int, int>();
             _cornersArray ??= new Vector3[4];
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(FramingExtensions) + ".";
+        private static readonly ProfilerMarker _PRF_Frame = new ProfilerMarker(_PRF_PFX + nameof(Frame));
+
+        private static readonly ProfilerMarker _PRF_GetRenderingBounds =
+            new ProfilerMarker(_PRF_PFX + nameof(GetRenderingBounds));
+
+        #endregion
     }
 }

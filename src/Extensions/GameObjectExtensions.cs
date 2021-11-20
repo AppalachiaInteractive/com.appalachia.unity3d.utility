@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Appalachia.Utility.Logging;
 using Unity.Profiling;
 using UnityEngine;
@@ -14,64 +15,10 @@ namespace Appalachia.Utility.Extensions
 {
     public static partial class GameObjectExtensions
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_DestroySafely =
-            new("GameObjectExtensions.DestroySafely");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetAsset =
-            new("GameObjectExtensions.GetAsset");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetComponentInImmediateChildren =
-            new("GameObjectExtensions.GetComponentInImmediateChildren");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_InstantiatePrefab =
-            new("GameObjectExtensions.InstantiatePrefab");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursive =
-            new("GameObjectExtensions.MoveToLayerRecursive");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursiveRecoverable =
-            new("GameObjectExtensions.MoveToLayerRecursiveRecoverable");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_RecoverLayersRecursive =
-            new("GameObjectExtensions.RecoverLayersRecursive");
-
-        private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateComponent));
-
-        private static readonly ProfilerMarker
-            _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
-
-        private static readonly ProfilerMarker _PRF_GetFullName =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFullName));
-
-        private static readonly ProfilerMarker _PRF_CreateGameObjectInScene =
-            new ProfilerMarker(_PRF_PFX + nameof(CreateGameObjectInScene));
+        #region Static Fields and Autoproperties
 
         private static Dictionary<int, string> _assetGUIDLookup = new();
         private static List<GameObject> s_GameObjects = new List<GameObject>();
-
-        private static readonly ProfilerMarker _PRF_GetRequiredComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(GetRequiredComponent));
-
-        private static readonly ProfilerMarker _PRF_GetRootObjectsEvenIfNotLoaded =
-            new ProfilerMarker(_PRF_PFX + nameof(GetRootObjectsEvenIfNotLoaded));
-
-        private static readonly ProfilerMarker _PRF_GetSceneSingleton =
-            new ProfilerMarker(_PRF_PFX + nameof(GetSceneSingleton));
-
-        private static readonly ProfilerMarker _PRF_SetAsSiblingTo =
-            new ProfilerMarker(_PRF_PFX + nameof(SetAsSiblingTo));
-
-        private static readonly ProfilerMarker _PRF_SetParentTo =
-            new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
-
-        #endregion
-
-        #region Fields
 
         #endregion
 
@@ -270,6 +217,26 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void FindOrCreateChild(this GameObject go, ref GameObject target, string name)
+        {
+            using (_PRF_FindOrCreateChild.Auto())
+            {
+                if (target != null)
+                {
+                    return;
+                }
+
+                target = FindChild(go, name);
+
+                if (target != null)
+                {
+                    return;
+                }
+
+                target = new GameObject(name).SetParentTo(go);
+            }
+        }
+
         public static T GetComponentInImmediateChildren<T>(this GameObject go)
             where T : Component
         {
@@ -326,6 +293,29 @@ namespace Appalachia.Utility.Extensions
                     if (component == null)
                     {
                         component = obj.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
+        public static void GetOrCreateComponentInChild<T>(this GameObject obj, ref T component, string name)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                if (component == null)
+                {
+                    component = obj.GetComponentsInChildren<T>()
+                                   .FirstOrDefault(
+                                        c => (c.gameObject.name == name) &&
+                                             (c.transform.parent == obj.transform)
+                                    );
+
+                    if (component == null)
+                    {
+                        var child = new GameObject(name).SetParentTo(obj.transform);
+
+                        component = child.AddComponent<T>();
                     }
                 }
             }
@@ -553,5 +543,62 @@ namespace Appalachia.Utility.Extensions
                 return go;
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_DestroySafely =
+            new("GameObjectExtensions.DestroySafely");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetAsset =
+            new("GameObjectExtensions.GetAsset");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetComponentInImmediateChildren =
+            new("GameObjectExtensions.GetComponentInImmediateChildren");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_InstantiatePrefab =
+            new("GameObjectExtensions.InstantiatePrefab");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursive =
+            new("GameObjectExtensions.MoveToLayerRecursive");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursiveRecoverable =
+            new("GameObjectExtensions.MoveToLayerRecursiveRecoverable");
+
+        private static readonly ProfilerMarker _PRF_GameObjectExtensions_RecoverLayersRecursive =
+            new("GameObjectExtensions.RecoverLayersRecursive");
+
+        private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateComponent));
+
+        private static readonly ProfilerMarker
+            _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
+
+        private static readonly ProfilerMarker _PRF_GetFullName =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFullName));
+
+        private static readonly ProfilerMarker _PRF_CreateGameObjectInScene =
+            new ProfilerMarker(_PRF_PFX + nameof(CreateGameObjectInScene));
+
+        private static readonly ProfilerMarker _PRF_GetRequiredComponent =
+            new ProfilerMarker(_PRF_PFX + nameof(GetRequiredComponent));
+
+        private static readonly ProfilerMarker _PRF_GetRootObjectsEvenIfNotLoaded =
+            new ProfilerMarker(_PRF_PFX + nameof(GetRootObjectsEvenIfNotLoaded));
+
+        private static readonly ProfilerMarker _PRF_GetSceneSingleton =
+            new ProfilerMarker(_PRF_PFX + nameof(GetSceneSingleton));
+
+        private static readonly ProfilerMarker _PRF_SetAsSiblingTo =
+            new ProfilerMarker(_PRF_PFX + nameof(SetAsSiblingTo));
+
+        private static readonly ProfilerMarker _PRF_SetParentTo =
+            new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
+
+        private static readonly ProfilerMarker _PRF_FindOrCreateChild =
+            new ProfilerMarker(_PRF_PFX + nameof(FindOrCreateChild));
+
+        #endregion
     }
 }
