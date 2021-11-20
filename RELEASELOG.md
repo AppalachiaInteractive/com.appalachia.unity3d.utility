@@ -1,6 +1,6 @@
 ```
 C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
-Let's go!  
+Development environment loaded!  
  ______   ______   __       ______   ______   ______   ______    
 /\  == \ /\  ___\ /\ \     /\  ___\ /\  __ \ /\  ___\ /\  ___\   
 \ \  __< \ \  __\ \ \ \____\ \  __\ \ \  __ \\ \___  \\ \  __\   
@@ -15,6 +15,7 @@ Let's go!
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 2af5be1597592f9b286c71a39c89826bf7032a73 | 2021-11-20 | Chris Schubert | Updating changelog and releaselog |
 | 3f9e8671afd67234517544d2aa7f5682178c0231 | 2021-11-20 | Chris Schubert | Extension and text editing improvements |
 | d4084249d0f7221ade1340b74c0e64eced62382c | 2021-11-14 | Chris Schubert | Updating changelog and releaselog |
 | 652b29dc8a198c55e46c0099d23d5dd805c96a85 | 2021-11-13 | Chris Schubert | Additional logging contexts |
