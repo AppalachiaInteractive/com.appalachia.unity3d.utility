@@ -14,6 +14,8 @@ Let's go!
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 3f9e8671afd67234517544d2aa7f5682178c0231 | 2021-11-20 | Chris Schubert | Extension and text editing improvements |
+| d4084249d0f7221ade1340b74c0e64eced62382c | 2021-11-14 | Chris Schubert | Updating changelog and releaselog |
 | 652b29dc8a198c55e46c0099d23d5dd805c96a85 | 2021-11-13 | Chris Schubert | Additional logging contexts |
 | 0b70568dd58309449c2f109f3eaa1fcb62b3a43e | 2021-11-13 | Chris Schubert | Updating changelog and releaselog |
 | 9e7c175414a1b24ca431477a94b95be2922b6c73 | 2021-11-13 | Chris Schubert | Adding private flag for repo filter. |
