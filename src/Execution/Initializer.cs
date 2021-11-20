@@ -7,8 +7,14 @@ using UnityEngine;
 namespace Appalachia.Utility.Execution
 {
     [Serializable]
-    public struct InitializationData
+    public struct Initializer
     {
+        public enum TagState
+        {
+            Serialized = 0,
+            NonSerialized = 100
+        }
+        
         #region Constants and Static Readonly
 
         private const string GROUP = "Internal";
@@ -17,47 +23,54 @@ namespace Appalachia.Utility.Execution
 
         #region Fields and Autoproperties
 
+        [NonSerialized] private HashSet<string> _nonSerializedTagsHash;
+        
+        [HideInInspector, SerializeField] private List<string> _nonSerializedTags;
+        
         [NonSerialized] private HashSet<string> _tagsHash;
-
-        [HideInInspector, SerializeField]
-        private List<string> _tags;
+        
+        [HideInInspector, SerializeField] private List<string> _tags;
 
         [NonSerialized] private IInitializable _object;
 
-        [HideInInspector, SerializeField]
-        private string _resetToken;
+        [HideInInspector, SerializeField] private string _resetToken;
 
         public string ResetToken => _resetToken;
 
         #endregion
 
-        public bool HasInitialized(string tag)
+        public bool HasInitialized(string tag, TagState tagState = TagState.Serialized)
         {
             using (_PRF_HasInitialized.Auto())
             {
-                InitializeInternal();
+                InitializeInternalCollections();
 
-                return _tagsHash.Contains(tag);
+                if (tagState == TagState.Serialized)
+                {
+                    return _tagsHash.Contains(tag);    
+                }
+                else
+                {
+                    return _nonSerializedTagsHash.Contains(tag);
+                }
+            }
+        }
+
+        public void Initialize<T>(T obj, string tag, TagState tagState, Action action)
+            where T : UnityEngine.Object, IInitializable
+        {
+            using (_PRF_Initialize.Auto())
+            {
+                InitializeInternal(obj, tag, false, tagState, action);
             }
         }
 
         public void Initialize<T>(T obj, string tag, Action action)
-        where T : UnityEngine.Object, IInitializable
+            where T : UnityEngine.Object, IInitializable
         {
             using (_PRF_Initialize.Auto())
             {
-                _object = obj;
-
-                if (HasInitialized(tag))
-                {
-                    return;
-                }
-
-                action();
-
-                MarkInitialized(tag);
-
-                SetDirty(obj);
+                InitializeInternal(obj, tag, false, TagState.Serialized, action);
             }
         }
 
@@ -66,31 +79,60 @@ namespace Appalachia.Utility.Execution
         {
             using (_PRF_Initialize.Auto())
             {
+                InitializeInternal(obj, tag, force, TagState.Serialized, action);
+            }
+        }
+
+        public void Initialize<T>(T obj, string tag, bool force, TagState tagState, Action action)
+            where T : UnityEngine.Object, IInitializable
+        {
+            using (_PRF_Initialize.Auto())
+            {
+                InitializeInternal(obj, tag, force, tagState, action);
+            }
+        }
+
+        private void InitializeInternal<T>(T obj, string tag, bool force, TagState tagState, Action action)
+            where T : UnityEngine.Object, IInitializable
+        {
+            using (_PRF_Initialize.Auto())
+            {
                 _object = obj;
 
-                if (!force && HasInitialized(tag))
+                if (!force && HasInitialized(tag, tagState))
                 {
                     return;
                 }
 
                 action();
 
-                MarkInitialized(tag);
+                MarkInitialized(tag, tagState);
 
                 SetDirty(obj);
             }
         }
 
-        public void MarkInitialized(string tag)
+        public void MarkInitialized(string tag, TagState tagState = TagState.Serialized)
         {
             using (_PRF_MarkInitialized.Auto())
             {
-                InitializeInternal();
+                InitializeInternalCollections();
 
-                if (!_tagsHash.Contains(tag))
+                if (tagState == TagState.Serialized)
                 {
-                    _tagsHash.Add(tag);
-                    _tags.Add(tag);
+                    if (!_tagsHash.Contains(tag))
+                    {
+                        _tagsHash.Add(tag);
+                        _tags.Add(tag);
+                    }
+                }
+                else
+                {
+                    if (!_nonSerializedTagsHash.Contains(tag))
+                    {
+                        _nonSerializedTagsHash.Add(tag);
+                        _nonSerializedTags.Add(tag);
+                    }
                 }
             }
         }
@@ -113,12 +155,14 @@ namespace Appalachia.Utility.Execution
             }
         }
 
-        private void InitializeInternal()
+        private void InitializeInternalCollections()
         {
             using (_PRF_InitializeInternal.Auto())
             {
                 _tags ??= new List<string>();
                 _tagsHash ??= new HashSet<string>(_tags);
+                _nonSerializedTags ??= new List<string>();
+                _nonSerializedTagsHash ??= new HashSet<string>(_tags);
             }
         }
 
@@ -128,6 +172,8 @@ namespace Appalachia.Utility.Execution
             {
                 _tags = new List<string>();
                 _tagsHash = new HashSet<string>();
+                _nonSerializedTags = new List<string>();
+                _nonSerializedTagsHash = new HashSet<string>();
 
                 SetDirty(obj);
             }
@@ -161,13 +207,13 @@ namespace Appalachia.Utility.Execution
 
         #region Profiling
 
-        private const string _PRF_PFX = nameof(InitializationData) + ".";
+        private const string _PRF_PFX = nameof(Initializer) + ".";
 
         private static readonly ProfilerMarker _PRF_ResetDirectly =
             new ProfilerMarker(_PRF_PFX + nameof(ResetDirectly));
 
         private static readonly ProfilerMarker _PRF_InitializeInternal =
-            new ProfilerMarker(_PRF_PFX + nameof(InitializeInternal));
+            new ProfilerMarker(_PRF_PFX + nameof(InitializeInternalCollections));
 
         private static readonly ProfilerMarker _PRF_Reset =
             new ProfilerMarker(_PRF_PFX + nameof(ResetInitializationData));
