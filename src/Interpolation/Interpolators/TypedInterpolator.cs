@@ -9,27 +9,27 @@ namespace Appalachia.Utility.Interpolation.Interpolators
     public struct TypedInterpolator<TMode> : IInterpolator
         where TMode : struct, IInterpolationMode
     {
-        public float start { get; set; }
-        public float target { get; set; }
-        public float value { get; set; }
-        public float time { get; set; }
+        public float min { get; set; }
+        public float max { get; set; }
+        public float current { get; set; }
+        public float percentage { get; set; }
 
         public void Target(float v)
         {
-            if (!Mathf.Approximately(target, v))
+            if (!Mathf.Approximately(max, v))
             {
-                start = value;
-                target = v;
-                time = 0f;
+                min = current;
+                max = v;
+                percentage = 0f;
             }
         }
 
         public void Reset(float v)
         {
-            start = v;
-            target = v;
-            value = v;
-            time = 0f;
+            min = v;
+            max = v;
+            current = v;
+            percentage = 0f;
         }
 
         public float Update()
@@ -44,12 +44,12 @@ namespace Appalachia.Utility.Interpolation.Interpolators
 
         [DebuggerStepThrough] public static implicit operator float(TypedInterpolator<TMode> i)
         {
-            return i.value;
+            return i.current;
         }
 
         [DebuggerStepThrough] public override string ToString()
         {
-            return value.ToString();
+            return current.ToString();
         }
     }
 }

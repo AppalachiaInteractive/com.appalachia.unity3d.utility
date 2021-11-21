@@ -9,7 +9,7 @@ namespace Appalachia.Utility.Interpolation
             where TMode : IInterpolationMode
             where TInterpolation : IInterpolator
         {
-            return e.Interpolate(i.value, i.target, i.time);
+            return e.Interpolate(i.current, i.max, i.percentage);
         }
     }
 }

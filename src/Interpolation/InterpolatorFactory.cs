@@ -6,7 +6,11 @@ namespace Appalachia.Utility.Interpolation
 {
     public static class InterpolatorFactory
     {
+        #region Constants and Static Readonly
+
         private static readonly IInterpolationMode[] interpolations;
+
+        #endregion
 
         static InterpolatorFactory()
         {
@@ -24,9 +28,44 @@ namespace Appalachia.Utility.Interpolation
             };
         }
 
+        public static float EaseInCubic(float min, float max, float percentage)
+        {
+            return ((max - min) * percentage * percentage * percentage) + min;
+        }
+
+        public static float EaseInOutSine(float min, float max, float percentage)
+        {
+            return ((max - min) * 0.5f * (1f - Mathf.Cos(Mathf.PI * percentage))) + min;
+        }
+
+        public static float EaseInQuad(float min, float max, float percentage)
+        {
+            return ((max - min) * percentage * percentage) + min;
+        }
+
+        public static float EaseInSine(float min, float max, float percentage)
+        {
+            return (-(max - min) * Mathf.Cos(Mathf.PI * 0.5f * percentage)) + (max - min) + min;
+        }
+
+        public static float EaseOutCubic(float min, float max, float percentage)
+        {
+            return ((max - min) * (((percentage - 1) * (percentage - 1) * (percentage - 1)) + 1f)) + min;
+        }
+
+        public static float EaseOutQuad(float min, float max, float percentage)
+        {
+            return (-(max - min) * percentage * (percentage - 2)) + min;
+        }
+
+        public static float EaseOutSine(float min, float max, float percentage)
+        {
+            return ((max - min) * Mathf.Sin(Mathf.PI * 0.5f * percentage)) + min;
+        }
+
         public static IInterpolationMode GetInterpolator(InterpolationMode i)
         {
-            return interpolations[(int) i];
+            return interpolations[(int)i];
         }
 
         public static IInterpolationMode GetInterpolator(string name)
@@ -35,55 +74,20 @@ namespace Appalachia.Utility.Interpolation
             return GetInterpolator(i);
         }
 
-        public static float Linear(float v0, float v1, float t)
+        public static float Linear(float min, float max, float percentage)
         {
-            return ((v1 - v0) * t) + v0;
+            return ((max - min) * percentage) + min;
         }
 
-        public static float LinearAngle(float v0, float v1, float t)
+        public static float LinearAngle(float min, float max, float percentage)
         {
-            return Mathf.LerpAngle(v0, v1, t);
+            return Mathf.LerpAngle(min, max, percentage);
         }
 
-        public static float SmoothStep(float v0, float v1, float t)
+        public static float SmoothStep(float min, float max, float percentage)
         {
-            var u = (-2f * t * t * t) + (3f * t * t);
-            return (v1 * u) + (v0 * (1f - u));
-        }
-
-        public static float EaseInQuad(float v0, float v1, float t)
-        {
-            return ((v1 - v0) * t * t) + v0;
-        }
-
-        public static float EaseOutQuad(float v0, float v1, float t)
-        {
-            return (-(v1 - v0) * t * (t - 2)) + v0;
-        }
-
-        public static float EaseInCubic(float v0, float v1, float t)
-        {
-            return ((v1 - v0) * t * t * t) + v0;
-        }
-
-        public static float EaseOutCubic(float v0, float v1, float t)
-        {
-            return ((v1 - v0) * (((t - 1) * (t - 1) * (t - 1)) + 1f)) + v0;
-        }
-
-        public static float EaseInSine(float v0, float v1, float t)
-        {
-            return (-(v1 - v0) * Mathf.Cos(Mathf.PI * 0.5f * t)) + (v1 - v0) + v0;
-        }
-
-        public static float EaseOutSine(float v0, float v1, float t)
-        {
-            return ((v1 - v0) * Mathf.Sin(Mathf.PI * 0.5f * t)) + v0;
-        }
-
-        public static float EaseInOutSine(float v0, float v1, float t)
-        {
-            return ((v1 - v0) * 0.5f * (1f - Mathf.Cos(Mathf.PI * t))) + v0;
+            var u = (-2f * percentage * percentage * percentage) + (3f * percentage * percentage);
+            return (max * u) + (min * (1f - u));
         }
     }
 }

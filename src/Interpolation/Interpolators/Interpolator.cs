@@ -8,36 +8,36 @@ namespace Appalachia.Utility.Interpolation.Interpolators
     [Serializable]
     public struct Interpolator : IInterpolator
     {
-        public float start { get; set; }
-        public float target { get; set; }
-        public float value { get; set; }
-        public float time { get; set; }
+        public float min { get; set; }
+        public float max { get; set; }
+        public float current { get; set; }
+        public float percentage { get; set; }
 
         public static float Update<TInterpolation, TMode>(ref TInterpolation i, float dt, TMode e)
             where TInterpolation : struct, IInterpolator
             where TMode : IInterpolationMode
         {
-            i.time = Mathf.Clamp01(i.time + dt);
-            i.value = e.Interpolate(i);
-            return i.value;
+            i.percentage = Mathf.Clamp01(i.percentage + dt);
+            i.current = e.Interpolate(i);
+            return i.current;
         }
 
         public void Target(float v)
         {
-            if (!Mathf.Approximately(target, v))
+            if (!Mathf.Approximately(max, v))
             {
-                start = value;
-                target = v;
-                time = 0f;
+                min = current;
+                max = v;
+                percentage = 0f;
             }
         }
 
         public void Reset(float v)
         {
-            start = v;
-            target = v;
-            value = v;
-            time = 0f;
+            min = v;
+            max = v;
+            current = v;
+            percentage = 0f;
         }
 
         public float Update<E>()
@@ -65,12 +65,12 @@ namespace Appalachia.Utility.Interpolation.Interpolators
 
         [DebuggerStepThrough] public static implicit operator float(Interpolator i)
         {
-            return i.value;
+            return i.current;
         }
 
         [DebuggerStepThrough] public override string ToString()
         {
-            return value.ToString();
+            return current.ToString();
         }
     }
 }

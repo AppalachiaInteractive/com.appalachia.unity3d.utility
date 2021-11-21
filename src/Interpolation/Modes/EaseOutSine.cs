@@ -2,9 +2,9 @@ namespace Appalachia.Utility.Interpolation.Modes
 {
     public struct EaseOutSine : IInterpolationMode
     {
-        public float Interpolate(float v0, float v1, float t)
+        public float Interpolate(float min, float max, float percentage)
         {
-            return InterpolatorFactory.EaseOutSine(v0, v1, t);
+            return InterpolatorFactory.EaseOutSine(min, max, percentage);
         }
     }
 }
