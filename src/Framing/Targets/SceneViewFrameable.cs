@@ -26,7 +26,14 @@ namespace Appalachia.Utility.Framing.Targets
         {
             using (_PRF_LookAt.Auto())
             {
-                _sceneView.LookAt(point, direction, newSize);
+                if (newSize < .01f)
+                {
+                    _sceneView.LookAt(point, direction);
+                }
+                else
+                {
+                    _sceneView.LookAt(point, direction, newSize);                    
+                }
 
                 switch (perspective)
                 {

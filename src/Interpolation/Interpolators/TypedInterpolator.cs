@@ -13,6 +13,8 @@ namespace Appalachia.Utility.Interpolation.Interpolators
         public float max { get; set; }
         public float current { get; set; }
         public float percentage { get; set; }
+        
+        public InterpolationMode mode { get;  set; }
 
         public void Target(float v)
         {
@@ -34,12 +36,16 @@ namespace Appalachia.Utility.Interpolation.Interpolators
 
         public float Update()
         {
-            return Interpolator.Update(ref this, Time.deltaTime, new TMode());
+            var m = new TMode();
+            mode = m.mode;
+            return Interpolator.Update(ref this, Time.deltaTime, m);
         }
 
         public float Update(float dt)
         {
-            return Interpolator.Update(ref this, dt, new TMode());
+            var m = new TMode();
+            mode = m.mode;
+            return Interpolator.Update(ref this, dt, m);
         }
 
         [DebuggerStepThrough] public static implicit operator float(TypedInterpolator<TMode> i)

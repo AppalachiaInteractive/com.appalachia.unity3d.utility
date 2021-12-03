@@ -6,5 +6,7 @@ namespace Appalachia.Utility.Interpolation.Modes
         {
             return InterpolatorFactory.LinearAngle(x, y, percentage);
         }
+
+        public InterpolationMode mode => InterpolationMode.LinearAngle;
     }
 }

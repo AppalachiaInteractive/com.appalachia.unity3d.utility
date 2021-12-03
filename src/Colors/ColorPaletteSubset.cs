@@ -122,6 +122,7 @@ namespace Appalachia.Utility.Colors
         public Color First => Get(0);
         public Color Last => Get((int)SIZE - 1);
         public Color Middle => Get(((int)SIZE / 2) - 1);
+        public Color Half => Middle;
         public Color Quarter => Get((int) (1f * (SIZE / 4f)) - 1);
         public Color ThreeQuarters => Get((int) (3f * (SIZE / 4f)) - 1);
         public Color Third => Get((int) (1f * (SIZE / 3f)) - 1);

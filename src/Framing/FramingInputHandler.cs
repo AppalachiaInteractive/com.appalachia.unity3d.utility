@@ -4,6 +4,7 @@ using System.Linq;
 using Appalachia.Utility.Framing.Extensions;
 using Appalachia.Utility.Logging;
 using Unity.Profiling;
+using UnityEditor;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
@@ -66,6 +67,12 @@ namespace Appalachia.Utility.Framing
                 
                 yield return new Unity.EditorCoroutines.Editor.EditorWaitForSeconds(.05f);
             }
+        }
+
+        [MenuItem(PKG.Menu.Appalachia.Tools.Base + "Reset Text Editing Flag", false, PKG.Priority)]
+        public static void ResetTextEditingField()
+        {
+            UnityEditor.EditorGUIUtility.editingTextField = false;
         }
         
         private static bool ExecuteFrameCheck()

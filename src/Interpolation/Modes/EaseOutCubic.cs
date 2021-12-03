@@ -6,5 +6,7 @@ namespace Appalachia.Utility.Interpolation.Modes
         {
             return InterpolatorFactory.EaseOutCubic(min, max, percentage);
         }
+
+        public InterpolationMode mode => InterpolationMode.EaseOutCubic;
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Appalachia.Utility.Execution
 {
-    public class SafeCoroutineManager : MonoBehaviour
+    public class SafeCoroutineManager: MonoBehaviour
     {
         private static SafeCoroutineManager _instance;
         // ReSharper disable once CollectionNeverQueried.Local

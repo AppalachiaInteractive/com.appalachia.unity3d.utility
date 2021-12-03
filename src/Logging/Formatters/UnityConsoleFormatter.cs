@@ -1,22 +1,16 @@
-using Appalachia.Utility.Colors;
-using Appalachia.Utility.Constants;
 using Unity.Profiling;
 
 namespace Appalachia.Utility.Logging.Formatters
 {
     public class UnityConsoleFormatter : AppaLogFormatter
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(UnityConsoleFormatter) + ".";
-
-        private static readonly ProfilerMarker _PRF_GetLogPrefix =
-            new ProfilerMarker(_PRF_PFX + nameof(GetLogPrefix));
-
-        #endregion
-
-        protected override string AlterContent(string content)
+        protected override string AlterContent(string content, LogLevel level)
         {
+            if (level == LogLevel.Exception)
+            {
+                return content;
+            }
+
             return formats.message.Format(content);
         }
 
@@ -30,10 +24,7 @@ namespace Appalachia.Utility.Logging.Formatters
         {
             using (_PRF_GetLogPrefix.Auto())
             {
-                var fileName = GetFileNameFromPathInternal(
-                    filePath,
-                    fn => formats.filename.Format(fn)
-                );
+                var fileName = GetFileNameFromPathInternal(filePath, fn => formats.filename.Format(fn));
 
                 var logLevelString = GetLogLevelString(
                     level,
@@ -87,5 +78,14 @@ namespace Appalachia.Utility.Logging.Formatters
                 return result;
             }
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(UnityConsoleFormatter) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetLogPrefix =
+            new ProfilerMarker(_PRF_PFX + nameof(GetLogPrefix));
+
+        #endregion
     }
 }

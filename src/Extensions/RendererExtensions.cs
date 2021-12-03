@@ -63,7 +63,7 @@ namespace Appalachia.Utility.Extensions
             if (save)
             {
                 UnityEditor.PrefabUtility.SavePrefabAsset(prefab);
-                UnityEditor.EditorUtility.SetDirty(prefab);
+                prefab.MarkAsModified();
             }
         }
 

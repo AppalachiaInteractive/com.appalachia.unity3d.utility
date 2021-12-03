@@ -6,5 +6,7 @@ namespace Appalachia.Utility.Interpolation.Modes
         {
             return InterpolatorFactory.EaseInOutSine(min, max, percentage);
         }
+        
+        public InterpolationMode mode => InterpolationMode.EaseInOutSine;
     }
 }

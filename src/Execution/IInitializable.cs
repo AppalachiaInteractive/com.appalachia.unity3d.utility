@@ -2,6 +2,6 @@ namespace Appalachia.Utility.Execution
 {
     public interface IInitializable
     {
-        void Initialize();
+        public void InitializeExternal();
     }
 }

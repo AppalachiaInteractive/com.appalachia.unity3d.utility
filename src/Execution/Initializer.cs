@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Appalachia.Utility.Extensions;
+using Appalachia.Utility.Logging;
 using Sirenix.OdinInspector;
 using Unity.Profiling;
 using UnityEngine;
@@ -104,11 +106,18 @@ namespace Appalachia.Utility.Execution
                     return;
                 }
 
-                action();
+                try
+                {
+                    action();
 
-                MarkInitialized(tag, tagState);
+                    MarkInitialized(tag, tagState);
+                }
+                catch (Exception ex)
+                {
+                    AppaLog.Exception($"Failed to initialize for tag {tag}", ex);
+                }
 
-                SetDirty(obj);
+                MarkAsModified(obj);
             }
         }
 
@@ -175,7 +184,7 @@ namespace Appalachia.Utility.Execution
                 _nonSerializedTags = new List<string>();
                 _nonSerializedTagsHash = new HashSet<string>();
 
-                SetDirty(obj);
+                MarkAsModified(obj);
             }
         }
 
@@ -194,13 +203,13 @@ namespace Appalachia.Utility.Execution
             return Appalachia.Utility.Colors.Colors.Appalachia.Yellow;
         }*/
 
-        private void SetDirty(IInitializable obj)
+        private void MarkAsModified(IInitializable obj)
         {
             _object = obj;
 #if UNITY_EDITOR
             if ((obj != null) && obj is UnityEngine.Object tobj)
             {
-                UnityEditor.EditorUtility.SetDirty(tobj);
+                tobj.MarkAsModified();
             }
 #endif
         }

@@ -46,6 +46,91 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void CreateOrGetChild(this GameObject go, ref GameObject target, string name, bool ui)
+        {
+            using (_PRF_FindOrCreateChild.Auto())
+            {
+                if (target != null)
+                {
+                    return;
+                }
+
+                target = GetChild(go, name);
+
+                if (target != null)
+                {
+                    return;
+                }
+
+                if (ui)
+                {
+                    target = new GameObject(name, typeof(RectTransform)).SetParentTo(go);
+                }
+                else
+                {
+                    target = new GameObject(name).SetParentTo(go);
+                }
+            }
+        }
+
+        public static void CreateOrGetComponent<T>(this GameObject obj, ref T component)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                DestroyComponentOnWrongGameObject(
+                    obj,
+                    ref component,
+                    DestructionMode.DestroyIfOnOtherGameObject
+                );
+
+                if (component == null)
+                {
+                    component = obj.GetComponent<T>();
+
+                    if (component == null)
+                    {
+                        component = obj.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
+        public static void CreateOrGetComponentInChild<T>(
+            this GameObject obj,
+            ref T component,
+            string name,
+            bool requireNameMatch = true)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                DestroyComponentOnWrongGameObject(
+                    obj,
+                    ref component,
+                    DestructionMode.DestroyIfNotOnChildGameObject
+                );
+
+                if (component == null)
+                {
+                    var components = obj.GetComponentsInChildren<T>();
+                    
+                    var childComponents = components.Where(c => c.transform.parent == obj.transform);
+                    var match = childComponents.FirstOrDefault(
+                        c => !requireNameMatch || (c.gameObject.name == name)
+                    );
+
+                    component = match;
+                    if (component == null)
+                    {
+                        var child = new GameObject(name).SetParentTo(obj.transform);
+
+                        component = child.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
         public static void DestroySafely(this Object o)
         {
             using (_PRF_GameObjectExtensions_DestroySafely.Auto())
@@ -198,7 +283,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static GameObject FindChild(this GameObject go, string name)
+        public static GameObject GetChild(this GameObject go, string name)
         {
             using (_PRF_AddChild.Auto())
             {
@@ -214,26 +299,6 @@ namespace Appalachia.Utility.Extensions
                 }
 
                 return null;
-            }
-        }
-
-        public static void FindOrCreateChild(this GameObject go, ref GameObject target, string name)
-        {
-            using (_PRF_FindOrCreateChild.Auto())
-            {
-                if (target != null)
-                {
-                    return;
-                }
-
-                target = FindChild(go, name);
-
-                if (target != null)
-                {
-                    return;
-                }
-
-                target = new GameObject(name).SetParentTo(go);
             }
         }
 
@@ -261,63 +326,6 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_GetFullName.Auto())
             {
                 return gameObj.transform.FullPath();
-            }
-        }
-
-        public static void GetOrCreateComponent<T>(this Component obj, ref T component)
-            where T : Component
-        {
-            using (_PRF_GetOrCreateComponent.Auto())
-            {
-                if (component == null)
-                {
-                    component = obj.gameObject.GetComponent<T>();
-
-                    if (component == null)
-                    {
-                        component = obj.gameObject.AddComponent<T>();
-                    }
-                }
-            }
-        }
-
-        public static void GetOrCreateComponent<T>(this GameObject obj, ref T component)
-            where T : Component
-        {
-            using (_PRF_GetOrCreateComponent.Auto())
-            {
-                if (component == null)
-                {
-                    component = obj.GetComponent<T>();
-
-                    if (component == null)
-                    {
-                        component = obj.AddComponent<T>();
-                    }
-                }
-            }
-        }
-
-        public static void GetOrCreateComponentInChild<T>(this GameObject obj, ref T component, string name)
-            where T : Component
-        {
-            using (_PRF_GetOrCreateComponent.Auto())
-            {
-                if (component == null)
-                {
-                    component = obj.GetComponentsInChildren<T>()
-                                   .FirstOrDefault(
-                                        c => (c.gameObject.name == name) &&
-                                             (c.transform.parent == obj.transform)
-                                    );
-
-                    if (component == null)
-                    {
-                        var child = new GameObject(name).SetParentTo(obj.transform);
-
-                        component = child.AddComponent<T>();
-                    }
-                }
             }
         }
 
@@ -481,25 +489,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static Component SetAsSiblingTo(this Component go, Transform sibling)
-        {
-            using (_PRF_SetAsSiblingTo.Auto())
-            {
-                go.transform.SetParent(sibling.parent);
-                return go;
-            }
-        }
-
         public static GameObject SetAsSiblingTo(this GameObject go, GameObject sibling)
-        {
-            using (_PRF_SetAsSiblingTo.Auto())
-            {
-                go.transform.SetParent(sibling.transform.parent);
-                return go;
-            }
-        }
-
-        public static Component SetAsSiblingTo(this Component go, GameObject sibling)
         {
             using (_PRF_SetAsSiblingTo.Auto())
             {
@@ -517,15 +507,6 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static Component SetParentTo(this Component go, Transform parent)
-        {
-            using (_PRF_SetParentTo.Auto())
-            {
-                go.transform.SetParent(parent);
-                return go;
-            }
-        }
-
         public static GameObject SetParentTo(this GameObject go, GameObject parent)
         {
             using (_PRF_SetParentTo.Auto())
@@ -535,18 +516,75 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static Component SetParentTo(this Component go, GameObject parent)
+        private static void DestroyComponentOnWrongGameObject<T>(
+            GameObject obj,
+            ref T component,
+            DestructionMode destructionMode)
+            where T : Component
         {
-            using (_PRF_SetParentTo.Auto())
+            using (_PRF_DestroyComponentOnWrongGameObject.Auto())
             {
-                go.transform.SetParent(parent.transform);
-                return go;
+                if (component != null)
+                {
+                    if (destructionMode == DestructionMode.DestroyIfNotOnChildGameObject)
+                    {
+                        if (component.gameObject.transform.parent == null)
+                        {
+                            DestroyObjectForRecreate(ref component, "a child object");
+                        }
+                        else if (component.gameObject.transform.parent.gameObject != obj)
+                        {
+                            DestroyObjectForRecreate(ref component, "a child object");
+                        }
+                    }
+
+                    if (destructionMode == DestructionMode.DestroyIfOnThisGameObject)
+                    {
+                        if (component.gameObject == obj)
+                        {
+                            DestroyObjectForRecreate(ref component, "another object");
+                        }
+                    }
+
+                    if (destructionMode == DestructionMode.DestroyIfOnOtherGameObject)
+                    {
+                        if (component.gameObject != obj)
+                        {
+                            DestroyObjectForRecreate(ref component, obj.name);
+                        }
+                    }
+                }
             }
         }
+
+        private static void DestroyObjectForRecreate<T>(ref T component, string recreatingOn)
+            where T : Component
+        {
+            AppaLog.Warn(
+                $"Destroying component {typeof(T).Name} on object {component.gameObject.name} before recreating on {recreatingOn}."
+            );
+
+            component.DestroySafely();
+            component = null;
+        }
+
+        #region Nested type: DestructionMode
+
+        private enum DestructionMode
+        {
+            DestroyIfOnThisGameObject,
+            DestroyIfOnOtherGameObject,
+            DestroyIfNotOnChildGameObject,
+        }
+
+        #endregion
 
         #region Profiling
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_DestroyComponentOnWrongGameObject =
+            new ProfilerMarker(_PRF_PFX + nameof(DestroyComponentOnWrongGameObject));
 
         private static readonly ProfilerMarker _PRF_GameObjectExtensions_DestroySafely =
             new("GameObjectExtensions.DestroySafely");
@@ -570,7 +608,7 @@ namespace Appalachia.Utility.Extensions
             new("GameObjectExtensions.RecoverLayersRecursive");
 
         private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateComponent));
+            new ProfilerMarker(_PRF_PFX + nameof(CreateOrGetComponent));
 
         private static readonly ProfilerMarker
             _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
@@ -597,7 +635,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
 
         private static readonly ProfilerMarker _PRF_FindOrCreateChild =
-            new ProfilerMarker(_PRF_PFX + nameof(FindOrCreateChild));
+            new ProfilerMarker(_PRF_PFX + nameof(CreateOrGetChild));
 
         #endregion
     }

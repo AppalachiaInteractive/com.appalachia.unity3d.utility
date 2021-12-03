@@ -13,10 +13,13 @@ namespace Appalachia.Utility.Interpolation.Interpolators
         public float current { get; set; }
         public float percentage { get; set; }
 
+        public InterpolationMode mode { get;  set; }
+
         public static float Update<TInterpolation, TMode>(ref TInterpolation i, float dt, TMode e)
             where TInterpolation : struct, IInterpolator
             where TMode : IInterpolationMode
         {
+            i.mode = e.mode;
             i.percentage = Mathf.Clamp01(i.percentage + dt);
             i.current = e.Interpolate(i);
             return i.current;
@@ -60,6 +63,8 @@ namespace Appalachia.Utility.Interpolation.Interpolators
 
         public float Update(float dt, InterpolationMode i)
         {
+            mode = i;
+            
             return Update(ref this, dt, InterpolatorFactory.GetInterpolator(i));
         }
 

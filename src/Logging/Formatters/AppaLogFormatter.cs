@@ -40,11 +40,21 @@ namespace Appalachia.Utility.Logging.Formatters
             string filePath,
             int lineNumber)
         {
-            var fullPrefix = GetLogPrefix(level, prefix, formattedPrefix, memberName, filePath, lineNumber);
+            using (_PRF_FormatLogMessage.Auto())
+            {
+                var fullPrefix = GetLogPrefix(
+                    level,
+                    prefix,
+                    formattedPrefix,
+                    memberName,
+                    filePath,
+                    lineNumber
+                );
 
-            var messageContent = AlterContent(content.ToString());
+                var messageContent = AlterContent(content.ToString(), level);
 
-            return $"{fullPrefix}{messageContent}";
+                return $"{fullPrefix}{messageContent}";
+            }
         }
 
         protected abstract string GetLogPrefix(
@@ -55,7 +65,7 @@ namespace Appalachia.Utility.Logging.Formatters
             string filePath,
             int lineNumber);
 
-        protected virtual string AlterContent(string content)
+        protected virtual string AlterContent(string content, LogLevel level)
         {
             return content;
         }
@@ -86,9 +96,12 @@ namespace Appalachia.Utility.Logging.Formatters
 
         protected string GetLogLevelString(LogLevel level, Func<LogLevel, string> adjustment)
         {
-            _logLevelStrings ??= InitializeLogLevelStringLookup(adjustment);
+            using (_PRF_GetLogLevelString.Auto())
+            {
+                _logLevelStrings ??= InitializeLogLevelStringLookup(adjustment);
 
-            return _logLevelStrings[level];
+                return _logLevelStrings[level];
+            }
         }
 
         private static Dictionary<LogLevel, string> InitializeLogLevelStringLookup(
@@ -112,6 +125,12 @@ namespace Appalachia.Utility.Logging.Formatters
         #region Profiling
 
         private const string _PRF_PFX = nameof(AppaLogFormatter) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetLogLevelString =
+            new ProfilerMarker(_PRF_PFX + nameof(GetLogLevelString));
+
+        private static readonly ProfilerMarker _PRF_FormatLogMessage =
+            new ProfilerMarker(_PRF_PFX + nameof(FormatLogMessage));
 
         private static readonly ProfilerMarker _PRF_GetFileNameFromPathInternal =
             new ProfilerMarker(_PRF_PFX + nameof(GetFileNameFromPathInternal));

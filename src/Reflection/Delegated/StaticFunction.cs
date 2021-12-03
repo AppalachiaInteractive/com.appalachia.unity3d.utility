@@ -4,6 +4,81 @@ using Appalachia.Utility.Reflection.Extensions;
 
 namespace Appalachia.Utility.Reflection.Delegated
 {
+    public static class StaticFunction
+    {
+        public static Func<TR> CreateDelegate<TR>(MethodInfo method)
+        {
+            return (Func<TR>) Delegate.CreateDelegate(typeof(Func<TR>), method);
+        }
+        
+        public static Func<T1, TR> CreateDelegate<T1, TR>(MethodInfo method)
+        {
+            return (Func<T1, TR>) Delegate.CreateDelegate(typeof(Func<T1, TR>), method);
+        }
+        
+        public static Func<T1, T2, TR> CreateDelegate<T1, T2, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, TR> CreateDelegate<T1, T2, T3, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, TR> CreateDelegate<T1, T2, T3, T4, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, T5, TR> CreateDelegate<T1, T2, T3, T4, T5, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, T5, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, T5, T6, TR> CreateDelegate<T1, T2, T3, T4, T5, T6, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, T5, T6, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, T6, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, T5, T6, T7, TR> CreateDelegate<T1, T2, T3, T4, T5, T6, T7, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, T5, T6, T7, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, T6, T7, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, T5, T6, T7, T8, TR> CreateDelegate<T1, T2, T3, T4, T5, T6, T7, T8, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, T5, T6, T7, T8, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, T6, T7, T8, TR>), method);
+        }
+        
+        public static Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TR> CreateDelegate<T1, T2, T3, T4, T5, T6, T7, T8, T9, TR>(MethodInfo method)
+        {
+            return (Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TR>) Delegate.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TR>), method);
+        }
+
+        public static Func<TR> CreateDelegate<TR>(
+            Type t,
+            string methodName,
+            BindingFlags flags = ReflectionExtensions.AllStatic)
+        {
+            var bestMethod = t.PrepareAndGetBestMethod(methodName, flags, null);
+
+            return (Func<TR>) Delegate.CreateDelegate(typeof(Func<TR>), bestMethod);
+        }
+        
+        public static Func<TR> CreateDelegate<TR>(
+            string typeNameWithNamespace,
+            string methodName,
+            BindingFlags flags = ReflectionExtensions.AllStatic)
+        {
+            var type = ReflectionExtensions.GetByName(typeNameWithNamespace);
+            
+            var bestMethod = type.PrepareAndGetBestMethod(methodName, flags, null);
+
+            return (Func<TR>) Delegate.CreateDelegate(typeof(Func<TR>), bestMethod);
+        }
+    }
+
     public class StaticFunction<T, T0, TR>
     {
         private const string _PRF_PFX = nameof(StaticFunction<T, T0, TR>) + ".";

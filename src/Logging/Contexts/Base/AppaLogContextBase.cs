@@ -39,11 +39,13 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
+        /// <param name="exception">The exception that occured.</param>
         /// <param name="logIf">Whether or not to log.</param>
         [DebuggerStepperBoundary]
         public void Critical(
             object message,
             UnityEngine.Object context = null,
+            Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -57,6 +59,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    exception,
                     logIf,
                     memberName,
                     filePath,
@@ -88,6 +91,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    null,
                     logIf,
                     memberName,
                     filePath,
@@ -101,11 +105,13 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
+        /// <param name="exception">The exception that occurred.</param>
         /// <param name="logIf">Whether or not to log.</param>
         [DebuggerStepperBoundary]
         public void Error(
             object message,
             UnityEngine.Object context = null,
+            Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -119,6 +125,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    exception,
                     logIf,
                     memberName,
                     filePath,
@@ -130,13 +137,15 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         /// <summary>
         ///     <para>Logs an exception to the console.</para>
         /// </summary>
-        /// <param name="exception">String for display.</param>
+        /// <param name="message">String for display.</param>
+        /// <param name="exception">The exception that occurred.</param>
         /// <param name="context">Object to which the message applies.</param>
         /// <param name="logIf">Whether or not to log.</param>
         [DebuggerStepperBoundary]
         public void Exception(
-            string exception,
+            string message,
             UnityEngine.Object context = null,
+            Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -148,8 +157,9 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogLevel.Exception,
                     LogPrefix,
                     LogPrefixFormatted,
-                    exception,
+                    message,
                     context,
+                    exception,
                     logIf,
                     memberName,
                     filePath,
@@ -179,8 +189,9 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogLevel.Exception,
                     LogPrefix,
                     LogPrefixFormatted,
-                    exception,
+                    exception.Message,
                     context,
+                    exception,
                     logIf,
                     memberName,
                     filePath,
@@ -194,11 +205,13 @@ namespace Appalachia.Utility.Logging.Contexts.Base
         /// </summary>
         /// <param name="message">String or object to be converted to string representation for display.</param>
         /// <param name="context">Object to which the message applies.</param>
+        /// <param name="exception">The exception that occurred.</param>
         /// <param name="logIf">Whether or not to log.</param>
         [DebuggerStepperBoundary]
         public void Fatal(
             object message,
             UnityEngine.Object context = null,
+            Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -212,6 +225,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    exception,
                     logIf,
                     memberName,
                     filePath,
@@ -243,6 +257,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    null,
                     logIf,
                     memberName,
                     filePath,
@@ -276,6 +291,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    null,
                     logIf,
                     memberName,
                     filePath,
@@ -307,6 +323,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    null,
                     logIf,
                     memberName,
                     filePath,
@@ -338,6 +355,7 @@ namespace Appalachia.Utility.Logging.Contexts.Base
                     LogPrefixFormatted,
                     message,
                     context,
+                    null,
                     logIf,
                     memberName,
                     filePath,
@@ -351,13 +369,45 @@ namespace Appalachia.Utility.Logging.Contexts.Base
             var line = 436;
             var step = 11;
 
-            Fatal("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 1));
+            Fatal(
+                "Testing 1 2 3...",
+                null,
+                new NotSupportedException("Testing 1 2 3..."),
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + (step * 1)
+            );
 
-            Critical("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 2));
+            Critical(
+                "Testing 1 2 3...",
+                null,
+                new NotSupportedException("Testing 1 2 3..."),
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + (step * 2)
+            );
 
-            Exception("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 3));
+            Exception(
+                "Testing 1 2 3...",
+                null,
+                new NotSupportedException("Testing 1 2 3..."),
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + (step * 3)
+            );
 
-            Error("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 4));
+            Error(
+                "Testing 1 2 3...",
+                null,
+                new NotSupportedException("Testing 1 2 3..."),
+                true,
+                nameof(Test),
+                "AppaLog.cs",
+                line + (step * 4)
+            );
 
             Warn("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 5));
 

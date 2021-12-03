@@ -17,6 +17,7 @@ namespace Appalachia.Utility.Interpolation
             interpolations = new IInterpolationMode[]
             {
                 new Linear(),
+                new LinearAngle(),
                 new SmoothStep(),
                 new EaseInQuad(),
                 new EaseOutQuad(),

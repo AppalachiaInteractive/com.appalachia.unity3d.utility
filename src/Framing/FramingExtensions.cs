@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Appalachia.Utility.Extensions;
 using Appalachia.Utility.Framing.Extensions;
 using Unity.Profiling;
 using UnityEngine;
@@ -162,9 +163,9 @@ namespace Appalachia.Utility.Framing
                         bounds.Encapsulate(collider.bounds);
                     }
                 }
-
-                _cachedIsUI.Add(instanceId, isUI);
-                _cachedBounds.Add(instanceId, bounds);
+                
+                _cachedIsUI.AddOrUpdate(instanceId, isUI);
+                _cachedBounds.AddOrUpdate(instanceId, bounds);
 
                 return bounds;
             }

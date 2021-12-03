@@ -45,7 +45,7 @@ namespace Appalachia.Utility.Logging
             public LogFormat area;
             public LogFormat bootload;
             public LogFormat maintenance;
-            public LogFormat subArea;
+            public LogFormat timeline;
 
             #endregion
         }
@@ -57,7 +57,7 @@ namespace Appalachia.Utility.Logging
         [Serializable, InlineProperty, LabelWidth(100)]
         public struct LogFormat
         {
-            #region Fields and Autoproperties
+             #region Fields and Autoproperties
 
             [OnValueChanged(nameof(Validate))]
             [HorizontalGroup("Format", .15f)]
