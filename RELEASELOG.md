@@ -1,4 +1,6 @@
 ```
+C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
+Development environment loaded!  
  ______   ______   __       ______   ______   ______   ______    
 /\  == \ /\  ___\ /\ \     /\  ___\ /\  __ \ /\  ___\ /\  ___\   
 \ \  __< \ \  __\ \ \ \____\ \  __\ \ \  __ \\ \___  \\ \  __\   
@@ -13,6 +15,8 @@
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 829767019eb5deecf32292472d5e78e67e338a0b | 2021-12-03 | Chris Schubert | Fixing missing test assemblies |
+| 19ad944a8ff795828153a852bcef41b9d0d34071 | 2021-12-02 | Chris Schubert | Updating changelog and releaselog |
 | e882537548aa82cded288ced000cf3049c20b705 | 2021-12-02 | Chris Schubert | Updating changelog and releaselog |
 | eb5f3dd6d99302f14e4a6217d3d31047ef5992e6 | 2021-12-02 | Chris Schubert | General code cleanup |
 | 106e1b72cea2ef45eb097da6542a4e1b63dace00 | 2021-12-02 | Chris Schubert | Updated log formatting, extensions, better delegate generations, and interpolation modes |
