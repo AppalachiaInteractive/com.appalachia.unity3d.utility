@@ -1,6 +1,4 @@
 ```
-C:/Users/Chris/com.appalachia/unity3d/appa/Assets/Appalachia.Utility
-Development environment loaded!  
  ______   ______   __       ______   ______   ______   ______    
 /\  == \ /\  ___\ /\ \     /\  ___\ /\  __ \ /\  ___\ /\  ___\   
 \ \  __< \ \  __\ \ \ \____\ \  __\ \ \  __ \\ \___  \\ \  __\   
@@ -15,6 +13,9 @@ Development environment loaded!
 `0.2.0`
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| eb5f3dd6d99302f14e4a6217d3d31047ef5992e6 | 2021-12-02 | Chris Schubert | General code cleanup |
+| 106e1b72cea2ef45eb097da6542a4e1b63dace00 | 2021-12-02 | Chris Schubert | Updated log formatting, extensions, better delegate generations, and interpolation modes |
+| c48d04c15fdb72c639ef905c1e1473a5ad05b4ee | 2021-11-21 | Chris Schubert | Updating changelog and releaselog |
 | 5b3e4472c0de72303ee2d24e787878a8588a4993 | 2021-11-21 | Chris Schubert | Updating asset manager usages |
 | 7f8c8f8eb345b6ba79697ecd37189e147237eba2 | 2021-11-20 | Chris Schubert | Updating changelog and releaselog |
 | eab2e376a4fbaf6d0aff0bc37f4aa3f13165889f | 2021-11-20 | Chris Schubert | Updating changelog and releaselog |
