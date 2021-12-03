@@ -12,6 +12,7 @@
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| e882537548aa82cded288ced000cf3049c20b705 | 2021-12-02 | Chris Schubert | Updating changelog and releaselog |
 | eb5f3dd6d99302f14e4a6217d3d31047ef5992e6 | 2021-12-02 | Chris Schubert | General code cleanup |
 | 106e1b72cea2ef45eb097da6542a4e1b63dace00 | 2021-12-02 | Chris Schubert | Updated log formatting, extensions, better delegate generations, and interpolation modes |
 | c48d04c15fdb72c639ef905c1e1473a5ad05b4ee | 2021-11-21 | Chris Schubert | Updating changelog and releaselog |
