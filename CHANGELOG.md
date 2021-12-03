@@ -14,6 +14,7 @@ Development environment loaded!
 ## Releasing
 | Hash | Date | Author | Changes |
 |------|------|--------|---------|
+| 819e37473314a40bae327522ad1128ff94879a31 | 2021-12-03 | Chris Schubert | Updating changelog and releaselog |
 | 829767019eb5deecf32292472d5e78e67e338a0b | 2021-12-03 | Chris Schubert | Fixing missing test assemblies |
 | 19ad944a8ff795828153a852bcef41b9d0d34071 | 2021-12-02 | Chris Schubert | Updating changelog and releaselog |
 | e882537548aa82cded288ced000cf3049c20b705 | 2021-12-02 | Chris Schubert | Updating changelog and releaselog |
