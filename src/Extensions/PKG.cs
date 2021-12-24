@@ -31,13 +31,13 @@ namespace Appalachia.Utility.Extensions
         public const string NeutralResourcesLanguage = "en";
         public const string AssemblyVersion = "0.2.0.0";
         public const string AssemblyFileVersion = "0.2.0.0";
-        public const int Priority = -427000;
+        public const int Priority = -418000;
         public const string Name = "Extensions";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
         public const string Version = "0.2.0";
         public const int VersionInt = 2000;
-        public const string BuildDate = "2021-11-19T00:01:26.1350982Z";
+        public const string BuildDate = "2021-12-21T00:29:22.8766838Z";
         
         public static partial class Prefs
         {

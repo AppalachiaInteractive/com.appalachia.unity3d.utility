@@ -1,6 +1,7 @@
 using System.IO;
 using Appalachia.Utility.AutoSave.Configuration;
 using Appalachia.Utility.AutoSave.Metadata;
+using Appalachia.Utility.Strings;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 
@@ -26,7 +27,7 @@ namespace Appalachia.Utility.AutoSave
             var saveNameIdentifier = AutoSaverConfiguration.FileName;
             var autosaveFileName = metadata.GetSaveFileName(saveNameIdentifier);
 
-            var filename = $"{autosaveFileName}.unity";
+            var filename = ZString.Format("{0}.unity", autosaveFileName);
             var finalOutputPath = "{0}{1}".Format(relativeSavePath, filename);
 
             return finalOutputPath;

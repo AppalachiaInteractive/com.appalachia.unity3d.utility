@@ -12,61 +12,285 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 449315d29dbe48f0bf9b5a18a5444b6a, type: 3}
   m_Name: AppaLogColors
   m_EditorClassIdentifier: 
-  filename:
-    bold: 1
-    italic: 0
-    color: {r: 0.9, g: 0.85081965, b: 0.74754095, a: 1}
-  message:
-    bold: 0
-    italic: 1
-    color: {r: 0.85, g: 0.84300417, b: 0.8325103, a: 1}
   contexts:
     application:
-      bold: 1
-      italic: 0
-      color: {r: 0.34, g: 0.69999987, b: 0.85, a: 1}
+      _color: {r: 0.6388156, g: 0.7372196, b: 0.57292765, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
     area:
-      bold: 1
-      italic: 0
-      color: {r: 0.56, g: 0.595122, b: 0.8, a: 1}
+      _color: {r: 0.587616, g: 0.77441806, b: 0.7160424, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
     bootload:
-      bold: 1
-      italic: 0
-      color: {r: 0.44941178, g: 0.7490196, b: 0.6575604, a: 1}
-    subArea:
-      bold: 1
-      italic: 0
-      color: {r: 0.533527, g: 0.74509805, b: 0.37254903, a: 1}
+      _color: {r: 0.54663265, g: 0.7125457, b: 0.67711633, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    debugOverlay:
+      _color: {r: 0.466874, g: 0.8859029, b: 0.58909076, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    game:
+      _color: {r: 0.64504284, g: 0.73075867, b: 0.9104853, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    hud:
+      _color: {r: 0.5152778, g: 0.53958195, b: 0.7097109, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    inGameMenu:
+      _color: {r: 0.4823244, g: 0.57928514, b: 0.91526574, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    input:
+      _color: {r: 0.64609027, g: 0.9984623, b: 0.7837356, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    lifetime:
+      _color: {r: 0.50853944, g: 0.7781421, b: 0.39184573, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    loadingScreen:
+      _color: {r: 0.4963502, g: 0.691587, b: 0.8712047, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    mainMenu:
+      _color: {r: 0.57277364, g: 0.7607293, b: 0.87602997, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    maintenance:
+      _color: {r: 0.57099205, g: 0.98060805, b: 0.9336729, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    pauseMenu:
+      _color: {r: 0.73020834, g: 0.8252804, b: 0.95556444, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    splashScreen:
+      _color: {r: 0.50386405, g: 0.7363812, b: 0.7882161, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    startEnvironment:
+      _color: {r: 0.6241146, g: 0.87350315, b: 0.8961749, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    startScreen:
+      _color: {r: 0.48472732, g: 0.8285501, b: 0.96308947, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    timeline:
+      _color: {r: 0.6790092, g: 0.9842935, b: 0.9795235, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    bazooka:
+      _color: {r: 0.6483253, g: 0.6562187, b: 0.95143396, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    frameEvent:
+      _color: {r: 0.7654214, g: 0.9849305, b: 0.7398971, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    runtimeGraphs:
+      _color: {r: 0.5642927, g: 0.8785288, b: 0.71813744, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    devConsole:
+      _color: {r: 0.69266754, g: 0.99513817, b: 0.8706841, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    clock:
+      _color: {r: 0.49775335, g: 0.4680717, b: 0.87513524, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    meshData:
+      _color: {r: 0.49957517, g: 0.7621583, b: 0.49820042, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    cursor:
+      _color: {r: 0.67103034, g: 0.88196397, b: 0.61726296, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    audio:
+      _color: {r: 0.66335994, g: 0.60802937, b: 0.92995256, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    character:
+      _color: {r: 0.672449, g: 0.5916574, b: 0.88996476, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    database:
+      _color: {r: 0.62519664, g: 0.9869074, b: 0.659107, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    wind:
+      _color: {r: 0.7298725, g: 0.5999892, b: 0.9512231, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    water:
+      _color: {r: 0.6168808, g: 0.43456307, b: 0.82350755, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    fire:
+      _color: {r: 0.6572122, g: 0.5172186, b: 0.76381296, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    prefabRendering:
+      _color: {r: 0.7202641, g: 0.4571857, b: 0.8518031, a: 1}
+      _format: 26
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    terrain:
+      _color: {r: 0.457544, g: 0.9084941, b: 0.54444593, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
   levels:
-    fatal:
-      bold: 1
-      italic: 1
-      color: {r: 1, g: 0, b: 0, a: 1}
     critical:
-      bold: 1
-      italic: 0
-      color: {r: 1, g: 0, b: 0, a: 1}
-    exception:
-      bold: 1
-      italic: 0
-      color: {r: 1, g: 0, b: 0, a: 1}
-    error:
-      bold: 1
-      italic: 0
-      color: {r: 0.95, g: 0.32396314, b: 0.008755776, a: 1}
-    warn:
-      bold: 1
-      italic: 0
-      color: {r: 0.9333334, g: 0.60784316, b: 0, a: 1}
-    info:
-      bold: 1
-      italic: 0
-      color: {r: 0.50980395, g: 0.66293275, b: 0.7294118, a: 1}
+      _color: {r: 1, g: 0.22666666, b: 0.19999999, a: 1}
+      _format: 10
+      _surroundLeft: '* ['
+      _surroundRight: '] *'
+      _style: 10
     debug:
-      bold: 1
-      italic: 0
-      color: {r: 0.8, g: 0.77939916, b: 0.72103006, a: 1}
+      _color: {r: 0.93333334, g: 0.9022222, b: 0.84, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    error:
+      _color: {r: 0.9490196, g: 0.31879687, b: 0.18980391, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    exception:
+      _color: {r: 1, g: 0.25333333, b: 0.19999999, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+    fatal:
+      _color: {r: 1, g: 0.19999999, b: 0.19999999, a: 1}
+      _format: 10
+      _surroundLeft: '** ['
+      _surroundRight: '] **'
+      _style: 10
+    info:
+      _color: {r: 0.93333334, g: 0.8702347, b: 0.74666667, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
     trace:
-      bold: 1
-      italic: 0
-      color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+      _color: {r: 0.93333334, g: 0.93333334, b: 0.93333334, a: 1}
+      _format: 0
+      _surroundLeft: 
+      _surroundRight: 
+      _style: 0
+    warn:
+      _color: {r: 0.93333334, g: 0.4986928, b: 0.18823528, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 10
+  specials:
+    className:
+      _color: {r: 1, g: 1, b: 1, a: 0.8509804}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 0
+    exceptionMessage:
+      _color: {r: 0.9, g: 0.48, b: 0.27, a: 1}
+      _format: 0
+      _surroundLeft: 
+      _surroundRight: 
+      _style: 0
+    exceptionName:
+      _color: {r: 0.8, g: 0.29782608, b: 0.2, a: 1}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 0
+    filename:
+      _color: {r: 1, g: 1, b: 1, a: 0.8509804}
+      _format: 10
+      _surroundLeft: '['
+      _surroundRight: ']'
+      _style: 0
+    message:
+      _color: {r: 1, g: 1, b: 1, a: 0.69803923}
+      _format: 0
+      _surroundLeft: 
+      _surroundRight: 
+      _style: 0
+    structural:
+      _color: {r: 1, g: 1, b: 1, a: 0.5019608}
+      _format: 0
+      _surroundLeft: 
+      _surroundRight: 
+      _style: 0
+  hueRange: {x: 90, y: 280}
+  saturationRange: {x: 20, y: 50}
+  valueRange: {x: 70, y: 100}

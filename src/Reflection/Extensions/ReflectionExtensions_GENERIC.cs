@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Appalachia.Utility.Strings;
 
 namespace Appalachia.Utility.Reflection.Extensions
 {
@@ -367,7 +368,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                     if (!index1.IsClass && !index1.IsInterface && !index1.IsValueType)
                     {
                         throw new Exception(
-                            $"Unknown parameter constraint type! {index1.GetReadableName()}"
+                            ZString.Format("Unknown parameter constraint type! {0}", index1.GetReadableName())
                         );
                     }
 
@@ -457,7 +458,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             if (!type.IsGenericTypeDefinition)
             {
                 throw new ArgumentException(
-                    $"Type '{type.GetReadableName()}' is not a generic type definition!"
+                    ZString.Format("Type '{0}' is not a generic type definition!", type.GetReadableName())
                 );
             }
 
@@ -486,7 +487,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             if (!type.IsGenericParameter)
             {
                 throw new ArgumentException(
-                    $"Type '{type.GetReadableName()}' is not a generic parameter!"
+                    ZString.Format("Type '{0}' is not a generic parameter!", type.GetReadableName())
                 );
             }
 

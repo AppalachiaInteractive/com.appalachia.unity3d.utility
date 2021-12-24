@@ -15,6 +15,9 @@ using System.Reflection.Emit;
 
 namespace Appalachia.Utility.Extensions
 {
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoad]
+#endif
     public static class ListExtensions
     {
         #region Profiling

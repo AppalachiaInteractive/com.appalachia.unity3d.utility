@@ -28,6 +28,7 @@ namespace Appalachia.Utility.Colors
             {
                 public const string Black       = "#171616FF";
                 public const string DarkBrown   = "#2E2922FF";
+                public const string DeepBrown = "#282521FF";
                 public const string Gray        = "#676051FF";
                 public const string Tan         = "#AFA58FFF";
                 public const string Bone        = "#DBD6CBFF";

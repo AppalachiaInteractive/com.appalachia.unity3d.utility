@@ -1,4 +1,5 @@
 using System;
+using Appalachia.Utility.Strings;
 using UnityEngine;
 
 namespace Appalachia.Utility.Colors
@@ -122,11 +123,14 @@ namespace Appalachia.Utility.Colors
         public Color First => Get(0);
         public Color Last => Get((int)SIZE - 1);
         public Color Middle => Get(((int)SIZE / 2) - 1);
-        public Color Half => Middle;
+        public Color OneHalf => Middle;
         public Color Quarter => Get((int) (1f * (SIZE / 4f)) - 1);
         public Color ThreeQuarters => Get((int) (3f * (SIZE / 4f)) - 1);
-        public Color Third => Get((int) (1f * (SIZE / 3f)) - 1);
+        public Color OneThird => Get((int)(1f * (SIZE / 3f)) - 1);
         public Color TwoThirds => Get((int) (2f * (SIZE / 3f)) - 1);
+        public Color ThreeEighths => Get((int)(3f * (SIZE / 8f)) - 1);
+        public Color FiveEighths => Get((int)(5f * (SIZE / 8f)) - 1);
+        public Color SevenEighths => Get((int)(7f * (SIZE / 8f)) - 1);
 
         public Color Gradient(float time, bool clamp = true)
         {
@@ -404,7 +408,7 @@ namespace Appalachia.Utility.Colors
 
                 for (var i = 0; i < SIZE; i++)
                 {
-                    _labels[i] = $"{name} - {i:00}";
+                    _labels[i] = ZString.Format("{0} - {1:00}", name, i);
                 }
             }
 

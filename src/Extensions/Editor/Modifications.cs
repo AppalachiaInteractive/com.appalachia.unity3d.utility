@@ -1,17 +1,38 @@
+using Appalachia.Utility.Constants;
 using Unity.Profiling;
+using UnityEditor;
 using UnityEngine;
 
 namespace Appalachia.Utility.Extensions
 {
     public static class Modifications
     {
+        public static bool CanModifyAssets()
+        {
+            using (_PRF_CanModifyAssets.Auto())
+            {
+                return
+#if UNITY_EDITOR
+                    !APPASERIALIZE.InSerializationWindow &&
+                    !Application.isPlaying &&
+                    !EditorApplication.isPlayingOrWillChangePlaymode
+                    /*&& !EditorApplication.isUpdating*/
+#else
+                        false
+#endif
+                    ;
+            }
+        }
+
         public static void CreateUndoStep(this Object[] go, string stepName)
         {
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(go, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(go, stepName);
+                }
 #endif
             }
         }
@@ -21,8 +42,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(go, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(go, stepName);
+                }
 #endif
             }
         }
@@ -32,8 +55,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(go, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(go, stepName);
+                }
 #endif
             }
         }
@@ -43,8 +68,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(go, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(go, stepName);
+                }
 #endif
             }
         }
@@ -54,8 +81,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                }
 #endif
             }
         }
@@ -65,8 +94,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                }
 #endif
             }
         }
@@ -76,8 +107,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                }
 #endif
             }
         }
@@ -87,8 +120,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(new[] { go }, stepName);
+                }
 #endif
             }
         }
@@ -98,8 +133,10 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_CreateUndoStep.Auto())
             {
 #if UNITY_EDITOR
-
-                UnityEditor.Undo.RegisterCompleteObjectUndo(objects, stepName);
+                if (CanModifyAssets())
+                {
+                    Undo.RegisterCompleteObjectUndo(objects, stepName);
+                }
 #endif
             }
         }
@@ -109,9 +146,9 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_MarkAsModified.Auto())
             {
 #if UNITY_EDITOR
-                if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating)
+                if (CanModifyAssets())
                 {
-                    UnityEditor.EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(target);
 
                     if (target.scene != default)
                     {
@@ -127,9 +164,9 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_MarkAsModified.Auto())
             {
 #if UNITY_EDITOR
-                if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating)
+                if (CanModifyAssets())
                 {
-                    UnityEditor.EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(target);
 
                     target.gameObject.MarkAsModified();
                 }
@@ -142,9 +179,9 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_MarkAsModified.Auto())
             {
 #if UNITY_EDITOR
-                if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating)
+                if (CanModifyAssets())
                 {
-                    UnityEditor.EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(target);
                 }
 #endif
             }
@@ -155,9 +192,9 @@ namespace Appalachia.Utility.Extensions
             using (_PRF_MarkAsModified.Auto())
             {
 #if UNITY_EDITOR
-                if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating)
+                if (CanModifyAssets())
                 {
-                    UnityEditor.EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(target);
                 }
 #endif
             }
@@ -166,6 +203,9 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(Modifications) + ".";
+
+        private static readonly ProfilerMarker _PRF_CanModifyAssets =
+            new ProfilerMarker(_PRF_PFX + nameof(CanModifyAssets));
 
         private static readonly ProfilerMarker _PRF_MarkAsModified =
             new ProfilerMarker(_PRF_PFX + nameof(MarkAsModified));

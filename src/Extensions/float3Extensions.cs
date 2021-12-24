@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Appalachia.Utility.Strings;
 using Unity.Mathematics;
 
 #endregion
@@ -42,19 +43,19 @@ namespace Appalachia.Utility.Extensions
         [DebuggerStepThrough]
         public static string ToStringF1(this float3 f)
         {
-            return $"({f.x:F1}),({f.y:F1}),({f.z:F1})";
+            return ZString.Format("({0:F1}),({1:F1}),({2:F1})", f.x, f.y, f.z);
         }
 
         [DebuggerStepThrough]
         public static string ToStringF2(this float3 f)
         {
-            return $"({f.x:F2}),({f.y:F2}),({f.z:F2})";
+            return ZString.Format("({0:F2}),({1:F2}),({2:F2})", f.x, f.y, f.z);
         }
 
         [DebuggerStepThrough]
         public static string ToStringF3(this float3 f)
         {
-            return $"({f.x:F3}),({f.y:F3}),({f.z:F3})";
+            return ZString.Format("({0:F3}),({1:F3}),({2:F3})", f.x, f.y, f.z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -13,6 +13,34 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static Vector2 ClampValue(this Vector2 value, Vector2 xRange, Vector2 yRange)
+        {
+            using (_PRF_ClampValue.Auto())
+            {
+                if (value.x < xRange.x)
+                {
+                    value.x = xRange.x;
+                }
+
+                if (value.x > xRange.y)
+                {
+                    value.x = xRange.y;
+                }
+
+                if (value.y < yRange.x)
+                {
+                    value.y = yRange.x;
+                }
+
+                if (value.y > yRange.y)
+                {
+                    value.y = yRange.y;
+                }
+
+                return value;
+            }
+        }
+
         public static float RandomValue(this Vector2 value)
         {
             using (_PRF_RandomValue.Auto())

@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Appalachia.Utility.Strings;
 using Unity.Burst;
 using Unity.Mathematics;
 using UnityEngine;
@@ -371,9 +372,9 @@ namespace Appalachia.Utility.Extensions
             var rotation = matrix.GetRotationFromMatrix();
             var scale = matrix.GetScaleFromMatrix();
 
-            return $"T [{pos.ToStringF1()}] | " +
-                   $"R [{rotation.ToEuler().ToStringF1()}] | " +
-                   $"S [{scale.ToStringF1()}]";
+            return ZString.Format("T [{0}] | ", pos.ToStringF1()) +
+                   ZString.Format("R [{0}] | ", rotation.ToEuler().ToStringF1()) +
+                   ZString.Format("S [{0}]",    scale.ToStringF1());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

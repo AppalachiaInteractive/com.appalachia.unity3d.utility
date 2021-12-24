@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Appalachia.Utility.Extensions.Cleaning;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,18 +25,19 @@ namespace Appalachia.Utility.Extensions
 
         #region Static Fields and Autoproperties
 
-        private static char[]
-            _npmPackageTrims = {'/', '\\', '.', ',', '"', '\'', ' ', '\t', '\n', '\r', '\0'};
+        private static char[] _npmPackageTrims =
+        {
+            '/', '\\', '.', ',', '"', '\'', ' ', '\t', '\n', '\r', '\0'
+        };
 
         private static Dictionary<char, string> _encodingReplacements;
         private static Dictionary<EncodingPrefix, string> _encodingPrefixes;
-        private static string[] _npmPackageRemovals = {".tgz", ".gz", ".tar", ".json", ".zip"};
+        private static string[] _npmPackageRemovals = { ".tgz", ".gz", ".tar", ".json", ".zip" };
         private static string[] _packagePaths;
 
         private static StringCleanerWithContext<char[]> _extensionCleaner;
 
         #endregion
-
         public static string CleanExtension(this string extension)
         {
             using (_PRF_CleanExtension.Auto())
@@ -43,7 +45,7 @@ namespace Appalachia.Utility.Extensions
                 if (_extensionCleaner == null)
                 {
                     _extensionCleaner = new StringCleanerWithContext<char[]>(
-                        new[] {'.', ' ', '\t', ','},
+                        new[] { '.', ' ', '\t', ',' },
                         (cleaner, value) =>
                         {
                             var result = value.ToLowerInvariant().Trim(cleaner.context1);
@@ -78,7 +80,7 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_CopyToClipboard.Auto())
             {
-                var te = new TextEditor {text = s};
+                var te = new TextEditor { text = s };
                 te.SelectAll();
                 te.Copy();
             }
@@ -124,7 +126,7 @@ namespace Appalachia.Utility.Extensions
                     if (_encodingReplacements.ContainsKey(character))
                     {
                         var replacementSuffix = _encodingReplacements[character];
-                        var replacement = $"{prefixString}{replacementSuffix}";
+                        var replacement = ZString.Format("{0}{1}", prefixString, replacementSuffix);
 
                         builder.Append(replacement);
                     }
@@ -193,13 +195,7 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_IsPackagePath.Auto())
             {
-                if (_packagePaths == null)
-                {
-                    _packagePaths = new[]
-                    {
-                        "Packages/", "Packages\\", "Library/PackageCache", "Library\\PackageCache",
-                    };
-                }
+                InitializePackagePathReplacements();
 
                 for (var i = 0; i < _packagePaths.Length; i++)
                 {
@@ -396,6 +392,20 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        private static void InitializePackagePathReplacements()
+        {
+            using (_PRF_InitializePackagePathReplacements.Auto())
+            {
+                if (_packagePaths == null)
+                {
+                    _packagePaths = new[]
+                    {
+                        "Library/PackageCache", "Packages/", "Library\\PackageCache", "Packages\\"
+                    };
+                }
+            }
+        }
+
         private static void SetupEncodingReplacements()
         {
             using (_PRF_SetupEncodingReplacements.Auto())
@@ -451,6 +461,9 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(StringExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_InitializePackagePathReplacements =
+            new ProfilerMarker(_PRF_PFX + nameof(InitializePackagePathReplacements));
 
         private static readonly ProfilerMarker _PRF_IsNotNullOrEmpty =
             new ProfilerMarker(_PRF_PFX + nameof(IsNotNullOrEmpty));

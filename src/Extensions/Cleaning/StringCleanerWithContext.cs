@@ -2,9 +2,8 @@ namespace Appalachia.Utility.Extensions.Cleaning
 {
     public class StringCleanerWithContext<T1> : StringCleanerBase<StringCleanerWithContext<T1>>
     {
-        public StringCleanerWithContext(T1 context1, ExecuteClean action, int capacity = 100) : base(
-            action,
-            capacity
+        public StringCleanerWithContext(T1 context1, ExecuteClean action) : base(
+            action
         )
         {
             this.context1 = context1;
@@ -22,8 +21,7 @@ namespace Appalachia.Utility.Extensions.Cleaning
         public StringCleanerWithContext(
             T1 context1,
             T2 context2,
-            ExecuteClean action,
-            int capacity = 100) : base(action, capacity)
+            ExecuteClean action) : base(action)
         {
             this.context1 = context1;
             this.context2 = context2;
@@ -44,8 +42,7 @@ namespace Appalachia.Utility.Extensions.Cleaning
             T1 context1,
             T2 context2,
             T3 context3,
-            ExecuteClean action,
-            int capacity = 100) : base(action, capacity)
+            ExecuteClean action) : base(action)
         {
             this.context1 = context1;
             this.context2 = context2;

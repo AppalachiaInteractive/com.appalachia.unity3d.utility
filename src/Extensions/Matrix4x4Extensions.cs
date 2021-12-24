@@ -10,6 +10,8 @@ namespace Appalachia.Utility.Extensions
 {
     public static class Matrix4x4Extensions
     {
+        
+        
         public static Vector3 GetPositionFromMatrix(this Matrix4x4 matrix)
         {
             return matrix.GetColumn(3);
@@ -30,7 +32,7 @@ namespace Appalachia.Utility.Extensions
                 (len2 == 0f) ||
                 (c1 == -c2))
             {
-                AppaLog.Warn("Bad viewing vector");
+                AppaLog.Context.Extensions.Warn("Bad viewing vector");
                 return Quaternion.identity;
             }
 

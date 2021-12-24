@@ -1,8 +1,10 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Linq;
 using Appalachia.Utility.Framing.Extensions;
 using Appalachia.Utility.Logging;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine.InputSystem;
@@ -10,10 +12,12 @@ using UnityEngine.InputSystem.Controls;
 
 namespace Appalachia.Utility.Framing
 {
-#if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
     internal static class FramingInputHandler
     {
+        
+        
+        
         #region Profiling
 
         private const string _PRF_PFX = nameof(FramingInputHandler) + ".";
@@ -52,7 +56,7 @@ namespace Appalachia.Utility.Framing
                 catch (Exception ex)
                 {
                     exceptionCount += 1;
-                    AppaLog.Exception("Exception while framing", ex);
+                    AppaLog.Context.Utility.Error("Exception while framing", null, ex);
 
                     if (exceptionCount > 10)
                     {
@@ -176,7 +180,7 @@ namespace Appalachia.Utility.Framing
 
                 if (!keyboard.enabled)
                 {
-                    AppaLog.Warn("Keyboard is not enabled!");
+                    AppaLog.Context.Utility.Warn("Keyboard is not enabled!");
                 }
 
                 //LogState(keyboard);
@@ -217,11 +221,11 @@ namespace Appalachia.Utility.Framing
         {
             if (stateCheck(keyboard.anyKey))
             {
-                AppaLog.Debug($"{keyboard.anyKey.path}.{name}");
+                AppaLog.Context.Utility.Debug(ZString.Format("{0}.{1}", keyboard.anyKey.path, name));
 
                 foreach (var k in keyboard.allKeys.Where(k => stateCheck(k)))
                 {
-                    AppaLog.Debug($"{k.path}.{name}");
+                    AppaLog.Context.Utility.Debug(ZString.Format("{0}.{1}", k.path, name));
                 }
             }
         }
@@ -233,5 +237,6 @@ namespace Appalachia.Utility.Framing
             LogState(keyboard, control => control.isPressed,            "isPressed");
         }
     }
-#endif
 }
+
+#endif

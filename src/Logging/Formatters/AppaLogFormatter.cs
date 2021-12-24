@@ -2,40 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
-using UnityEngine;
+
+// ReSharper disable FormatStringProblem
 
 namespace Appalachia.Utility.Logging.Formatters
 {
     public abstract class AppaLogFormatter
     {
-        protected AppaLogFormatter()
-        {
-            if (formats == null)
-            {
-                formats = Resources.Load<AppaLogFormats>(AppaLogFormats.ADDRESS);
-            }
+        #region Constants and Static Readonly
 
-            if (formats == null)
-            {
-                formats = ScriptableObject.CreateInstance<AppaLogFormats>();
-            }
-        }
+        private static readonly Utf16PreparedFormat<string, string> _messageFormatter = new("{0}{1}");
+
+        #endregion
 
         #region Fields and Autoproperties
-
-        protected AppaLogFormats formats;
 
         protected Dictionary<LogLevel, string> _logLevelStrings;
         protected Dictionary<string, string> _fileNames;
 
         #endregion
 
-        public object FormatLogMessage(
+        public string FormatLogMessage(
             LogLevel level,
             string prefix,
             string formattedPrefix,
             object content,
+            object context,
+            Exception exception,
             string memberName,
             string filePath,
             int lineNumber)
@@ -46,6 +41,8 @@ namespace Appalachia.Utility.Logging.Formatters
                     level,
                     prefix,
                     formattedPrefix,
+                    context,
+                    exception,
                     memberName,
                     filePath,
                     lineNumber
@@ -53,7 +50,7 @@ namespace Appalachia.Utility.Logging.Formatters
 
                 var messageContent = AlterContent(content.ToString(), level);
 
-                return $"{fullPrefix}{messageContent}";
+                return _messageFormatter.Format(fullPrefix, messageContent);
             }
         }
 
@@ -61,6 +58,8 @@ namespace Appalachia.Utility.Logging.Formatters
             LogLevel level,
             string prefix,
             string formattedPrefix,
+            object context,
+            Exception exception,
             string memberName,
             string filePath,
             int lineNumber);
@@ -76,13 +75,17 @@ namespace Appalachia.Utility.Logging.Formatters
             {
                 _fileNames ??= new Dictionary<string, string>();
 
-                string fileName;
+                string fileName = null;
 
                 if (!_fileNames.ContainsKey(filePath))
                 {
                     var rawFileName = Path.GetFileNameWithoutExtension(filePath);
 
-                    fileName = adjustment(rawFileName);
+                    if (adjustment != null)
+                    {
+                        fileName = adjustment(rawFileName);
+                    }
+
                     _fileNames.Add(filePath, fileName);
                 }
                 else

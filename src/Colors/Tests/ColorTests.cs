@@ -1,4 +1,3 @@
-using Appalachia.Utility.Colors;
 using NUnit.Framework;
 using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
@@ -73,22 +72,22 @@ namespace Appalachia.Utility.Colors
             Assert.AreApproximatelyEqual(
                 referenceColor.r,
                 testValue.r,
-                $"[{testEnum.ToString()}] Red channel of both colors match."
+                string.Format("[{0}] Red channel of both colors match.", testEnum.ToString())
             );
             Assert.AreApproximatelyEqual(
                 referenceColor.g,
                 testValue.g,
-                $"[{testEnum.ToString()}] Green channel of both colors match."
+                string.Format("[{0}] Green channel of both colors match.", testEnum.ToString())
             );
             Assert.AreApproximatelyEqual(
                 referenceColor.b,
                 testValue.b,
-                $"[{testEnum.ToString()}] Blue channel of both colors match."
+                string.Format("[{0}] Blue channel of both colors match.", testEnum.ToString())
             );
             Assert.AreApproximatelyEqual(
                 referenceColor.a,
                 testValue.a,
-                $"[{testEnum.ToString()}] Alpha channel of both colors match."
+                string.Format("[{0}] Alpha channel of both colors match.", testEnum.ToString())
             );
         }
 
@@ -104,22 +103,31 @@ namespace Appalachia.Utility.Colors
             Assert.AreApproximatelyEqual(
                 nh,
                 h * 0.5f,
-                $"[{testEnum.ToString()}] Hue of color blended with black should be halved."
+                string.Format("[{0}] Hue of color blended with black should be halved.", testEnum.ToString())
             );
             Assert.AreApproximatelyEqual(
                 ns,
                 s * 0.5f,
-                $"[{testEnum.ToString()}] Saturation of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Saturation of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 nv,
                 v * 0.5f,
-                $"[{testEnum.ToString()}] Value of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Value of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.a,
                 0.5f,
-                $"[{testEnum.ToString()}] Value of alpha blended with invisible should be halved."
+                string.Format(
+                    "[{0}] Value of alpha blended with invisible should be halved.",
+                    testEnum.ToString()
+                )
             );
         }
 
@@ -132,22 +140,31 @@ namespace Appalachia.Utility.Colors
             Assert.AreApproximatelyEqual(
                 blended.r,
                 referenceColor.r * 0.5f,
-                $"[{testEnum.ToString()}] Red channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Red channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.g,
                 referenceColor.g * 0.5f,
-                $"[{testEnum.ToString()}] Green channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Green channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.b,
                 referenceColor.b * 0.5f,
-                $"[{testEnum.ToString()}] Blue channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Blue channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.a,
                 referenceColor.a,
-                $"[{testEnum.ToString()}] Alpha channel should still match original.."
+                string.Format("[{0}] Alpha channel should still match original..", testEnum.ToString())
             );
         }
 
@@ -160,22 +177,34 @@ namespace Appalachia.Utility.Colors
             Assert.AreApproximatelyEqual(
                 blended.r,
                 referenceColor.r * 0.5f,
-                $"[{testEnum.ToString()}] Red channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Red channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.g,
                 referenceColor.g * 0.5f,
-                $"[{testEnum.ToString()}] Green channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Green channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.b,
                 referenceColor.b * 0.5f,
-                $"[{testEnum.ToString()}] Blue channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Blue channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 blended.a,
                 referenceColor.a * 0.5f,
-                $"[{testEnum.ToString()}] Alpha channel of color blended with invisible should be halved."
+                string.Format(
+                    "[{0}] Alpha channel of color blended with invisible should be halved.",
+                    testEnum.ToString()
+                )
             );
         }
 
@@ -222,22 +251,34 @@ namespace Appalachia.Utility.Colors
             Assert.AreApproximatelyEqual(
                 wrapper.color.r,
                 referenceColor.r * 0.1f,
-                $"[{testEnum.ToString()}] Red channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Red channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 wrapper.color.g,
                 referenceColor.g * 0.2f,
-                $"[{testEnum.ToString()}] Green channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Green channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 wrapper.color.b,
                 referenceColor.b * 0.3f,
-                $"[{testEnum.ToString()}] Blue channel of color blended with black should be halved."
+                string.Format(
+                    "[{0}] Blue channel of color blended with black should be halved.",
+                    testEnum.ToString()
+                )
             );
             Assert.AreApproximatelyEqual(
                 wrapper.color.a,
                 referenceColor.a * 0.4f,
-                $"[{testEnum.ToString()}] Alpha channel of color blended with invisible should be halved."
+                string.Format(
+                    "[{0}] Alpha channel of color blended with invisible should be halved.",
+                    testEnum.ToString()
+                )
             );
         }
 
@@ -408,7 +449,10 @@ namespace Appalachia.Utility.Colors
             Assert.AreEqual(
                 referenceColor,
                 reverseColor,
-                $"[{testEnum.ToString()}] The hex code produced for a color should be able to be parsed back to the same color."
+                string.Format(
+                    "[{0}] The hex code produced for a color should be able to be parsed back to the same color.",
+                    testEnum.ToString()
+                )
             );
         }
 
@@ -423,7 +467,10 @@ namespace Appalachia.Utility.Colors
             Assert.AreEqual(
                 referenceColor,
                 reverseColor,
-                $"[{testEnum.ToString()}] The hex code produced for a color should be able to be parsed back to the same color."
+                string.Format(
+                    "[{0}] The hex code produced for a color should be able to be parsed back to the same color.",
+                    testEnum.ToString()
+                )
             );
         }
     }

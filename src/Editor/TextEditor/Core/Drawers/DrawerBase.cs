@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Appalachia.Utility.Strings;
 using Appalachia.Utility.TextEditor.Core.Documents;
 using Appalachia.Utility.TextEditor.Core.GUICache;
 using UnityEditor;
@@ -91,7 +92,11 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.PrefixLabel($"{label}:", headerFieldStyle, headerLabelStyle);
+                EditorGUILayout.PrefixLabel(
+                    ZString.Format("{0}:", label),
+                    headerFieldStyle,
+                    headerLabelStyle
+                );
                 EditorGUILayout.TextField(value, headerFieldStyle, headerFieldOptions);
             }
         }
@@ -101,7 +106,7 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             if (!document.FileInfo.Exists)
             {
                 EditorGUILayout.HelpBox(
-                    $"Unable to locate file at: [{document.FileInfo.FullName}]",
+                    ZString.Format("Unable to locate file at: [{0}]", document.FileInfo.FullName),
                     MessageType.Error,
                     true
                 );
@@ -164,7 +169,7 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             if (document.LoadState.failed)
             {
                 EditorGUILayout.HelpBox(
-                    $"Unable to load file: [{document.LoadState.exception.Message}]",
+                    ZString.Format("Unable to load file: [{0}]", document.LoadState.exception.Message),
                     MessageType.Error
                 );
                 return;
@@ -173,7 +178,7 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             if (document.ParseState.failed)
             {
                 EditorGUILayout.HelpBox(
-                    $"Unable to parse file: [{document.ParseState.exception.Message}]",
+                    ZString.Format("Unable to parse file: [{0}]", document.ParseState.exception.Message),
                     MessageType.Error
                 );
 
@@ -182,7 +187,10 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             else if (document.ValidationState.failed)
             {
                 EditorGUILayout.HelpBox(
-                    $"Unable to validate file: [{document.ValidationState.exception.Message}]",
+                    ZString.Format(
+                        "Unable to validate file: [{0}]",
+                        document.ValidationState.exception.Message
+                    ),
                     MessageType.Warning
                 );
 
@@ -192,7 +200,7 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             if (document.SaveState.failed)
             {
                 EditorGUILayout.HelpBox(
-                    $"Unable to save file: [{document.SaveState.exception.Message}]",
+                    ZString.Format("Unable to save file: [{0}]", document.SaveState.exception.Message),
                     MessageType.Error
                 );
             }
@@ -227,7 +235,11 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
             var outputDirectory = Path.GetDirectoryName(assetPath);
             Debug.Assert(outputDirectory != null, nameof(outputDirectory) + " != null");
 
-            var newFileName = $"{DateTime.Now:yyyyMMdd-hhmmss}.{extension.Trim().Trim('.')}";
+            var newFileName = ZString.Format(
+                "{0:yyyyMMdd-hhmmss}.{1}",
+                DateTime.Now,
+                extension.Trim().Trim('.')
+            );
 
             var newFilePath = Path.Combine(outputDirectory, newFileName);
 
@@ -245,17 +257,17 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
         protected string FormatSize(long size)
         {
             return size < 1024f
-                ? $"{size} B"
+                ? ZString.Format("{0} B", size)
                 : size < (1024f * 1024f)
-                    ? $"{size / 1024f:#.00} KB"
+                    ? ZString.Format("{0:#.00} KB", size / 1024f)
                     : size < (1024f * 1024f * 1024f)
-                        ? $"{size / 1024f / 1024f:#.00} MB"
-                        : $"{size / 1024f / 1024f / 1024f:#.00} GB";
+                        ? ZString.Format("{0:#.00} MB", size / 1024f / 1024f)
+                        : ZString.Format("{0:#.00} GB", size / 1024f / 1024f / 1024f);
         }
 
         protected string FormatDate(DateTime dateTime)
         {
-            return $"{dateTime.ToShortDateString()} {dateTime.ToLongTimeString()}";
+            return ZString.Format("{0} {1}", dateTime.ToShortDateString(), dateTime.ToLongTimeString());
         }
 
         protected class GUIKEYS

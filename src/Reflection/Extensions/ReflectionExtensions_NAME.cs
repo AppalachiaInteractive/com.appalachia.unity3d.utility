@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 namespace Appalachia.Utility.Reflection.Extensions
@@ -47,7 +48,11 @@ namespace Appalachia.Utility.Reflection.Extensions
             {
 
                 return type.IsNested && !type.IsGenericParameter
-                    ? $"{type.DeclaringType.GetReadableName()}.{GetCachedReadableName(type)}"
+                    ? ZString.Format(
+                        "{0}.{1}",
+                        type.DeclaringType.GetReadableName(),
+                        GetCachedReadableName(type)
+                    )
                     : GetCachedReadableName(type);
             }
         }
@@ -60,13 +65,17 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 if (type.IsNested && !type.IsGenericParameter)
                 {
-                    return $"{GetReadableFullName(type.DeclaringType)}.{GetCachedReadableName(type)}";
+                    return ZString.Format(
+                        "{0}.{1}",
+                        GetReadableFullName(type.DeclaringType),
+                        GetCachedReadableName(type)
+                    );
                 }
 
                 var str = GetCachedReadableName(type);
                 if (type.Namespace != null)
                 {
-                    str = $"{type.Namespace}.{str}";
+                    str = ZString.Format("{0}.{1}", type.Namespace, str);
                 }
 
                 return str;
@@ -106,12 +115,12 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 if (type.InheritsFrom(typeof(Nullable<>)))
                 {
-                    return $"{CalculateReadableName(type.GetGenericArguments()[0])}?";
+                    return ZString.Format("{0}?", CalculateReadableName(type.GetGenericArguments()[0]));
                 }
 
                 if (type.IsByRef)
                 {
-                    return $"ref {CalculateReadableName(type.GetElementType())}";
+                    return ZString.Format("ref {0}", CalculateReadableName(type.GetElementType()));
                 }
 
                 if (type.IsGenericParameter || !type.IsGenericType)

@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Appalachia.Utility.Constants;
 using Appalachia.Utility.Logging;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -46,94 +48,9 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static void CreateOrGetChild(this GameObject go, ref GameObject target, string name, bool ui)
+        public static void DestroySafely(this Object o, bool allowDestroyingAssets = false)
         {
-            using (_PRF_FindOrCreateChild.Auto())
-            {
-                if (target != null)
-                {
-                    return;
-                }
-
-                target = GetChild(go, name);
-
-                if (target != null)
-                {
-                    return;
-                }
-
-                if (ui)
-                {
-                    target = new GameObject(name, typeof(RectTransform)).SetParentTo(go);
-                }
-                else
-                {
-                    target = new GameObject(name).SetParentTo(go);
-                }
-            }
-        }
-
-        public static void CreateOrGetComponent<T>(this GameObject obj, ref T component)
-            where T : Component
-        {
-            using (_PRF_GetOrCreateComponent.Auto())
-            {
-                DestroyComponentOnWrongGameObject(
-                    obj,
-                    ref component,
-                    DestructionMode.DestroyIfOnOtherGameObject
-                );
-
-                if (component == null)
-                {
-                    component = obj.GetComponent<T>();
-
-                    if (component == null)
-                    {
-                        component = obj.AddComponent<T>();
-                    }
-                }
-            }
-        }
-
-        public static void CreateOrGetComponentInChild<T>(
-            this GameObject obj,
-            ref T component,
-            string name,
-            bool requireNameMatch = true)
-            where T : Component
-        {
-            using (_PRF_GetOrCreateComponent.Auto())
-            {
-                DestroyComponentOnWrongGameObject(
-                    obj,
-                    ref component,
-                    DestructionMode.DestroyIfNotOnChildGameObject
-                );
-
-                if (component == null)
-                {
-                    var components = obj.GetComponentsInChildren<T>();
-                    
-                    var childComponents = components.Where(c => c.transform.parent == obj.transform);
-                    var match = childComponents.FirstOrDefault(
-                        c => !requireNameMatch || (c.gameObject.name == name)
-                    );
-
-                    component = match;
-                    if (component == null)
-                    {
-                        var child = new GameObject(name).SetParentTo(obj.transform);
-
-                        component = child.AddComponent<T>();
-                    }
-                }
-            }
-        }
-
-        public static void DestroySafely(this Object o)
-        {
-            using (_PRF_GameObjectExtensions_DestroySafely.Auto())
+            using (_PRF_DestroySafely.Auto())
             {
                 var wasNull = false;
 
@@ -150,8 +67,11 @@ namespace Appalachia.Utility.Extensions
                 }
                 catch (Exception ex)
                 {
-                    AppaLog.Error($"Not able to dispose of [{o.name}] before destroying.", o);
-                    AppaLog.Exception(ex, o);
+                    AppaLog.Context.Extensions.Error(
+                        ZString.Format("Not able to dispose of [{0}] before destroying.", o.name),
+                        o,
+                        ex
+                    );
                 }
                 finally
                 {
@@ -165,13 +85,12 @@ namespace Appalachia.Utility.Extensions
                             }
                             else
                             {
-                                Object.DestroyImmediate(o);
+                                Object.DestroyImmediate(o, allowDestroyingAssets);
                             }
                         }
                         catch (Exception ex)
                         {
-                            AppaLog.Error("Exception while destroying object.", o);
-                            AppaLog.Exception(ex, o);
+                            AppaLog.Context.Extensions.Error("Exception while destroying object.", o, ex);
                         }
                     }
                 }
@@ -181,7 +100,7 @@ namespace Appalachia.Utility.Extensions
         public static void DestroySafely<T>(this T o)
             where T : Object, IDisposable
         {
-            using (_PRF_GameObjectExtensions_DestroySafely.Auto())
+            using (_PRF_DestroySafely.Auto())
             {
                 var wasNull = false;
 
@@ -195,8 +114,11 @@ namespace Appalachia.Utility.Extensions
                 }
                 catch (Exception ex)
                 {
-                    AppaLog.Error($"Not able to dispose of [{typeof(T).Name} before destroying.", o);
-                    AppaLog.Exception(ex, o);
+                    AppaLog.Context.Extensions.Error(
+                        ZString.Format("Not able to dispose of [{0} before destroying.", typeof(T).Name),
+                        o,
+                        ex
+                    );
                 }
                 finally
                 {
@@ -215,17 +137,35 @@ namespace Appalachia.Utility.Extensions
                         }
                         catch (Exception ex)
                         {
-                            AppaLog.Error("Exception while destroying object", o);
-                            AppaLog.Exception(ex, o);
+                            AppaLog.Context.Extensions.Error("Exception while destroying object", o, ex);
                         }
                     }
                 }
             }
         }
 
+        public static void DestroySafely(this Scene scene)
+        {
+            using (_PRF_DestroySafely.Auto())
+            {
+                DestroySafely(scene.GetRootGameObjects());
+            }
+        }
+
+        public static void DestroySafely(this IEnumerable<GameObject> gos)
+        {
+            using (_PRF_DestroySafely.Auto())
+            {
+                foreach (var go in gos)
+                {
+                    go.DestroySafely();
+                }
+            }
+        }
+
         public static void DestroySafely(this GameObject o)
         {
-            using (_PRF_GameObjectExtensions_DestroySafely.Auto())
+            using (_PRF_DestroySafely.Auto())
             {
                 if (o == null)
                 {
@@ -248,15 +188,14 @@ namespace Appalachia.Utility.Extensions
                 }
                 catch (Exception ex)
                 {
-                    AppaLog.Error("Exception while destroying GameObject.", o);
-                    AppaLog.Exception(ex, o);
+                    AppaLog.Context.Extensions.Error("Exception while destroying GameObject.", o, ex);
                 }
             }
         }
 
         public static void DestroySafely(this Transform o)
         {
-            using (_PRF_GameObjectExtensions_DestroySafely.Auto())
+            using (_PRF_DestroySafely.Auto())
             {
                 try
                 {
@@ -277,8 +216,7 @@ namespace Appalachia.Utility.Extensions
                 }
                 catch (Exception ex)
                 {
-                    AppaLog.Error("Exception while destroying transform.", o);
-                    AppaLog.Exception(ex, o);
+                    AppaLog.Context.Extensions.Error("Exception while destroying transform.", o, ex);
                 }
             }
         }
@@ -305,9 +243,9 @@ namespace Appalachia.Utility.Extensions
         public static T GetComponentInImmediateChildren<T>(this GameObject go)
             where T : Component
         {
-            using (_PRF_GameObjectExtensions_GetComponentInImmediateChildren.Auto())
+            using (_PRF_GetComponentInImmediateChildren.Auto())
             {
-                var cs = go.GetComponentsInChildren<T>();
+                var cs = go.GetComponentsInChildren<T>(true);
                 for (var index = 0; index < cs.Length; index++)
                 {
                     var c = cs[index];
@@ -321,11 +259,149 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void GetComponentInParent<T>(this GameObject obj, ref T component)
+            where T : Component
+        {
+            using (_PRF_GetComponentInParent.Auto())
+            {
+                if (component == null)
+                {
+                    component = obj.GetComponentInParent<T>(true);
+                }
+            }
+        }
+
         public static string GetFullName(this GameObject gameObj)
         {
             using (_PRF_GetFullName.Auto())
             {
-                return gameObj.transform.FullPath();
+                return gameObj.transform.GetFullPath();
+            }
+        }
+
+        public static void GetOrCreateChild(this GameObject go, ref GameObject target, string name, bool ui)
+        {
+            using (_PRF_FindOrCreateChild.Auto())
+            {
+                if (target != null)
+                {
+                    return;
+                }
+
+                target = GetChild(go, name);
+
+                if (target != null)
+                {
+                    return;
+                }
+
+                if (ui)
+                {
+                    target = new GameObject(name, typeof(RectTransform)).SetParentTo(go);
+                }
+                else
+                {
+                    target = new GameObject(name).SetParentTo(go);
+                }
+            }
+        }
+
+        public static void GetOrCreateComponent<T>(this GameObject obj, ref T component)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                DestroyComponentOnWrongGameObject(
+                    obj,
+                    ref component,
+                    DestructionMode.DestroyIfOnOtherGameObject
+                );
+
+                if (component == null)
+                {
+                    component = obj.GetComponent<T>();
+
+                    if (component == null)
+                    {
+                        component = obj.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
+        public static void GetOrCreateComponentInChild<T>(
+            this GameObject obj,
+            ref T component,
+            string name,
+            bool requireNameMatch = true)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                DestroyComponentOnWrongGameObject(
+                    obj,
+                    ref component,
+                    DestructionMode.DestroyIfNotOnChildGameObject
+                );
+
+                if (component == null)
+                {
+                    var components = obj.GetComponentsInChildren<T>(true);
+
+                    var childComponents = components.Where(c => c.transform.parent == obj.transform);
+                    var match = childComponents.FirstOrDefault(
+                        c => !requireNameMatch || (c.gameObject.name == name)
+                    );
+
+                    component = match;
+                    if (component == null)
+                    {
+                        var child = new GameObject(name).SetParentTo(obj.transform);
+
+                        component = child.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
+        public static void GetOrCreateLifetimeComponentInChild<T>(
+            this GameObject obj,
+            ref T component,
+            string name = null)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateLifetimeComponentInChild.Auto())
+            {
+                if (component != null)
+                {
+                    return;
+                }
+
+                component = Object.FindObjectOfType<T>(true);
+
+                if (component)
+                {
+                    if (component.transform.parent != obj.transform)
+                    {
+                        component.transform.SetParent(obj.transform);
+                    }
+
+                    if (name != null)
+                    {
+                        component.name = name;
+                    }
+                    else if (component.name != "New Game Object")
+                    {
+                    }
+                    else
+                    {
+                        component.name = typeof(T).Name;
+                    }
+
+                    return;
+                }
+
+                obj.GetOrCreateComponentInChild(ref component, name, false);
             }
         }
 
@@ -391,7 +467,7 @@ namespace Appalachia.Utility.Extensions
             Transform parent = null,
             Matrix4x4 worldPosition = default)
         {
-            using (_PRF_GameObjectExtensions_InstantiatePrefab.Auto())
+            using (_PRF_InstantiatePrefab.Auto())
             {
 #if UNITY_EDITOR
                 var go = UnityEditor.PrefabUtility.InstantiatePrefab(prefab) as GameObject;
@@ -426,9 +502,22 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void MoveToActiveScene(this GameObject go)
+        {
+            using (_PRF_MoveToActiveScene.Auto())
+            {
+                AppaLog.Context.Extensions.Debug(
+                    ZString.Format("Moving [{0}] to currently active scene.", go.name)
+                );
+
+                var scene = SceneManager.GetActiveScene();
+                SceneManager.MoveGameObjectToScene(go, scene);
+            }
+        }
+
         public static void MoveToLayerRecursive(this GameObject go, int layer)
         {
-            using (_PRF_GameObjectExtensions_MoveToLayerRecursive.Auto())
+            using (_PRF_MoveToLayerRecursive.Auto())
             {
                 go.layer = layer;
 
@@ -444,7 +533,7 @@ namespace Appalachia.Utility.Extensions
             this GameObject go,
             int layer)
         {
-            using (_PRF_GameObjectExtensions_MoveToLayerRecursiveRecoverable.Auto())
+            using (_PRF_MoveToLayerRecursiveRecoverable.Auto())
             {
                 var originalLayers = new Dictionary<Transform, int>();
                 originalLayers.Add(go.transform, go.layer);
@@ -465,11 +554,34 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void MoveToLoadedScene(this GameObject go)
+        {
+            using (_PRF_MoveToLoadedScene.Auto())
+            {
+                if (!go.scene.isLoaded)
+                {
+                    AppaLog.Context.Extensions.Debug(
+                        ZString.Format("Moving [{0}] to a loaded scene.", go.name.FormatNameForLogging())
+                    );
+
+                    for (var i = 0; i < SceneManager.sceneCount; i++)
+                    {
+                        var scene = SceneManager.GetSceneAt(i);
+
+                        if (scene.isLoaded)
+                        {
+                            SceneManager.MoveGameObjectToScene(go, scene);
+                        }
+                    }
+                }
+            }
+        }
+
         public static void RecoverLayersRecursive(
             this GameObject go,
             Dictionary<Transform, int> originalLayers)
         {
-            using (_PRF_GameObjectExtensions_RecoverLayersRecursive.Auto())
+            using (_PRF_RecoverLayersRecursive.Auto())
             {
                 go.layer = originalLayers[go.transform];
                 var children = go.GetComponentsInChildren<Transform>();
@@ -560,8 +672,13 @@ namespace Appalachia.Utility.Extensions
         private static void DestroyObjectForRecreate<T>(ref T component, string recreatingOn)
             where T : Component
         {
-            AppaLog.Warn(
-                $"Destroying component {typeof(T).Name} on object {component.gameObject.name} before recreating on {recreatingOn}."
+            AppaLog.Context.Extensions.Warn(
+                ZString.Format(
+                    "Destroying component {0} on object {1} before recreating on {2}.",
+                    typeof(T).Name,
+                    component.gameObject.name,
+                    recreatingOn
+                )
             );
 
             component.DestroySafely();
@@ -583,32 +700,41 @@ namespace Appalachia.Utility.Extensions
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
 
+        private static readonly ProfilerMarker _PRF_GetComponentInParent =
+            new ProfilerMarker(_PRF_PFX + nameof(GetComponentInParent));
+
+        private static readonly ProfilerMarker _PRF_GetOrCreateLifetimeComponentInChild =
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateLifetimeComponentInChild));
+
+        private static readonly ProfilerMarker _PRF_MoveToActiveScene =
+            new ProfilerMarker(_PRF_PFX + nameof(MoveToActiveScene));
+
+        private static readonly ProfilerMarker _PRF_MoveToLoadedScene =
+            new ProfilerMarker(_PRF_PFX + nameof(MoveToLoadedScene));
+
+        private static readonly ProfilerMarker _PRF_DestroySafely =
+            new ProfilerMarker(_PRF_PFX + nameof(DestroySafely));
+
+        private static readonly ProfilerMarker _PRF_GetComponentInImmediateChildren =
+            new ProfilerMarker(_PRF_PFX + nameof(GetComponentInImmediateChildren));
+
+        private static readonly ProfilerMarker _PRF_InstantiatePrefab =
+            new ProfilerMarker(_PRF_PFX + nameof(InstantiatePrefab));
+
+        private static readonly ProfilerMarker _PRF_MoveToLayerRecursive =
+            new ProfilerMarker(_PRF_PFX + nameof(MoveToLayerRecursive));
+
+        private static readonly ProfilerMarker _PRF_MoveToLayerRecursiveRecoverable =
+            new ProfilerMarker(_PRF_PFX + nameof(MoveToLayerRecursiveRecoverable));
+
+        private static readonly ProfilerMarker _PRF_RecoverLayersRecursive =
+            new ProfilerMarker(_PRF_PFX + nameof(RecoverLayersRecursive));
+
         private static readonly ProfilerMarker _PRF_DestroyComponentOnWrongGameObject =
             new ProfilerMarker(_PRF_PFX + nameof(DestroyComponentOnWrongGameObject));
 
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_DestroySafely =
-            new("GameObjectExtensions.DestroySafely");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetAsset =
-            new("GameObjectExtensions.GetAsset");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_GetComponentInImmediateChildren =
-            new("GameObjectExtensions.GetComponentInImmediateChildren");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_InstantiatePrefab =
-            new("GameObjectExtensions.InstantiatePrefab");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursive =
-            new("GameObjectExtensions.MoveToLayerRecursive");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_MoveToLayerRecursiveRecoverable =
-            new("GameObjectExtensions.MoveToLayerRecursiveRecoverable");
-
-        private static readonly ProfilerMarker _PRF_GameObjectExtensions_RecoverLayersRecursive =
-            new("GameObjectExtensions.RecoverLayersRecursive");
-
         private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(CreateOrGetComponent));
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateComponent));
 
         private static readonly ProfilerMarker
             _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
@@ -635,7 +761,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
 
         private static readonly ProfilerMarker _PRF_FindOrCreateChild =
-            new ProfilerMarker(_PRF_PFX + nameof(CreateOrGetChild));
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateChild));
 
         #endregion
     }

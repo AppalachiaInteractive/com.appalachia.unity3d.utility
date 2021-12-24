@@ -32,13 +32,13 @@ namespace Appalachia.Utility.Execution
             }
         }
 
-        public void Add(SafeCoroutineWrapper wrapper)
+        internal void Add(SafeCoroutineWrapper wrapper)
         {
             _executing ??= new List<SafeCoroutineWrapper>();
             _executing.Add(wrapper);
         }
 
-        public void Completed(SafeCoroutineWrapper wrapper)
+        internal void Completed(SafeCoroutineWrapper wrapper)
         {
             _executing.Remove(wrapper);
         }

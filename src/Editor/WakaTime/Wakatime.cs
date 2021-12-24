@@ -5,6 +5,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Appalachia.Utility.Strings;
 using Unity.EditorCoroutines.Editor;
 using Unity.Profiling;
 using UnityEditor;
@@ -37,6 +38,11 @@ namespace Appalachia.Utility.WakaTime
         {
             using (_PRF_Initialize.Auto())
             {
+                if (EditorApplication.isPlayingOrWillChangePlaymode)
+                {
+                    return;
+                }
+                
                 Configuration.RefreshPreferences();
                 Logger.DebugLog("Initializing...");
 
@@ -71,6 +77,11 @@ namespace Appalachia.Utility.WakaTime
         [DidReloadScripts]
         private static void OnScriptReload()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return;
+            }
+            
             using (_PRF_OnScriptReload.Auto())
             {
                 Logger.DebugLog("Reloading scripts..");
@@ -81,7 +92,12 @@ namespace Appalachia.Utility.WakaTime
 
         private static IEnumerator SendHeartbeatInternal(bool fromSave, string callerMemberName)
         {
-            Logger.DebugLog($"[{callerMemberName}] Heartbeat generated - checking if it should be sent...");
+            Logger.DebugLog(
+                ZString.Format(
+                    "[{0}] Heartbeat generated - checking if it should be sent...",
+                    callerMemberName
+                )
+            );
 
             var scene = SceneManager.GetActiveScene();
 
@@ -103,14 +119,14 @@ namespace Appalachia.Utility.WakaTime
 
             if (!processHeartbeat)
             {
-                Logger.DebugLog($"[{callerMemberName}] Skipping this heartbeat.");
+                Logger.DebugLog(ZString.Format("[{0}] Skipping this heartbeat.", callerMemberName));
                 yield break;
             }
 
             yield return null;
 
             var wakatimePath = Configuration.WakaTimePath;
-            var cliTargetPath = $"\"{wakatimePath}\"";
+            var cliTargetPath = ZString.Format("\"{0}\"", wakatimePath);
 
             yield return null;
             var process = new Process();
@@ -118,15 +134,15 @@ namespace Appalachia.Utility.WakaTime
             {
                 CreateNoWindow = true,
                 FileName = "python",
-                Arguments = $" {cliTargetPath} " +
-                            $" --entity \"{heartbeat.entity}\"" +
+                Arguments = ZString.Format(" {0} ",             cliTargetPath) +
+                            ZString.Format(" --entity \"{0}\"", heartbeat.entity) +
                             (heartbeat.isWrite ? " --write" : string.Empty) +
                             (heartbeat.isDebugging ? " --verbose" : string.Empty) +
-                            $" --entity-type \"{heartbeat.type}\"" +
-                            $" --language \"{heartbeat.language}\"" +
-                            $" --plugin \"{heartbeat.plugin}\"" +
-                            $" --time \"{heartbeat.time}\"" +
-                            $" --project \"{heartbeat.project}\"",
+                            ZString.Format(" --entity-type \"{0}\"", heartbeat.type) +
+                            ZString.Format(" --language \"{0}\"",    heartbeat.language) +
+                            ZString.Format(" --plugin \"{0}\"",      heartbeat.plugin) +
+                            ZString.Format(" --time \"{0}\"",        heartbeat.time) +
+                            ZString.Format(" --project \"{0}\"",     heartbeat.project),
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
@@ -158,7 +174,9 @@ namespace Appalachia.Utility.WakaTime
             {
                 Configuration.WakaTimePath = null;
                 Logger.Log(processStartInfo.Arguments);
-                Logger.LogError($"Unable to utilize WakaTime CLI: [{error}].  Disable this plugin.");
+                Logger.LogError(
+                    ZString.Format("Unable to utilize WakaTime CLI: [{0}].  Disable this plugin.", error)
+                );
             }
         }
     }

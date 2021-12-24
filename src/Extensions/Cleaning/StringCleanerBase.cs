@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Text;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 namespace Appalachia.Utility.Extensions.Cleaning
@@ -9,11 +9,11 @@ namespace Appalachia.Utility.Extensions.Cleaning
     {
         public delegate string ExecuteClean(T instance, string input);
 
-        protected StringCleanerBase(ExecuteClean action, int capacity = 100)
+        protected StringCleanerBase(ExecuteClean action)
         {
             using (_PRF_StringCleanerBase.Auto())
             {
-                _builder = new StringBuilder(capacity);
+                _builder = new Utf16ValueStringBuilder(false);
                 _lookup = new Dictionary<string, string>();
                 _action = action;
             }
@@ -22,7 +22,7 @@ namespace Appalachia.Utility.Extensions.Cleaning
         #region Fields and Autoproperties
 
         private Dictionary<string, string> _lookup;
-        private StringBuilder _builder;
+        private Utf16ValueStringBuilder _builder;
         private ExecuteClean _action;
 
         #endregion

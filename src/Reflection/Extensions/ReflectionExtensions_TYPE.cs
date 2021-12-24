@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using Appalachia.Utility.Reflection.Common;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 #endregion
@@ -70,7 +71,7 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 foreach (var type in GetAllTypes_CACHED())
                 {
-                    if (nameWithNamespace == $"{type.Namespace}.{type.Name}")
+                    if (nameWithNamespace == ZString.Format("{0}.{1}", type.Namespace, type.Name))
                     {
                         _typeByNameLookup.Add(nameWithNamespace, type);
                         return type;

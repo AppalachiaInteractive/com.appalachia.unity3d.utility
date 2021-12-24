@@ -2,6 +2,7 @@
 
 using System;
 using System.Text;
+using Appalachia.Utility.Strings;
 using Unity.Mathematics;
 using Unity.Profiling;
 using UnityEditor;
@@ -24,8 +25,8 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_FindInParents =
             new ProfilerMarker(_PRF_PFX + nameof(FindInParents));
 
-        private static readonly ProfilerMarker
-            _PRF_FullPath = new ProfilerMarker(_PRF_PFX + nameof(FullPath));
+        private static readonly ProfilerMarker _PRF_FullPath =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFullPath));
 
         private static readonly ProfilerMarker _PRF_GetPathRelativeTo =
             new ProfilerMarker(_PRF_PFX + nameof(GetPathRelativeTo));
@@ -50,6 +51,17 @@ namespace Appalachia.Utility.Extensions
 
         #endregion
 
+        private static readonly ProfilerMarker _PRF_SetToOrigin =
+            new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
+
+        public static void SetToOrigin(this Transform transform)
+        {
+            using (_PRF_SetToOrigin.Auto())
+            {
+                transform.SetMatrix4x4ToTransform(Matrix4x4.identity);
+            }
+        }
+        
         public static void DestroyChildren(this Transform transform)
         {
             using (_PRF_DestroyChildren.Auto())
@@ -89,7 +101,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static string FullPath(this Transform transform)
+        public static string GetFullPath(this Transform transform)
         {
             using (_PRF_FullPath.Auto())
             {
@@ -113,21 +125,29 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static string GetPathRelativeTo(this Transform transform, Transform parent)
+        public static string GetPathRelativeTo(this GameObject current, GameObject relativeTo)
         {
             using (_PRF_GetPathRelativeTo.Auto())
             {
-                if (transform == parent)
+                return current.transform.GetPathRelativeTo(relativeTo.transform);
+            }
+        }
+
+        public static string GetPathRelativeTo(this Transform current, Transform relativeTo)
+        {
+            using (_PRF_GetPathRelativeTo.Auto())
+            {
+                if (current == relativeTo)
                 {
                     return "";
                 }
 
-                if (transform.IsChildOf(parent))
+                if (current.IsChildOf(relativeTo))
                 {
-                    return transform.FullPath().Substring(parent.FullPath().Length + 1);
+                    return current.GetFullPath()[(relativeTo.GetFullPath().Length + 1)..];
                 }
 
-                return transform.FullPath();
+                return current.GetFullPath();
             }
         }
 
@@ -150,7 +170,9 @@ namespace Appalachia.Utility.Extensions
             {
                 if (matrix == _matrix_zero)
                 {
-                    throw new NotSupportedException($"Default matrix for {t.gameObject.name}.");
+                    throw new NotSupportedException(
+                        ZString.Format("Default matrix for {0}.", t.gameObject.name)
+                    );
                 }
 
                 t.position = matrix.GetColumn(3);

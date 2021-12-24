@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 namespace Appalachia.Utility.Extensions
@@ -13,6 +15,7 @@ namespace Appalachia.Utility.Extensions
 
         #endregion
 
+        [SuppressMessage("ReSharper", "UselessBinaryOperation")]
         public static string ToFileSize(this long length, int decimals = 2)
         {
             using (_PRF_ToFileSize.Auto())
@@ -26,7 +29,7 @@ namespace Appalachia.Utility.Extensions
 
                 if (length < kb)
                 {
-                    return $"{length} B";
+                    return ZString.Format("{0} B", length);
                 }
 
                 if (length < mb)
@@ -36,7 +39,7 @@ namespace Appalachia.Utility.Extensions
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
-                    return $"{stringFormatted} KB";
+                    return ZString.Format("{0} KB", stringFormatted);
                 }
 
                 if (length < gb)
@@ -46,7 +49,7 @@ namespace Appalachia.Utility.Extensions
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
-                    return $"{stringFormatted} MB";
+                    return ZString.Format("{0} MB", stringFormatted);
                 }
 
                 if (length < tb)
@@ -56,7 +59,7 @@ namespace Appalachia.Utility.Extensions
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
-                    return $"{stringFormatted} GB";
+                    return ZString.Format("{0} GB", stringFormatted);
                 }
                 else
                 {
@@ -65,7 +68,7 @@ namespace Appalachia.Utility.Extensions
                     var result = major + minor;
                     var stringFormatted = result.ToString(stringFormat);
 
-                    return $"{stringFormatted} TB";
+                    return ZString.Format("{0} TB", stringFormatted);
                 }
             }
         }

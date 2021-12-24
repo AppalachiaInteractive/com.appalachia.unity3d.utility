@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Appalachia.Utility.Strings;
 
 namespace Appalachia.Utility.Execution.Progress
 {
@@ -93,7 +94,7 @@ namespace Appalachia.Utility.Execution.Progress
             }
             else
             {
-                _segmentPrefixes.Push($"{_segmentPrefixes.Peek()} | {segmentPrefix}");
+                _segmentPrefixes.Push(ZString.Format("{0} | {1}", _segmentPrefixes.Peek(), segmentPrefix));
             }
 
             return new AppaProgressSegment(this);
@@ -104,7 +105,7 @@ namespace Appalachia.Utility.Execution.Progress
             _currentRaw = p.progress;
 
             p.progress = p.progress * _segmentSizes.Peek();
-            p.message = $"{_segmentPrefixes.Peek()} | {p.message}";
+            p.message = ZString.Format("{0} | {1}", _segmentPrefixes.Peek(), p.message);
 
             _currentSegmented = p.progress;
         }

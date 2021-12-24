@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using Appalachia.Utility.AutoSave.Configuration;
+using Appalachia.Utility.Execution;
 using UnityEditor;
 using UnityEngine;
 
@@ -61,7 +62,7 @@ namespace Appalachia.Utility.AutoSave
                 return;
             }
 
-            if (Application.isPlaying)
+            if (AppalachiaApplication.IsPlayingOrWillPlay)
             {
                 if (_launchTime == null)
                 {

@@ -8,6 +8,7 @@ namespace Appalachia.Utility.Enums
         public static void PopulateEnumKeys<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
             Func<TKey, TValue> creator,
+            Func<TKey, bool> doInclude = null,
             bool clear = false)
             where TKey : Enum
         {
@@ -17,14 +18,17 @@ namespace Appalachia.Utility.Enums
             {
                 dictionary.Clear();
             }
-            
+
             for (var i = 0; i < keys.Length; i++)
             {
                 var key = keys[i];
 
                 if (!dictionary.ContainsKey(key))
                 {
-                    dictionary.Add(key, creator(key));
+                    if ((doInclude == null) || doInclude(key))
+                    {
+                        dictionary.Add(key, creator(key));
+                    }
                 }
             }
         }

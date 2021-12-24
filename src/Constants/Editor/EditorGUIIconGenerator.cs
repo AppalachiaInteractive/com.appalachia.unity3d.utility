@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,19 +11,20 @@ using UnityEditor;
 using UnityEditor.Experimental;
 using UnityEngine;
 
-
 namespace Appalachia.Utility.Constants.Icons
 {
     public static class EditorGUIIconGenerator
     {
+        private const string COMPILER_IF_UNITY_EDITOR = "#if UNITY_EDITOR\r\n";
+        private const string COMPILER_ENDIF = "#endif // UNITY_EDITOR\r\n";
         public const string compileFlag = "EDITOR_ICONS_GENERATED";
         private const string generatedEnumFileName = "EditorGUIIcons";
         private const string defaultGeneratedEnumRelativeFilePath = "Assets/" + generatedEnumFileName + ".cs";
-    
+
         #region Template Strings
-    
-        private const string resetContent = @"
-#if UNITY_EDITOR
+
+        private const string resetContent = COMPILER_IF_UNITY_EDITOR +
+                                            @"
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -67,11 +69,11 @@ public static class EditorGUIIcons
         return null;
     }
 }
-#endif
-";
+" +
+                                            COMPILER_ENDIF;
 
-        private const string generatorString = @"
-#if UNITY_EDITOR
+        private const string generatorString = COMPILER_IF_UNITY_EDITOR +
+                                               @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,7 +87,7 @@ public static class EditorGUIIcons
     public const int VALUE_COUNT = %%%COUNT%%%;
     public const string VALUE_COUNT_STRING = ""%%%COUNT%%%"";
 
-#region Enumerations
+	#region Enumerations
 
     public enum Enum
     {
@@ -99,15 +101,15 @@ public static class EditorGUIIcons
 %%%SORTENUM%%%
     }
 
-#endregion
+	#endregion
 
-#region Constants
+	#region Constants
 
 %%%LIST%%%
 
-#endregion
+	#endregion
 
-#region Initialization
+	#region Initialization
 
     public static readonly Dictionary<Enum, string> _iconLookup;
     public static readonly Dictionary<string, Enum> _reverseIconLookup;
@@ -123,9 +125,9 @@ public static class EditorGUIIcons
 %%%LOOKUP%%%
     }
 
-#endregion
+	#endregion
 
-#region Methods
+	#region Methods
 
     public static GUIContent GetIconContent(Enum icon)
     {
@@ -157,22 +159,22 @@ public static class EditorGUIIcons
         return _reverseIconLookup[name];
     }
 
-#endregion
+	#endregion
 
-#region UI
+	#region UI
 
 %%%EDITOR%%%
 
-#endregion
+	#endregion
 }
-#endif
-";
+" +
+                                               COMPILER_ENDIF;
 
-        private const string editorString = @"
-    #if UNITY_EDITOR
+        private const string editorString = COMPILER_IF_UNITY_EDITOR +
+                                            @"
     public class EditorGUIIconViewer : EditorWindow
     {
-#region UI Constants
+	    #region UI Constants
 
         private const string _headerText = ""EditorGUI Icons"";
 
@@ -203,9 +205,9 @@ public static class EditorGUIIcons
         private const float _regexLabelSize = 18f;
         private const float _selectedIconLabelSize = 130f;
 
-#endregion
+	    #endregion
 
-#region Icons
+	    #region Icons
 
         private const string _regenerateButtonIconName = ""sceneviewtools on"";
         private const string _resetButtonIconName = ""grid.erasertool"";
@@ -215,17 +217,17 @@ public static class EditorGUIIcons
         private const string _regexInvalidIconName = ""p4_deletedlocal"";
         private const string _regexMissingIconName = ""testignored"";
 
-#endregion
+	    #endregion
 
-#region State
+	    #region State
 
         private static Enum[] _enums;
         private static string[] _iconNames;
         private static GUIContent[] _icons;
 
-#endregion
+	    #endregion
 
-#region UI State
+	    #region UI State
 
         private string _searchFilter = """";
         private Color _backgroundColor = new(0.1647059f, 0.1647059f, 0.1647059f, 1f);
@@ -241,11 +243,9 @@ public static class EditorGUIIcons
         private string _lastSelection = """";
         private GUIContent _lastSelectionContent;
 
-#endregion
+	    #endregion
 
-#region Layout
-
-
+	    #region Layout
 
         private static readonly GUILayoutOption[] _expandWidth = {GUILayout.ExpandWidth(true)};
         private GUILayoutOption[] _iconLayout = {GUILayout.Width(_defaultIconSize)};
@@ -268,9 +268,9 @@ public static class EditorGUIIcons
             GUILayout.Width(_selectedIconLabelSize)
         };
 
-#endregion
+	    #endregion
 
-#region Properties
+	    #region Properties
 
         private GUILayoutOption[] iconSizeLabelLayout
         {
@@ -353,11 +353,9 @@ public static class EditorGUIIcons
             }
         }
 
-#endregion
+	    #endregion
 
-#endregion
-
-#region Style
+	    #region Style
 
 
 
@@ -365,9 +363,9 @@ public static class EditorGUIIcons
         private GUIStyle _iconStyle;
         private GUIStyle _regexIconStyle;
 
-#endregion
+	    #endregion
 
-#region Properties
+	    #region Properties
 
         private GUIStyle scrollViewStyle
         {
@@ -432,11 +430,9 @@ public static class EditorGUIIcons
             }
         }
 
-#endregion
+	    #endregion
 
-#endregion
-
-#region Content
+	    #region Content
 
 
 
@@ -449,9 +445,9 @@ public static class EditorGUIIcons
         private GUIContent _regexValidLabel;
         private GUIContent _selectedIconLabel;
 
-#endregion
+	    #endregion
 
-#region Properties
+	    #region Properties
 
         private GUIContent regenerateButtonContent
         {
@@ -584,11 +580,9 @@ public static class EditorGUIIcons
             }
         }
 
-#endregion
+	    #endregion
 
-#endregion
-
-#region Editor Window API
+	    #region Editor Window API
 
         private void OnEnable()
         {
@@ -677,9 +671,9 @@ public static class EditorGUIIcons
             GUIUtility.ExitGUI();
         }
 
-#endregion
+	    #endregion
 
-#region UI Menu Items
+	    #region UI Menu Items
 
         [UnityEditor.MenuItem(""Appalachia/Tools/EditorGUI Icons/Explore"", priority = PKG.Priority 22)]
         internal static void ExploreEditorGUIIcons()
@@ -687,9 +681,9 @@ public static class EditorGUIIcons
             GetWindow<EditorGUIIconViewer>(false, ""EditorGUI Icons"", true);
         }
 
-#endregion
+	    #endregion
 
-#region UI Parts
+	    #region UI Parts
 
         private void DrawHeader(string text, string subheader, Action additional)
         {
@@ -872,9 +866,9 @@ public static class EditorGUIIcons
             }
         }
 
-#endregion
+	    #endregion
 
-#region UI Helper Methods
+	    #region UI Helper Methods
 
         private Texture2D MakeTex(int width, int height, Color col)
         {
@@ -969,10 +963,11 @@ public static class EditorGUIIcons
             Missing
         }
 
-#endregion
+	    #endregion
     }
-#endif  
-";
+" +
+                                            COMPILER_ENDIF;
+        
         #endregion
     
         private const string TOKEN_VERSION = "%%%VERSION%%%";
@@ -982,7 +977,6 @@ public static class EditorGUIIcons
         private const string TOKEN_SORTENUM = "%%%SORTENUM%%%";
         private const string TOKEN_LIST = "%%%LIST%%%";
         private const string TOKEN_EDITOR = "%%%EDITOR%%%";
-
 
         private const string REPLACEMENT_LOOKUP = "        _iconLookup.Add(Enum.$2, $2);";
         private const string REPLACEMENT_LOOKUP2 = "        _reverseIconLookup.Add($2, Enum.$2);";
@@ -1001,7 +995,7 @@ public static class EditorGUIIcons
         private static bool NeedToGenerateEditorIcons()
         {
 #if !EDITOR_ICONS_GENERATED
-        return true;
+            return true;
 #else
             return false;
 #endif
@@ -1010,6 +1004,10 @@ public static class EditorGUIIcons
         [InitializeOnLoadMethod]
         public static void CheckForInitializationNeed()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return;
+            }
 
             if (NeedToGenerateEditorIcons())
             {
@@ -1242,19 +1240,7 @@ public static class EditorGUIIcons
 
         private static string GetIconsPath()
         {
-#if UNITY_2018_3_OR_NEWER
             return EditorResources.iconsPath;
-#else
-        var assembly = typeof(EditorGUIUtility).Assembly;
-        var editorResourcesUtility =
-assembly.GetType("UnityEditorAppalachia.EditorResourcesUtility");
-
-        var iconsPathProperty = editorResourcesUtility.GetProperty(
-            "iconsPath",
-            BindingFlags.Static | BindingFlags.Public);
-
-        return (string)iconsPathProperty.GetValue(null, new object[] { });
-#endif
         }
 
         private class IconMetadata

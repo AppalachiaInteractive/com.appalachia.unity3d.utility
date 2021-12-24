@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Appalachia.Utility.Strings;
 using UnityEditor;
 using UnityEngine;
 
@@ -115,13 +116,16 @@ namespace Appalachia.Utility.Reflection
 
         public static Type GetArrayElementType(this SerializedProperty property)
         {
-            Debug.Assert(property.isArray, $"Property {property.propertyPath} is not an array");
+            Debug.Assert(
+                property.isArray,
+                ZString.Format("Property {0} is not an array", property.propertyPath)
+            );
 
             var fieldType = property.GetFieldType();
             if (fieldType == null)
             {
                 throw new ArgumentException(
-                    $"Cannot determine managed field type of {property.propertyPath}",
+                    ZString.Format("Cannot determine managed field type of {0}", property.propertyPath),
                     nameof(property)
                 );
             }
@@ -440,7 +444,7 @@ namespace Appalachia.Utility.Reflection
                     ////TODO: other property types
                     default:
                         throw new NotImplementedException(
-                            $"Support for {property.propertyType} property type"
+                            ZString.Format("Support for {0} property type", property.propertyType)
                         );
                 }
             }

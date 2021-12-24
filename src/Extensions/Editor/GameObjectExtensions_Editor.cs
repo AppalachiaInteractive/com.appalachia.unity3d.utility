@@ -1,8 +1,12 @@
 #region
 
+using System;
 using System.Collections.Generic;
+using Appalachia.Utility.Logging;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 #endregion
 
@@ -11,25 +15,6 @@ namespace Appalachia.Utility.Extensions
 #if UNITY_EDITOR
     public static partial class GameObjectExtensions
     {
-        #region Profiling
-
-        private static readonly ProfilerMarker _PRF_GetAssetGUID =
-            new ProfilerMarker(_PRF_PFX + nameof(GetAssetGUID));
-
-        private static readonly ProfilerMarker _PRF_EditorGetFriendlyPath =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetFriendlyPath));
-
-        private static readonly ProfilerMarker _PRF_EditorGetGameObjectFromComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetGameObjectFromComponent));
-
-        private static readonly ProfilerMarker _PRF_EditorGetScriptableObjects =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetScriptableObjects));
-
-        private static readonly ProfilerMarker _PRF_EditorIsSceneObject =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorIsSceneObject));
-
-        #endregion
-
         public static string EditorGetFriendlyPath(this GameObject gameObj)
         {
             using (_PRF_EditorGetFriendlyPath.Auto())
@@ -58,7 +43,7 @@ namespace Appalachia.Utility.Extensions
                         obj.GetInstanceID()
                     );
                 return gameObjID != 0
-                    ? (GameObject) UnityEditor.EditorUtility.InstanceIDToObject(gameObjID)
+                    ? (GameObject)UnityEditor.EditorUtility.InstanceIDToObject(gameObjID)
                     : obj as GameObject;
             }
         }
@@ -100,7 +85,7 @@ namespace Appalachia.Utility.Extensions
 
         public static GameObject GetAsset(this GameObject prefab)
         {
-            using (_PRF_GameObjectExtensions_GetAsset.Auto())
+            using (_PRF_GetAsset.Auto())
             {
                 if (!UnityEditor.PrefabUtility.IsPartOfPrefabInstance(prefab))
                 {
@@ -148,6 +133,115 @@ namespace Appalachia.Utility.Extensions
                 return null;
             }
         }
+
+#if UNITY_EDITOR
+
+        private static readonly ProfilerMarker _PRF_Editor_GetTransformFromRelativePath =
+            new ProfilerMarker(_PRF_PFX + nameof(Editor_GetTransformFromRelativePath));
+
+        public static Transform Editor_GetTransformFromRelativePath(this Transform relativeTo, string path)
+        {
+            using (_PRF_Editor_GetTransformFromRelativePath.Auto())
+            {
+                if (path.IsNullOrWhiteSpace())
+                {
+                    throw new ArgumentNullException(nameof(path));
+                }
+
+                // path = "MyObject/Child1/child2";
+                var pathParts = path.Split('/'); // [MyObject], [Child1], [child2]
+
+                var currentTransform = relativeTo;
+
+                for (var pathPartIndex = 0; pathPartIndex < pathParts.Length; pathPartIndex++)
+                {
+                    var pathPart = pathParts[pathPartIndex];
+
+                    var foundChild = currentTransform.Find(pathPart);
+
+                    if (foundChild == null)
+                    {
+                        var logMessage = ZString.Format(
+                            "Could not find transform path [{0}] relative to [{1}]",
+                            path,
+                            relativeTo.gameObject.name
+                        );
+
+                        AppaLog.Context.Extensions.Warn(logMessage, relativeTo);
+
+                        return null;
+                    }
+
+                    currentTransform = foundChild;
+                }
+
+                return currentTransform;
+            }
+        }
+#endif
+
+        public static bool IsDescendentOf(this GameObject prospectiveChild, GameObject prospectiveParent)
+        {
+            using (_PRF_IsDescendentOf.Auto())
+            {
+                return IsDescendentOf(prospectiveChild.transform, prospectiveParent.transform);
+            }
+        }
+
+        public static bool IsDescendentOf(this Transform prospectiveChild, Transform prospectiveParent)
+        {
+            using (_PRF_IsDescendentOf.Auto())
+            {
+                if ((prospectiveChild == null) || (prospectiveParent == null))
+                {
+                    return false;
+                }
+
+                if (prospectiveChild.parent == null)
+                {
+                    return false;
+                }
+
+                var currentlyChecking = prospectiveChild;
+
+                while (currentlyChecking.parent != null)
+                {
+                    if (currentlyChecking == prospectiveParent)
+                    {
+                        return true;
+                    }
+
+                    currentlyChecking = currentlyChecking.parent;
+                }
+
+                return false;
+            }
+        }
+
+        #region Profiling
+
+        private static readonly ProfilerMarker _PRF_IsDescendentOf =
+            new ProfilerMarker(_PRF_PFX + nameof(IsDescendentOf));
+
+        private static readonly ProfilerMarker _PRF_GetAssetGUID =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAssetGUID));
+
+        private static readonly ProfilerMarker _PRF_EditorGetFriendlyPath =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetFriendlyPath));
+
+        private static readonly ProfilerMarker _PRF_EditorGetGameObjectFromComponent =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetGameObjectFromComponent));
+
+        private static readonly ProfilerMarker _PRF_EditorGetScriptableObjects =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetScriptableObjects));
+
+        private static readonly ProfilerMarker _PRF_EditorIsSceneObject =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorIsSceneObject));
+
+        private static readonly ProfilerMarker
+            _PRF_GetAsset = new ProfilerMarker(_PRF_PFX + nameof(GetAsset));
+
+        #endregion
     }
 #endif
 }

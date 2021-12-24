@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Appalachia.Utility.Strings;
 
 namespace Appalachia.Utility.Execution.Progress
 {
@@ -49,7 +50,9 @@ namespace Appalachia.Utility.Execution.Progress
 
             return obj is AppaProgress other
                 ? CompareTo(other)
-                : throw new ArgumentException($"Object must be of type {nameof(AppaProgress)}");
+                : throw new ArgumentException(
+                    ZString.Format("Object must be of type {0}", nameof(AppaProgress))
+                );
         }
 
         [DebuggerStepThrough] public int CompareTo(AppaProgress other)
@@ -134,7 +137,7 @@ namespace Appalachia.Utility.Execution.Progress
 
         [DebuggerStepThrough] public static implicit operator string(AppaProgress o)
         {
-            return o.message ?? $"{o.progress:N3}";
+            return o.message ?? ZString.Format("{0:N3}", o.progress);
         }
 
         [DebuggerStepThrough] public static implicit operator Tuple<string, float>(AppaProgress o)

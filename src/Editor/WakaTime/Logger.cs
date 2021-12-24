@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using Appalachia.Utility.Strings;
 using UnityEngine;
 
 namespace Appalachia.Utility.WakaTime
@@ -8,29 +9,29 @@ namespace Appalachia.Utility.WakaTime
     {
         internal static string GetLogPrefix()
         {
-            return $"{Constants.Logger.LogPrefix} ";
+            return ZString.Format("{0} ", Constants.Logger.LogPrefix);
         }
 
         internal static void Log(string message)
         {
-            Debug.Log($"{GetLogPrefix()}{message}");
+            Debug.Log(ZString.Format("{0}{1}", GetLogPrefix(), message));
         }
 
         internal static void LogWarning(string message)
         {
-            Debug.LogWarning($"{GetLogPrefix()}{message}");
+            Debug.LogWarning(ZString.Format("{0}{1}", GetLogPrefix(), message));
         }
 
         internal static void LogError(string message)
         {
-            Debug.LogError($"{GetLogPrefix()}{message}");
+            Debug.LogError(ZString.Format("{0}{1}", GetLogPrefix(), message));
         }
 
         internal static void DebugLog(string message)
         {
             if (Configuration.Debugging)
             {
-                Debug.Log($"{GetLogPrefix()}{message}");
+                Debug.Log(ZString.Format("{0}{1}", GetLogPrefix(), message));
             }
         }
 
@@ -38,7 +39,7 @@ namespace Appalachia.Utility.WakaTime
         {
             if (Configuration.Debugging)
             {
-                Debug.LogWarning($"{GetLogPrefix()}{message}");
+                Debug.LogWarning(ZString.Format("{0}{1}", GetLogPrefix(), message));
             }
         }
     }

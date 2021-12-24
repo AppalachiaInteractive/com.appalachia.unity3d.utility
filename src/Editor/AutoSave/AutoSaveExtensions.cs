@@ -1,3 +1,5 @@
+using Appalachia.Utility.Strings;
+
 #if UNITY_EDITOR
 
 namespace Appalachia.Utility.AutoSave
@@ -6,7 +8,7 @@ namespace Appalachia.Utility.AutoSave
     {
         public static string Format(this string formatString, params object[] args)
         {
-            return string.Format(formatString, args);
+            return ZString.Format(formatString, args);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Appalachia.Utility.Strings;
 using Appalachia.Utility.TextEditor.Core.Drawers;
 using Appalachia.Utility.TextEditor.Core.GUICache;
 using Newtonsoft.Json.Linq;
@@ -92,9 +93,9 @@ namespace Appalachia.Utility.TextEditor.JSON
             int valueCount)
         {
             var foldoutHeader = isObject
-                ? $"{propertyName}  {{{valueCount}}}"
+                ? ZString.Format("{0}  {{{1}}}", propertyName, valueCount)
                 : isArray
-                    ? $"{propertyName}  [{valueCount}]"
+                    ? ZString.Format("{0}  [{1}]", propertyName, valueCount)
                     : propertyName;
 
             return foldoutHeader;
@@ -247,7 +248,7 @@ namespace Appalachia.Utility.TextEditor.JSON
                     EditorGUILayout.BeginHorizontal();
                 }
 
-                PrefixLabel($"[{innerArrayIndex}]", JSGUIKeys.TextField, JSGUIKeys.Label);
+                PrefixLabel(ZString.Format("[{0}]", innerArrayIndex), JSGUIKeys.TextField, JSGUIKeys.Label);
                 DrawToken(element, null, innerArrayIndex);
 
                 if (horizontal)
@@ -573,7 +574,7 @@ namespace Appalachia.Utility.TextEditor.JSON
                     break;
             }
 
-            var propertyName = GetUniqueName(jObject, string.Format("new {0}", typeName));
+            var propertyName = GetUniqueName(jObject, ZString.Format("new {0}", typeName));
             var property = new JProperty(propertyName, value);
             jObject.Add(property);
         }
@@ -587,7 +588,7 @@ namespace Appalachia.Utility.TextEditor.JSON
             while (jObject[uniqueName] != null)
             {
                 suffix++;
-                uniqueName = $"{originalProperty}-{suffix:000}";
+                uniqueName = ZString.Format("{0}-{1:000}", originalProperty, suffix);
             }
 
             return uniqueName;
@@ -618,7 +619,7 @@ namespace Appalachia.Utility.TextEditor.JSON
             {
                 const string pfx = Prefix + "Level.";
 
-                return $"{pfx}{i}";
+                return ZString.Format("{0}{1}", pfx, i);
             }
         }
     }

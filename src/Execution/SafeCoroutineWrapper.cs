@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Appalachia.Utility.Logging;
+using Appalachia.Utility.Strings;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -10,6 +11,8 @@ namespace Appalachia.Utility.Execution
 {
     public class SafeCoroutineWrapper
     {
+        
+        
         public delegate void OnError(Exception ex);
 
         public delegate void OnSuccess();
@@ -28,7 +31,12 @@ namespace Appalachia.Utility.Execution
 
             if (processKey == null)
             {
-                _processKey = $"{callerFilePath} > {callerMemberName}:{callerLineNumber}";
+                _processKey = ZString.Format(
+                    "{0} > {1}:{2}",
+                    callerFilePath,
+                    callerMemberName,
+                    callerLineNumber
+                );
             }
             else
             {
@@ -131,8 +139,8 @@ namespace Appalachia.Utility.Execution
             {
                 return;
             }
-            
-            AppaLog.Warn($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
+
+            //AppaLog.Context.Execution.Warn($"Auto-cancelling a coroutine [{ProcessKey}] due to: [{reason}].");
 
             _isCancellationInProgress = true;
             _wasCancelled = true;
@@ -141,13 +149,17 @@ namespace Appalachia.Utility.Execution
 #if UNITY_EDITOR
             if (_editorCoroutine != null)
             {
-                AppaLog.Info($"Auto-cancel of [{ProcessKey}]: cancelling editor co-routine.");
+                AppaLog.Context.Execution.Info(
+                    ZString.Format("Auto-cancel of [{0}]: cancelling editor co-routine.", ProcessKey)
+                );
                 Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StopCoroutine(_editorCoroutine);
             }
 #endif
             if (_coroutine != null)
             {
-                AppaLog.Info($"Auto-cancel of [{ProcessKey}]: cancelling runtime co-routine.");
+                AppaLog.Context.Execution.Info(
+                    ZString.Format("Auto-cancel of [{0}]: cancelling runtime co-routine.", ProcessKey)
+                );
                 SafeCoroutineManager.instance.StopCoroutine(_coroutine);
             }
             
@@ -158,7 +170,12 @@ namespace Appalachia.Utility.Execution
         {
             if (ShouldTimeout())
             {
-                var message = $"| {ExecutionTime:F2} / {TimeoutSeconds:F2} | {ProcessKey}";
+                var message = ZString.Format(
+                    "| {0:F2} / {1:F2} | {2}",
+                    ExecutionTime,
+                    TimeoutSeconds,
+                    ProcessKey
+                );
                 throw new TimeoutException(message);
             }
         }
@@ -205,7 +222,9 @@ namespace Appalachia.Utility.Execution
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"Coroutine [{ProcessKey}] threw an exception! [{ex.Message}]");
+                    Debug.LogError(
+                        ZString.Format("Coroutine [{0}] threw an exception! [{1}]", ProcessKey, ex.Message)
+                    );
                     Debug.LogException(ex);
 
                     _exception = ex;
@@ -217,7 +236,11 @@ namespace Appalachia.Utility.Execution
                     catch (Exception ex2)
                     {
                         Debug.LogError(
-                            $"Coroutine [{ProcessKey}] threw ANOTHER an exception! [{ex2.Message}]"
+                            ZString.Format(
+                                "Coroutine [{0}] threw ANOTHER an exception! [{1}]",
+                                ProcessKey,
+                                ex2.Message
+                            )
                         );
                         Debug.LogException(ex2);
                     }
@@ -248,12 +271,16 @@ namespace Appalachia.Utility.Execution
         {
             if (_rejectsCancellation)
             {
-                AppaLog.Warn($"Coroutine [{ProcessKey}] rejects cancellation and will finish.");
+                AppaLog.Context.Execution.Warn(
+                    ZString.Format("Coroutine [{0}] rejects cancellation and will finish.", ProcessKey)
+                );
                 while (enumerator.MoveNext())
                 {
                 }
 
-                AppaLog.Info($"Coroutine [{ProcessKey}] has finished after rejecting cancellation.");
+                AppaLog.Context.Execution.Info(
+                    ZString.Format("Coroutine [{0}] has finished after rejecting cancellation.", ProcessKey)
+                );
             }
         }
 

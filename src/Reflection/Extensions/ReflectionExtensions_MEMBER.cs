@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 namespace Appalachia.Utility.Reflection.Extensions
@@ -89,7 +90,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                     FieldInfo info    => info.GetValue(obj),
                     PropertyInfo info => info.GetGetMethod(true).Invoke(obj, null),
                     _ => throw new ArgumentException(
-                        $"Can't get the value of a {member.GetType().Name}"
+                        ZString.Format("Can't get the value of a {0}", member.GetType().Name)
                     )
                 };
             }
@@ -110,7 +111,9 @@ namespace Appalachia.Utility.Reflection.Extensions
                         var setMethod = info2.GetSetMethod(true);
                         if (setMethod == null)
                         {
-                            throw new ArgumentException($"Property {info2.Name} has no setter");
+                            throw new ArgumentException(
+                                ZString.Format("Property {0} has no setter", info2.Name)
+                            );
                         }
 
                         setMethod.Invoke(obj, new object[1] {value});
@@ -118,7 +121,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                     }
                     default:
                         throw new ArgumentException(
-                            $"Can't set the value of a {member.GetType().Name}"
+                            ZString.Format("Can't set the value of a {0}", member.GetType().Name)
                         );
                 }
             }

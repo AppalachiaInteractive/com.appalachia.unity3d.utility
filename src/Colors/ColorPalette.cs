@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Appalachia.Utility.Strings;
 using UnityEngine;
 
 namespace Appalachia.Utility.Colors
@@ -36,9 +37,12 @@ namespace Appalachia.Utility.Colors
         public ColorPaletteSubset classes;
         public ColorPaletteSubset bad;
         public ColorPaletteSubset disabled;
+        public ColorPaletteSubset disabledLight;
         public ColorPaletteSubset good;
         public ColorPaletteSubset highlight;
+        public ColorPaletteSubset highlightLight;
         public ColorPaletteSubset notable;
+        public ColorPaletteSubset notableLight;
         public ColorPaletteSubset ui;
         public ColorPaletteSubset neutral;
         public ColorPaletteSubset badToGood;
@@ -52,11 +56,14 @@ namespace Appalachia.Utility.Colors
             new[]
             {
                 disabled,
+                disabledLight,
                 ui,
                 bad,
                 good,
                 notable,
+                notableLight,
                 highlight,
+                highlightLight,
                 neutral,
                 badToGood,
                 badToNeutral,
@@ -137,8 +144,15 @@ namespace Appalachia.Utility.Colors
             {
                 var color = this[label];
 
-                var formatted =
-                    $"{_prefixSpace}{label} = new Color({color.r}f, {color.g}f, {color.b}f, {color.a}f),";
+                var formatted = ZString.Format(
+                    "{0}{1} = new Color({2}f, {3}f, {4}f, {5}f),",
+                    _prefixSpace,
+                    label,
+                    color.r,
+                    color.g,
+                    color.b,
+                    color.a
+                );
 
                 _logBuilder.AppendLine(formatted);
             }
@@ -228,6 +242,12 @@ namespace Appalachia.Utility.Colors
                 new Color(150.0f / 255.0f, 150.0f / 255.0f, 150.0f / 255.0f, 1.0f)
             );
 
+            p.disabledLight = new ColorPaletteSubset(
+                "Disabled Light",
+                new Color(125.0f / 255.0f, 125.0f / 255.0f, 125.0f / 255.0f, 1.0f),
+                new Color(175.0f / 255.0f, 175.0f / 255.0f, 175.0f / 255.0f, 1.0f)
+            );
+
             p.ui = new ColorPaletteSubset(
                 "UI",
                 new Color(025.0f / 255.0f, 025.0f / 255.0f, 025.0f / 255.0f, 1.0f),
@@ -252,10 +272,22 @@ namespace Appalachia.Utility.Colors
                 new Color(227.0f / 255.0f, 242.0f / 255.0f, 253.0f / 255.0f, 1.0f)
             );
 
+            p.notableLight = new ColorPaletteSubset(
+                "Notable Light",
+                new Color(113.0f / 255.0f, 171.0f / 255.0f, 255.0f / 255.0f, 1.0f),
+                new Color(227.0f / 255.0f, 242.0f / 255.0f, 253.0f / 255.0f, 1.0f)
+            );
+
             p.highlight = new ColorPaletteSubset(
                 "Highlight",
                 new Color(116.0f / 255.0f, 070.0f / 255.0f, 184.0f / 255.0f, 1.0f),
                 new Color(128.0f / 255.0f, 255.0f / 255.0f, 219.0f / 255.0f, 1.0f)
+            );
+
+            p.highlightLight = new ColorPaletteSubset(
+                "Highlight Light",
+                new Color(174.0f / 255.0f, 105.0f / 255.0f, 255.0f / 255.0f, 1.0f),
+                new Color(192.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.0f)
             );
             
             p.neutral = new ColorPaletteSubset(

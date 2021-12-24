@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEngine;
 
@@ -30,10 +30,16 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>
             _FIELD_CACHE = new();
 
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>
+            _PROPERTY_CACHE = new();
+
         private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>>
             _METHOD_CACHE = new();
 
         private static Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>> _FIELD_CACHE_BASIC = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>> _PROPERTY_CACHE_BASIC =
+            new();
         private static Dictionary<Type, Dictionary<BindingFlags, MethodInfo[]>> _METHOD_CACHE_BASIC = new();
         private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
         private static HashSet<Type> _POPULATED_TYPES_CACHE;
@@ -166,6 +172,16 @@ namespace Appalachia.Utility.Reflection.Extensions
                 _FIELD_CACHE.Add(t, new Dictionary<BindingFlags, Dictionary<string, FieldInfo>>());
             }
 
+            if (!_PROPERTY_CACHE_BASIC.ContainsKey(t))
+            {
+                _PROPERTY_CACHE_BASIC.Add(t, new Dictionary<BindingFlags, PropertyInfo[]>());
+            }
+
+            if (!_PROPERTY_CACHE.ContainsKey(t))
+            {
+                _PROPERTY_CACHE.Add(t, new Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>());
+            }
+
             /*t.PopulateType_INTERNAL();*/
         }
 
@@ -287,6 +303,20 @@ namespace Appalachia.Utility.Reflection.Extensions
                         );
                 }
 
+                if (_PROPERTY_CACHE_BASIC == null)
+                {
+                    _PROPERTY_CACHE_BASIC =
+                        new Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>>(TYPE_ESTIMATE);
+                }
+
+                if (_PROPERTY_CACHE == null)
+                {
+                    _PROPERTY_CACHE =
+                        new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>(
+                            TYPE_ESTIMATE
+                        );
+                }
+
                 if (_METHOD_CACHE_BASIC == null)
                 {
                     _METHOD_CACHE_BASIC =
@@ -354,8 +384,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                         return type.IsSealed && type.IsAbstract;
                     default:
                         throw new NotSupportedException(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
+                            ZString.Format(
                                 "Unable to determine IsStatic for member {0}.{1}MemberType was {2} but only fields, properties, methods, events and types are supported.",
                                 member.DeclaringType.FullName,
                                 member.Name,
@@ -405,6 +434,46 @@ namespace Appalachia.Utility.Reflection.Extensions
                     if (!flagTypeFieldCache.ContainsKey(field.Name))
                     {
                         flagTypeFieldCache.Add(field.Name, field);
+                    }
+                }
+            }
+        }
+
+        private static void PopulateProperties_INTERNAL(this Type t, BindingFlags flags)
+        {
+            using (_PRF_PopulateProperties.Auto())
+            {
+                CheckInitialization(t);
+
+                var typePropertyCacheBasic = _PROPERTY_CACHE_BASIC[t];
+                var typePropertyCache = _PROPERTY_CACHE[t];
+
+                if (!typePropertyCache.ContainsKey(flags))
+                {
+                    typePropertyCache.Add(flags, new Dictionary<string, PropertyInfo>());
+                }
+
+                var flagTypePropertyCache = typePropertyCache[flags];
+
+                PropertyInfo[] propertys;
+
+                if (!typePropertyCacheBasic.ContainsKey(flags))
+                {
+                    propertys = t.GetProperties(flags);
+
+                    typePropertyCacheBasic.Add(flags, propertys);
+                }
+                else
+                {
+                    propertys = typePropertyCacheBasic[flags];
+                }
+
+                for (var index = 0; index < propertys.Length; index++)
+                {
+                    var property = propertys[index];
+                    if (!flagTypePropertyCache.ContainsKey(property.Name))
+                    {
+                        flagTypePropertyCache.Add(property.Name, property);
                     }
                 }
             }

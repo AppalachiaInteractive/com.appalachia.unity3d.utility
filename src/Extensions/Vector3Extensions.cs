@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Appalachia.Utility.Strings;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -343,7 +344,7 @@ namespace Appalachia.Utility.Extensions
         {
             if ((ratio1 < 0) || (ratio1 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio: {ratio1}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio: {0}", ratio1));
             }
 
             return (source * (1 - ratio1)) + (other1 * ratio1);
@@ -358,19 +359,19 @@ namespace Appalachia.Utility.Extensions
         {
             if ((ratio1 < 0) || (ratio1 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio 1: {ratio1}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio 1: {0}", ratio1));
             }
 
             if ((ratio2 < 0) || (ratio2 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio 2: {ratio2}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio 2: {0}", ratio2));
             }
 
             var ratioSum = ratio1 + ratio2;
 
             if ((ratioSum < 0) || (ratioSum > 1))
             {
-                throw new NotSupportedException($"Invalid ratio sum: {ratioSum}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio sum: {0}", ratioSum));
             }
 
             return (source * (1 - ratioSum)) + (other1 * ratio1) + (other2 * ratio2);
@@ -387,24 +388,24 @@ namespace Appalachia.Utility.Extensions
         {
             if ((ratio1 < 0) || (ratio1 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio: {ratio1}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio: {0}", ratio1));
             }
 
             if ((ratio2 < 0) || (ratio2 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio 2: {ratio2}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio 2: {0}", ratio2));
             }
 
             if ((ratio3 < 0) || (ratio3 > 1))
             {
-                throw new NotSupportedException($"Invalid ratio 3: {ratio3}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio 3: {0}", ratio3));
             }
 
             var ratioSum = ratio1 + ratio2 + ratio3;
 
             if ((ratioSum < 0) || (ratioSum > 1))
             {
-                throw new NotSupportedException($"Invalid ratio sum: {ratioSum}");
+                throw new NotSupportedException(ZString.Format("Invalid ratio sum: {0}", ratioSum));
             }
 
             return (source * (1 - ratioSum)) + (other1 * ratio1) + (other2 * ratio2) + (other3 * ratio3);

@@ -2,43 +2,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Appalachia.Utility.Strings;
 
 namespace Appalachia.Utility.Reflection.Extensions
 {
     public static partial class ReflectionExtensions
     {
-        private static Dictionary<Type, List<Type>> _totalLookup;
-        private static Dictionary<Type, List<Type>> _concreteLookup;
+        private static Dictionary<Type, List<Type>> _inheritorLookup;
+        private static Dictionary<Type, List<Type>> _concreteInheritorLookup;
 
-        private static Dictionary<Type, List<Type>> TotalLookup
+        private static Dictionary<Type, List<Type>> InheritorLookup
         {
             get
             {
-                if (_totalLookup == null)
+                if (_inheritorLookup == null)
                 {
-                    _totalLookup = new Dictionary<Type, List<Type>>();
+                    _inheritorLookup = new Dictionary<Type, List<Type>>();
                 }
 
-                return _totalLookup;
+                return _inheritorLookup;
             }
         }
 
-        private static Dictionary<Type, List<Type>> ConcreteLookup
+        private static Dictionary<Type, List<Type>> ConcreteInheritorLookup
         {
             get
             {
-                if (_concreteLookup == null)
+                if (_concreteInheritorLookup == null)
                 {
-                    _concreteLookup = new Dictionary<Type, List<Type>>();
+                    _concreteInheritorLookup = new Dictionary<Type, List<Type>>();
                 }
 
-                return _concreteLookup;
+                return _concreteInheritorLookup;
             }
         }
 
         public static List<Type> GetAllConcreteInheritors(this Type t)
         {
-            var l = ConcreteLookup;
+            var l = ConcreteInheritorLookup;
 
             if (!l.ContainsKey(t))
             {
@@ -101,12 +102,9 @@ namespace Appalachia.Utility.Reflection.Extensions
             return false;
         }
         
-       
-
-        
         public static List<Type> GetAllInheritors(this Type t)
         {
-            var l = TotalLookup;
+            var l = InheritorLookup;
 
             if (!l.ContainsKey(t))
             {
@@ -208,13 +206,13 @@ namespace Appalachia.Utility.Reflection.Extensions
 
             if (!baseType.IsGenericType)
             {
-                throw new ArgumentException($"Type {baseType.Name} is not a generic type.");
+                throw new ArgumentException(ZString.Format("Type {0} is not a generic type.", baseType.Name));
             }
 
             if (!type.InheritsFrom(baseType))
             {
                 throw new ArgumentException(
-                    $"Type {type.Name} does not inherit from {baseType.Name}."
+                    ZString.Format("Type {0} does not inherit from {1}.", type.Name, baseType.Name)
                 );
             }
 
@@ -231,7 +229,11 @@ namespace Appalachia.Utility.Reflection.Extensions
             if (type1 == null)
             {
                 throw new ArgumentException(
-                    $"{type.Name} is assignable from {baseType.Name}, but base type was not found?"
+                    ZString.Format(
+                        "{0} is assignable from {1}, but base type was not found?",
+                        type.Name,
+                        baseType.Name
+                    )
                 );
             }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Appalachia.Utility.AutoSave.Configuration;
+using Appalachia.Utility.Strings;
 using UnityEngine.SceneManagement;
 
 namespace Appalachia.Utility.AutoSave.Metadata
@@ -35,7 +36,7 @@ namespace Appalachia.Utility.AutoSave.Metadata
         public string GetSaveFileName(string identifier)
         {
             var formattedTime = saveTime.ToString(AutoSaverConfiguration.DateTimeFormat);
-            return $"{sceneName}.{identifier}.{formattedTime}";
+            return ZString.Format("{0}.{1}.{2}", sceneName, identifier, formattedTime);
         }
 
         public static List<AutoSaveMetadata> FromFiles(string[] files)
@@ -74,7 +75,10 @@ namespace Appalachia.Utility.AutoSave.Metadata
                 {
                     save.sceneName = splits[0];
 
-                    if (!DateTime.TryParse($"{splits[2]} {splits[3]}", out save.saveTime))
+                    if (!DateTime.TryParse(
+                            ZString.Format("{0} {1}", splits[2], splits[3]),
+                            out save.saveTime
+                        ))
                     {
                         save.saveTime = default;
                     }
