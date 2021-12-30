@@ -8,13 +8,11 @@ namespace Appalachia.Utility.Async.Linq
     internal abstract class AsyncEnumeratorBase<TSource, TResult> : MoveNextSource,
                                                                     IAppaTaskAsyncEnumerator<TResult>
     {
+        #region Constants and Static Readonly
+
         private static readonly Action<object> moveNextCallbackDelegate = MoveNextCallBack;
 
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        protected CancellationToken cancellationToken;
-
-        private IAppaTaskAsyncEnumerator<TSource> enumerator;
-        private AppaTask<bool>.Awaiter sourceMoveNext;
+        #endregion
 
         public AsyncEnumeratorBase(
             IAppaTaskAsyncEnumerable<TSource> source,
@@ -25,35 +23,26 @@ namespace Appalachia.Utility.Async.Linq
             TaskTracker.TrackActiveTask(this, 4);
         }
 
+        #region Fields and Autoproperties
+
+        protected CancellationToken cancellationToken;
+
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private AppaTask<bool>.Awaiter sourceMoveNext;
+
+        private IAppaTaskAsyncEnumerator<TSource> enumerator;
+
+        #endregion
+
+        // Util
+        protected TSource SourceCurrent => enumerator.Current;
+
         // abstract
 
         /// <summary>
         ///     If return value is false, continue source.MoveNext.
         /// </summary>
         protected abstract bool TryMoveNextCore(bool sourceHasCurrent, out bool result);
-
-        // Util
-        protected TSource SourceCurrent => enumerator.Current;
-
-        // IAppaTaskAsyncEnumerator<T>
-
-        public TResult Current { get; protected set; }
-
-        public AppaTask<bool> MoveNextAsync()
-        {
-            if (enumerator == null)
-            {
-                enumerator = source.GetAsyncEnumerator(cancellationToken);
-            }
-
-            completionSource.Reset();
-            if (!OnFirstIteration())
-            {
-                SourceMoveNext();
-            }
-
-            return new AppaTask<bool>(this, completionSource.Version);
-        }
 
         protected virtual bool OnFirstIteration()
         {
@@ -123,6 +112,28 @@ namespace Appalachia.Utility.Async.Linq
             }
         }
 
+        #region IAppaTaskAsyncEnumerator<TResult> Members
+
+        // IAppaTaskAsyncEnumerator<T>
+
+        public TResult Current { get; protected set; }
+
+        public AppaTask<bool> MoveNextAsync()
+        {
+            if (enumerator == null)
+            {
+                enumerator = source.GetAsyncEnumerator(cancellationToken);
+            }
+
+            completionSource.Reset();
+            if (!OnFirstIteration())
+            {
+                SourceMoveNext();
+            }
+
+            return new AppaTask<bool>(this, completionSource.Version);
+        }
+
         // if require additional resource to dispose, override and call base.DisposeAsync.
         public virtual AppaTask DisposeAsync()
         {
@@ -134,21 +145,19 @@ namespace Appalachia.Utility.Async.Linq
 
             return default;
         }
+
+        #endregion
     }
 
     internal abstract class AsyncEnumeratorAwaitSelectorBase<TSource, TResult, TAwait> : MoveNextSource,
         IAppaTaskAsyncEnumerator<TResult>
     {
+        #region Constants and Static Readonly
+
         private static readonly Action<object> moveNextCallbackDelegate = MoveNextCallBack;
         private static readonly Action<object> setCurrentCallbackDelegate = SetCurrentCallBack;
 
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        protected CancellationToken cancellationToken;
-
-        private IAppaTaskAsyncEnumerator<TSource> enumerator;
-        private AppaTask<bool>.Awaiter sourceMoveNext;
-
-        private AppaTask<TAwait>.Awaiter resultAwaiter;
+        #endregion
 
         public AsyncEnumeratorAwaitSelectorBase(
             IAppaTaskAsyncEnumerable<TSource> source,
@@ -159,13 +168,26 @@ namespace Appalachia.Utility.Async.Linq
             TaskTracker.TrackActiveTask(this, 4);
         }
 
+        #region Fields and Autoproperties
+
+        protected CancellationToken cancellationToken;
+
+        // Util
+        protected TSource SourceCurrent { get; private set; }
+
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private AppaTask<bool>.Awaiter sourceMoveNext;
+
+        private AppaTask<TAwait>.Awaiter resultAwaiter;
+
+        private IAppaTaskAsyncEnumerator<TSource> enumerator;
+
+        #endregion
+
         // abstract
 
         protected abstract AppaTask<TAwait> TransformAsync(TSource sourceCurrent);
         protected abstract bool TrySetCurrentCore(TAwait awaitResult, out bool terminateIteration);
-
-        // Util
-        protected TSource SourceCurrent { get; private set; }
 
         protected (bool waitCallback, bool requireNextIteration) ActionCompleted(
             bool trySetCurrentResult,
@@ -181,32 +203,10 @@ namespace Appalachia.Utility.Async.Linq
             return (false, true);
         }
 
-        protected (bool waitCallback, bool requireNextIteration) WaitAwaitCallback(out bool moveNextResult)
-        {
-            moveNextResult = default;
-            return (true, false);
-        }
-
         protected (bool waitCallback, bool requireNextIteration) IterateFinished(out bool moveNextResult)
         {
             moveNextResult = false;
             return (false, false);
-        }
-
-        // IAppaTaskAsyncEnumerator<T>
-
-        public TResult Current { get; protected set; }
-
-        public AppaTask<bool> MoveNextAsync()
-        {
-            if (enumerator == null)
-            {
-                enumerator = source.GetAsyncEnumerator(cancellationToken);
-            }
-
-            completionSource.Reset();
-            SourceMoveNext();
-            return new AppaTask<bool>(this, completionSource.Version);
         }
 
         protected void SourceMoveNext()
@@ -218,7 +218,7 @@ namespace Appalachia.Utility.Async.Linq
                 var result = false;
                 try
                 {
-                    (var waitCallback, var requireNextIteration) = TryMoveNextCore(
+                    var (waitCallback, requireNextIteration) = TryMoveNextCore(
                         sourceMoveNext.GetResult(),
                         out result
                     );
@@ -246,31 +246,6 @@ namespace Appalachia.Utility.Async.Linq
             }
         }
 
-        private (bool waitCallback, bool requireNextIteration) TryMoveNextCore(
-            bool sourceHasCurrent,
-            out bool result)
-        {
-            if (sourceHasCurrent)
-            {
-                SourceCurrent = enumerator.Current;
-                var task = TransformAsync(SourceCurrent);
-                if (UnwarapTask(task, out var taskResult))
-                {
-                    var currentResult = TrySetCurrentCore(taskResult, out var terminateIteration);
-                    if (terminateIteration)
-                    {
-                        return IterateFinished(out result);
-                    }
-
-                    return ActionCompleted(currentResult, out result);
-                }
-
-                return WaitAwaitCallback(out result);
-            }
-
-            return IterateFinished(out result);
-        }
-
         protected bool UnwarapTask(AppaTask<TAwait> taskResult, out TAwait result)
         {
             resultAwaiter = taskResult.GetAwaiter();
@@ -286,13 +261,19 @@ namespace Appalachia.Utility.Async.Linq
             return false;
         }
 
+        protected (bool waitCallback, bool requireNextIteration) WaitAwaitCallback(out bool moveNextResult)
+        {
+            moveNextResult = default;
+            return (true, false);
+        }
+
         private static void MoveNextCallBack(object state)
         {
             var self = (AsyncEnumeratorAwaitSelectorBase<TSource, TResult, TAwait>)state;
             var result = false;
             try
             {
-                (var waitCallback, var requireNextIteration) = self.TryMoveNextCore(
+                var (waitCallback, requireNextIteration) = self.TryMoveNextCore(
                     self.sourceMoveNext.GetResult(),
                     out result
                 );
@@ -357,6 +338,49 @@ namespace Appalachia.Utility.Async.Linq
             }
         }
 
+        private (bool waitCallback, bool requireNextIteration) TryMoveNextCore(
+            bool sourceHasCurrent,
+            out bool result)
+        {
+            if (sourceHasCurrent)
+            {
+                SourceCurrent = enumerator.Current;
+                var task = TransformAsync(SourceCurrent);
+                if (UnwarapTask(task, out var taskResult))
+                {
+                    var currentResult = TrySetCurrentCore(taskResult, out var terminateIteration);
+                    if (terminateIteration)
+                    {
+                        return IterateFinished(out result);
+                    }
+
+                    return ActionCompleted(currentResult, out result);
+                }
+
+                return WaitAwaitCallback(out result);
+            }
+
+            return IterateFinished(out result);
+        }
+
+        #region IAppaTaskAsyncEnumerator<TResult> Members
+
+        // IAppaTaskAsyncEnumerator<T>
+
+        public TResult Current { get; protected set; }
+
+        public AppaTask<bool> MoveNextAsync()
+        {
+            if (enumerator == null)
+            {
+                enumerator = source.GetAsyncEnumerator(cancellationToken);
+            }
+
+            completionSource.Reset();
+            SourceMoveNext();
+            return new AppaTask<bool>(this, completionSource.Version);
+        }
+
         // if require additional resource to dispose, override and call base.DisposeAsync.
         public virtual AppaTask DisposeAsync()
         {
@@ -368,5 +392,7 @@ namespace Appalachia.Utility.Async.Linq
 
             return default;
         }
+
+        #endregion
     }
 }
