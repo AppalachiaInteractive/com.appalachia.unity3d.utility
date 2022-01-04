@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using static Appalachia.Utility.Logging.AppaLog.Context;
 
 namespace Appalachia.Utility.Logging
 {
@@ -17,7 +16,7 @@ namespace Appalachia.Utility.Logging
 
             InitializeSettings();
 
-            for (var dotCount = ResolutionSet.MAX_PARTS; dotCount >= 1; dotCount--)
+            for (var dotCount = ResolutionSet.MAX_PARTS - 1; dotCount >= 1; dotCount--)
             {
                 for (var index = 0; index < _settings.Length; index++)
                 {
@@ -30,7 +29,7 @@ namespace Appalachia.Utility.Logging
                 }
             }
 
-            return Uncategorized;
+            return AppaLog.Context.Uncategorized;
         }
 
         private static void InitializeSettings()
@@ -42,126 +41,156 @@ namespace Appalachia.Utility.Logging
 
             _settings = new ResolutionSet[]
             {
-                new(() => Application, "Appalachia.Prototype.KOC.Application"),
-                new(() => Area, "Appalachia.Prototype.KOC.Application.Areas"),
-                new(() => ArrayPooling, "Appalachia.Core.ArrayPooling"),
-                new(() => Assets, "Appalachia.Core.Assets"),
-                new(() => Assets, "Appalachia.Editor.AssetGeneration"),
-                new(() => Audio, "Appalachia.Audio"),
                 new(
-                    () => Behaviours,
+                    () => AppaLog.Context.Behaviours,
+                    "Appalachia.Core.Objects.Root.AppalachiaBehaviour",
+                    "Appalachia.Core.Objects.Root.SingletonAppalachiaBehaviour",
                     "Appalachia.Core.Behaviours",
                     "Appalachia.Prototype.KOC.Application.Behaviours"
                 ),
-                new(() => CI, "Appalachia.CI", "Appalachia.Editor.CI"),
-                new(() => Caching, "Appalachia.Core.Caching"),
-                new(() => Character, "Appalachia.Prototype.KOC.Character"),
+                new(() => AppaLog.Context.Repo, "Appalachia.Core.Objects.Root.AppalachiaRepository"),
                 new(
-                    () => Collections,
+                    () => AppaLog.Context.Object,
+                    "Appalachia.Core.Objects.Root.AppalachiaObject",
+                    "Appalachia.Core.Objects.Root.SingletonAppalachiaObject"
+                ),
+                new(() => AppaLog.Context.Application, "Appalachia.Prototype.KOC.Application"),
+                new(() => AppaLog.Context.Area, "Appalachia.Prototype.KOC.Application.Areas"),
+                new(() => AppaLog.Context.ArrayPooling, "Appalachia.Core.ArrayPooling"),
+                new(() => AppaLog.Context.Assets, "Appalachia.Core.Assets"),
+                new(() => AppaLog.Context.Assets, "Appalachia.Editor.AssetGeneration"),
+                new(() => AppaLog.Context.Audio, "Appalachia.Audio"),
+                new(() => AppaLog.Context.CI, "Appalachia.CI", "Appalachia.Editor.CI"),
+                new(() => AppaLog.Context.Caching, "Appalachia.Core.Caching"),
+                new(() => AppaLog.Context.Character, "Appalachia.Prototype.KOC.Character"),
+                new(
+                    () => AppaLog.Context.Collections,
                     "Appalachia.Core.Collections",
                     "Appalachia.Prototype.KOC.Application.Collections"
                 ),
-                new(() => Components, "Appalachia.Prototype.KOC.Application.Components"),
-                new(() => ConvexDecomposition, "Appalachia.Spatial.ConvexDecomposition"),
-                new(() => Crafting, "Appalachia.Prototype.KOC.Crafting"),
-                new(() => Data, "Appalachia.Data"),
-                new(() => Data, "Appalachia.Prototype.KOC.Data"),
+                new(() => AppaLog.Context.Components, "Appalachia.Prototype.KOC.Application.Components"),
+                new(() => AppaLog.Context.ConvexDecomposition, "Appalachia.Spatial.ConvexDecomposition"),
+                new(() => AppaLog.Context.Crafting, "Appalachia.Prototype.KOC.Crafting"),
+                new(() => AppaLog.Context.Data, "Appalachia.Data", "Appalachia.Prototype.KOC.Data"),
                 new(
-                    () => Database,
+                    () => AppaLog.Context.Database,
                     "Appalachia.Data.AccessLayer",
                     "Appalachia.Data.Core.AccessLayer",
                     "Appalachia.Data.Core.Databases"
                 ),
-                new(() => DebugOverlay, "Appalachia.Prototype.KOC.Application.Areas.DebugOverlay"),
                 new(
-                    () => DevConsole,
+                    () => AppaLog.Context.DebugOverlay,
+                    "Appalachia.Prototype.KOC.Application.Areas.DebugOverlay"
+                ),
+                new(
+                    () => AppaLog.Context.DevConsole,
                     "Appalachia.Prototype.KOC.Debugging.DebugConsole",
                     "Appalachia.Prototype.KOC.Debugging.DevConsole"
                 ),
-                new(() => Editing, "Appalachia.Core.Editing", "Appalachia.Editing"),
-                new(() => Editor, "Appalachia.Editor"),
-                new(() => Execution, "Appalachia.Core.Execution"),
-                new(() => Extensions, "Appalachia.Prototype.KOC.Application.Extensions"),
-                new(() => Filtering, "Appalachia.Core.Filtering"),
-                new(() => Fire, "Appalachia.Simulation.Core.Metadata.Fuel", "Appalachia.Simulation.Fire"),
-                new(() => Game, "Appalachia.Prototype.KOC.Application.Areas.Game"),
+                new(() => AppaLog.Context.Editing, "Appalachia.Core.Editing", "Appalachia.Editing"),
+                new(() => AppaLog.Context.Editor, "Appalachia.Editor"),
+                new(() => AppaLog.Context.Execution, "Appalachia.Core.Execution"),
+                new(() => AppaLog.Context.Extensions, "Appalachia.Prototype.KOC.Application.Extensions"),
+                new(() => AppaLog.Context.Filtering, "Appalachia.Core.Filtering"),
                 new(
-                    () => Gameplay,
+                    () => AppaLog.Context.Fire,
+                    "Appalachia.Simulation.Core.Metadata.Fuel",
+                    "Appalachia.Simulation.Fire"
+                ),
+                new(() => AppaLog.Context.Game, "Appalachia.Prototype.KOC.Application.Areas.Game"),
+                new(
+                    () => AppaLog.Context.Gameplay,
                     "Appalachia.Core.Runtime.Gameplay",
                     "Appalachia.Prototype.KOC.Gameplay"
                 ),
-                new(() => Globals, "Appalachia.Globals"),
-                new(() => HUD, "Appalachia.Prototype.KOC.Application.Areas.HUD"),
-                new(() => InGameMenu, "Appalachia.Prototype.KOC.Application.Areas.InGameMenu"),
-                new(() => Input, "Appalachia.Prototype.KOC.Application.Input"),
-                new(() => Inventory, "Appalachia.Prototype.KOC.Inventory"),
-                new(() => Jobs, "Appalachia.Jobs"),
-                new(() => KOC, "Appalachia.Prototype.KOC"),
-                new(() => Labels, "Appalachia.Core.Labels"),
-                new(() => Layers, "Appalachia.Core.Layers"),
-                new(() => Lighting, "Appalachia.Rendering.Lighting"),
-                new(() => LoadingScreen, "Appalachia.Prototype.KOC.Application.Areas.LoadingScreen"),
-                new(() => MainMenu, "Appalachia.Prototype.KOC.Application.Areas.MainMenu"),
-                new(() => Maintenance, "Appalachia.Editor.CI.Maintenance"),
-                new(() => Math, "Appalachia.Core.Math"),
-                new(() => MeshBurial, "Appalachia.Spatial.MeshBurial"),
-                new(() => Obi, "Appalachia.Simulation.Obi"),
-                new(() => ObjectPooling, "Appalachia.Core.ObjectPooling"),
-                new(() => Octree, "Appalachia.Spatial.Octree"),
+                new(() => AppaLog.Context.Globals, "Appalachia.Globals"),
+                new(() => AppaLog.Context.HUD, "Appalachia.Prototype.KOC.Application.Areas.HUD"),
                 new(
-                    () => Optimization,
+                    () => AppaLog.Context.InGameMenu,
+                    "Appalachia.Prototype.KOC.Application.Areas.InGameMenu"
+                ),
+                new(() => AppaLog.Context.Input, "Appalachia.Prototype.KOC.Application.Input"),
+                new(() => AppaLog.Context.Inventory, "Appalachia.Prototype.KOC.Inventory"),
+                new(() => AppaLog.Context.Jobs, "Appalachia.Jobs"),
+                new(() => AppaLog.Context.KOC, "Appalachia.Prototype.KOC"),
+                new(() => AppaLog.Context.Labels, "Appalachia.Core.Labels"),
+                new(() => AppaLog.Context.Layers, "Appalachia.Core.Layers"),
+                new(() => AppaLog.Context.Lighting, "Appalachia.Rendering.Lighting"),
+                new(
+                    () => AppaLog.Context.LoadingScreen,
+                    "Appalachia.Prototype.KOC.Application.Areas.LoadingScreen"
+                ),
+                new(() => AppaLog.Context.MainMenu, "Appalachia.Prototype.KOC.Application.Areas.MainMenu"),
+                new(() => AppaLog.Context.Maintenance, "Appalachia.Editor.CI.Maintenance"),
+                new(() => AppaLog.Context.Math, "Appalachia.Core.Math"),
+                new(() => AppaLog.Context.MeshBurial, "Appalachia.Spatial.MeshBurial"),
+                new(() => AppaLog.Context.Obi, "Appalachia.Simulation.Obi"),
+                new(() => AppaLog.Context.ObjectPooling, "Appalachia.Core.ObjectPooling"),
+                new(() => AppaLog.Context.Octree, "Appalachia.Spatial.Octree"),
+                new(
+                    () => AppaLog.Context.Optimization,
                     "Appalachia.Core.Optimization",
                     "Appalachia.Spatial.Optimization"
                 ),
-                new(() => Overrides, "Appalachia.Core.Overrides"),
-                new(() => PauseMenu, "Appalachia.Prototype.KOC.Application.Areas.PauseMenu"),
-                new(() => Playables, "Appalachia.Prototype.KOC.Application.Playables"),
+                new(() => AppaLog.Context.Overrides, "Appalachia.Core.Overrides"),
+                new(() => AppaLog.Context.PauseMenu, "Appalachia.Prototype.KOC.Application.Areas.PauseMenu"),
+                new(() => AppaLog.Context.Playables, "Appalachia.Prototype.KOC.Application.Playables"),
                 new(
-                    () => PostProcessing,
+                    () => AppaLog.Context.PostProcessing,
                     "Appalachia.Core.PostProcessing",
                     "Appalachia.Rendering.PostProcessing"
                 ),
-                new(() => Prefabs, "Appalachia.Rendering.Prefabs"),
-                new(() => Preferences, "Appalachia.Core.Preferences"),
+                new(() => AppaLog.Context.Prefabs, "Appalachia.Rendering.Prefabs"),
+                new(() => AppaLog.Context.Preferences, "Appalachia.Core.Preferences"),
                 new(
-                    () => ReactionSystem,
+                    () => AppaLog.Context.ReactionSystem,
                     "Appalachia.Core.ReactionSystem",
                     "Appalachia.Simulation.ReactionSystem"
                 ),
-                new(() => Rendering, "Appalachia.Core.Rendering", "Appalachia.Rendering"),
-                new(() => RuntimeGraphs, "Appalachia.Prototype.KOC.Debugging.RuntimeGraphs"),
-                new(() => SDF, "Appalachia.Spatial.SDF"),
-                new(() => Scriptables, "Appalachia.Prototype.KOC.Application.Scriptables"),
+                new(() => AppaLog.Context.Rendering, "Appalachia.Core.Rendering", "Appalachia.Rendering"),
+                new(() => AppaLog.Context.RuntimeGraphs, "Appalachia.Prototype.KOC.Debugging.RuntimeGraphs"),
+                new(() => AppaLog.Context.SDF, "Appalachia.Spatial.SDF"),
+                new(() => AppaLog.Context.Scriptables, "Appalachia.Prototype.KOC.Application.Scriptables"),
                 new(
-                    () => Shading,
+                    () => AppaLog.Context.Shading,
                     "Appalachia.Core.Shading",
                     "Appalachia.Rendering.Shading",
                     "Appalachia.Shaders"
                 ),
-                new(() => Shell, "Appalachia.Editor.Shell"),
-                new(() => Simulation, "Appalachia.Core.Simulation", "Appalachia.Simulation"),
-                new(() => Spatial, "Appalachia.Core.Spatial", "Appalachia.Spatial"),
-                new(() => SplashScreen, "Appalachia.Prototype.KOC.Application.Areas.SplashScreen"),
+                new(() => AppaLog.Context.Shell, "Appalachia.Editor.Shell"),
+                new(() => AppaLog.Context.Simulation, "Appalachia.Core.Simulation", "Appalachia.Simulation"),
+                new(() => AppaLog.Context.Spatial, "Appalachia.Core.Spatial", "Appalachia.Spatial"),
                 new(
-                    () => StartEnvironment,
+                    () => AppaLog.Context.SplashScreen,
+                    "Appalachia.Prototype.KOC.Application.Areas.SplashScreen"
+                ),
+                new(
+                    () => AppaLog.Context.StartEnvironment,
                     "Appalachia.Prototype.KOC.Application.Areas.StartEnvironment"
                 ),
-                new(() => StartScreen, "Appalachia.Prototype.KOC.Application.Areas.StartScreen"),
-                new(() => Styling, "Appalachia.Prototype.KOC.Application.Styling"),
-                new(() => Terrain, "Appalachia.Spatial.Terrains"),
-                new(() => TouchBend, "Appalachia.Core.Runtime.TouchBend"),
                 new(
-                    () => Trees,
+                    () => AppaLog.Context.StartScreen,
+                    "Appalachia.Prototype.KOC.Application.Areas.StartScreen"
+                ),
+                new(() => AppaLog.Context.Styling, "Appalachia.Prototype.KOC.Application.Styling"),
+                new(() => AppaLog.Context.Terrain, "Appalachia.Spatial.Terrains"),
+                new(() => AppaLog.Context.TouchBend, "Appalachia.Core.Runtime.TouchBend"),
+                new(
+                    () => AppaLog.Context.Trees,
                     "Appalachia.Core.Runtime.Trees",
                     "Appalachia.Simulation.Core.Metadata.Tree",
                     "Appalachia.Simulation.Trees"
                 ),
-                new(() => VFX, "Appalachia.Rendering.VFX"),
-                new(() => Visualizers, "Appalachia.Spatial.Visualizers"),
-                new(() => Volumes, "Appalachia.Core.Volumes"),
-                new(() => Voxels, "Appalachia.Spatial.Voxels"),
-                new(() => Water, "Appalachia.Simulation.Buoyancy"),
-                new(() => Wind, "Appalachia.Simulation.Core.Metadata.Wind", "Appalachia.Simulation.Wind"),
+                new(() => AppaLog.Context.VFX, "Appalachia.Rendering.VFX"),
+                new(() => AppaLog.Context.Visualizers, "Appalachia.Spatial.Visualizers"),
+                new(() => AppaLog.Context.Volumes, "Appalachia.Core.Volumes"),
+                new(() => AppaLog.Context.Voxels, "Appalachia.Spatial.Voxels"),
+                new(() => AppaLog.Context.Water, "Appalachia.Simulation.Buoyancy"),
+                new(
+                    () => AppaLog.Context.Wind,
+                    "Appalachia.Simulation.Core.Metadata.Wind",
+                    "Appalachia.Simulation.Wind"
+                ),
             };
         }
 

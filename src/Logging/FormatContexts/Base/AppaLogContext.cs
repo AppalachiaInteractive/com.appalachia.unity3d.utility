@@ -7,16 +7,50 @@ using Unity.Profiling;
 namespace Appalachia.Utility.Logging
 {
     [SuppressMessage("ReSharper", "ExplicitCallerInfoArgument")]
-    public abstract class AppaLogContext
+    public sealed class AppaLogContext
     {
-        protected AppaLogContext()
+        public AppaLogContext([NotNull] string logPrefix)
         {
-            Contexts.AllContexts.Add(this);
+            _logPrefix = logPrefix;
+            _format = AppaLogFormats.contexts[logPrefix.ToUpperInvariant()];
         }
 
-        public abstract string LogPrefix { get; }
+        #region Fields and Autoproperties
 
-        public abstract string LogPrefixFormatted { get; }
+        private readonly AppaLogFormats.LogFormat _format;
+
+        private string _formattedLogPrefix;
+
+        private string _logPrefix;
+
+        #endregion
+
+        public string LogPrefix
+        {
+            get
+            {
+                using (_PRF_LogPrefix.Auto())
+                {
+                    return _logPrefix;
+                }
+            }
+        }
+
+        public string LogPrefixFormatted
+        {
+            get
+            {
+                using (_PRF_LogPrefixFormatted.Auto())
+                {
+                    if (_formattedLogPrefix == null)
+                    {
+                        _formattedLogPrefix = _format.Format(_logPrefix);
+                    }
+
+                    return _formattedLogPrefix;
+                }
+            }
+        }
 
         /// <summary>
         ///     <para>Logs a warning message to the console.</para>
@@ -217,11 +251,7 @@ namespace Appalachia.Utility.Logging
                 );
             }
         }
-
-        public void Touch()
-        {
-        }
-
+        
         /// <summary>
         ///     <para>Logs a trace message to the log file.</para>
         /// </summary>
@@ -286,13 +316,6 @@ namespace Appalachia.Utility.Logging
             }
         }
 
-        internal abstract AppaLogFormats.LogFormat GetPrefixFormat();
-        internal abstract AppaLogFormats.LogFormat GetPrefixFormatInstance();
-
-        internal abstract void Reset();
-
-        internal abstract void UpdateFormatInstance(AppaLogFormats.LogFormat format);
-
         internal void Test()
         {
             var line = 436;
@@ -351,98 +374,17 @@ namespace Appalachia.Utility.Logging
 
         private static readonly ProfilerMarker _PRF_Fatal = new ProfilerMarker(_PRF_PFX + nameof(Fatal));
         private static readonly ProfilerMarker _PRF_Info = new ProfilerMarker(_PRF_PFX + nameof(Info));
+
         private static readonly ProfilerMarker _PRF_Log = new ProfilerMarker(_PRF_PFX + nameof(Log));
-        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
-        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
-
-        #endregion
-    }
-
-    public abstract class AppaLogContext<T> : AppaLogContext
-        where T : AppaLogContext<T>, new()
-    {
-        #region Static Fields and Autoproperties
-
-        private static T _instance;
-
-        #endregion
-
-        #region Fields and Autoproperties
-
-        private string _formattedLogPrefix;
-
-        private string _logPrefix;
-
-        #endregion
-
-        public static T Instance
-        {
-            get
-            {
-                using (_PRF_Instance.Auto())
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new T();
-                    }
-
-                    return _instance;
-                }
-            }
-        }
-
-        public override string LogPrefix
-        {
-            get
-            {
-                using (_PRF_LogPrefix.Auto())
-                {
-                    if (_logPrefix == null)
-                    {
-                        _logPrefix = typeof(T).Name;
-                    }
-
-                    return _logPrefix;
-                }
-            }
-        }
-
-        public override string LogPrefixFormatted
-        {
-            get
-            {
-                using (_PRF_LogPrefixFormatted.Auto())
-                {
-                    if (_formattedLogPrefix == null)
-                    {
-                        var format = GetPrefixFormat();
-                        _formattedLogPrefix = format.Format(_logPrefix);
-                    }
-
-                    return _formattedLogPrefix;
-                }
-            }
-        }
-
-        internal override void Reset()
-        {
-            _instance = null;
-            _logPrefix = null;
-            _formattedLogPrefix = null;
-        }
-
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(AppaLogContext<T>) + ".";
-
-        private static readonly ProfilerMarker
-            _PRF_Instance = new ProfilerMarker(_PRF_PFX + nameof(Instance));
 
         private static readonly ProfilerMarker _PRF_LogPrefix =
             new ProfilerMarker(_PRF_PFX + nameof(LogPrefix));
 
         private static readonly ProfilerMarker _PRF_LogPrefixFormatted =
             new ProfilerMarker(_PRF_PFX + nameof(LogPrefixFormatted));
+
+        private static readonly ProfilerMarker _PRF_Trace = new ProfilerMarker(_PRF_PFX + nameof(Trace));
+        private static readonly ProfilerMarker _PRF_Warn = new ProfilerMarker(_PRF_PFX + nameof(Warn));
 
         #endregion
     }

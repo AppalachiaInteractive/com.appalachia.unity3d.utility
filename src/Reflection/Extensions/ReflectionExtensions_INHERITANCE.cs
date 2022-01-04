@@ -132,7 +132,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             {
                 var assemblyType = types[i];
 
-                if (t.IsAssignableFrom(assemblyType))
+                if (assemblyType.InheritsFrom(t))
                 {
                     if (concreteOnly && assemblyType.IsAbstract)
                     {
@@ -146,7 +146,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             return list;
         }
 
-        public static bool ImplementsOrInherits(this Type type, Type to)
+        public static bool ImplementsOrInheritsFrom(this Type type, Type to)
         {
             return to.IsAssignableFrom(type);
         }

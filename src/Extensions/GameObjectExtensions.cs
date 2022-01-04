@@ -221,6 +221,72 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static void Get<T>(
+            this GameObject obj,
+            ref T component,
+            GetComponentStrategy getStyle = GetComponentStrategy.CurrentObject)
+            where T : Component
+        {
+            using (_PRF_Get.Auto())
+            {
+                var includeInactive = getStyle.HasFlag(GetComponentStrategy.IncludeInactive);
+
+                if (component != null)
+                {
+                    return;
+                }
+
+                if (getStyle.HasFlag(GetComponentStrategy.CurrentObject))
+                {
+                    component = obj.GetComponent<T>();
+                }
+
+                if (component != null)
+                {
+                    return;
+                }
+
+                if (getStyle.HasFlag(GetComponentStrategy.ParentObject))
+                {
+                    component = obj.GetComponentInParent<T>(includeInactive);
+                }
+
+                if (component != null)
+                {
+                    return;
+                }
+
+                if (getStyle.HasFlag(GetComponentStrategy.Children))
+                {
+                    component = obj.GetComponentInChildren<T>(includeInactive);
+                }
+
+                if (component != null)
+                {
+                    return;
+                }
+
+                if (getStyle.HasFlag(GetComponentStrategy.AnyParent))
+                {
+                    component = obj.transform.root.GetComponentInChildren<T>(includeInactive);
+                }
+            }
+        }
+
+        public static T Get<T>(
+            this GameObject obj,
+            GetComponentStrategy getStyle = GetComponentStrategy.CurrentObject)
+            where T : Component
+        {
+            using (_PRF_Get.Auto())
+            {
+                T result = null;
+                Get(obj, ref result, getStyle);
+
+                return result;
+            }
+        }
+
         public static GameObject GetChild(this GameObject go, string name)
         {
             using (_PRF_AddChild.Auto())
@@ -699,6 +765,8 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_Get = new ProfilerMarker(_PRF_PFX + nameof(Get));
 
         private static readonly ProfilerMarker _PRF_GetComponentInParent =
             new ProfilerMarker(_PRF_PFX + nameof(GetComponentInParent));

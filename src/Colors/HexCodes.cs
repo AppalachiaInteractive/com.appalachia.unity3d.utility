@@ -33,11 +33,20 @@ namespace Appalachia.Utility.Colors
         }
 
         /// <inheritdoc cref="FromHexCode" />
-        public static Color ColorFromHex([NotNull] this string hexCode)
+        public static Color ColorFromHex([NotNull] this string hexCode, float alpha)
         {
             using (_PRF_ColorFromHex.Auto())
             {
-                return FromHexCode(hexCode);
+                return FromHexCode(hexCode, false).UpdateAlpha(alpha);
+            }
+        }
+
+        /// <inheritdoc cref="FromHexCode" />
+        public static Color ColorFromHex([NotNull] this string hexCode, bool alphaLast = true)
+        {
+            using (_PRF_ColorFromHex.Auto())
+            {
+                return FromHexCode(hexCode, alphaLast);
             }
         }
 
@@ -54,7 +63,7 @@ namespace Appalachia.Utility.Colors
         /// <exception cref="ArgumentException">The argument was not appropriate.</exception>
         /// <exception cref="ArgumentNullException">The argument was null.</exception>
         /// <returns>The color that the code represents.</returns>
-        public static Color FromHexCode(string hexCode, bool alphaLast = false)
+        public static Color FromHexCode(string hexCode, bool alphaLast = true)
         {
             using (_PRF_FromHexCode.Auto())
             {
@@ -72,7 +81,10 @@ namespace Appalachia.Utility.Colors
 
                 var cleanHexCode = hexCode.Replace("#", "").ToUpperInvariant().Trim();
 
-                if ((cleanHexCode.Length != 6) && (cleanHexCode.Length != 8))
+                var threePart = cleanHexCode.Length == 6;
+                var fourPart = cleanHexCode.Length == 8;
+
+                if (!(threePart || fourPart))
                 {
                     throw new ArgumentException(
                         ZString.Format("{0} was not appropriate length.", nameof(hexCode))
@@ -93,32 +105,44 @@ namespace Appalachia.Utility.Colors
                     }
                 }
 
-                var part1 = ZString.Format("{0}{1}", cleanHexCode[0], cleanHexCode[1]);
-                var part2 = ZString.Format("{0}{1}", cleanHexCode[2], cleanHexCode[3]);
-                var part3 = ZString.Format("{0}{1}", cleanHexCode[4], cleanHexCode[5]);
-                var part4 = ZString.Format("{0}{1}", cleanHexCode[6], cleanHexCode[7]);
+                var rawPart1 = ZString.Format("{0}{1}", cleanHexCode[0], cleanHexCode[1]);
+                var parsedPart1 = int.Parse(rawPart1, NumberStyles.HexNumber);
+                var floatPart1 = parsedPart1 / 255f;
 
-                var int1 = int.Parse(part1, NumberStyles.HexNumber);
-                var int2 = int.Parse(part2, NumberStyles.HexNumber);
-                var int3 = int.Parse(part3, NumberStyles.HexNumber);
-                var int4 = int.Parse(part4, NumberStyles.HexNumber);
+                var rawPart2 = ZString.Format("{0}{1}", cleanHexCode[2], cleanHexCode[3]);
+                var parsedPart2 = int.Parse(rawPart2, NumberStyles.HexNumber);
+                var floatPart2 = parsedPart2 / 255f;
 
-                var r = int1 / 255f;
-                var g = int2 / 255f;
-                var b = int3 / 255f;
-                var a = int4 / 255f;
+                var rawPart3 = ZString.Format("{0}{1}", cleanHexCode[4], cleanHexCode[5]);
+                var parsedPart3 = int.Parse(rawPart3, NumberStyles.HexNumber);
+                var floatPart3 = parsedPart3 / 255f;
 
-                if (!alphaLast)
+                Color result;
+
+                if (fourPart)
                 {
-                    var temp = a;
-                    a = r;
-                    r = temp;
+                    var rawPart4 = ZString.Format("{0}{1}", cleanHexCode[6], cleanHexCode[7]);
+                    var parsedPart4 = int.Parse(rawPart4, NumberStyles.HexNumber);
+                    var floatPart4 = parsedPart4 / 255f;
+
+                    if (!alphaLast)
+                    {
+                        (floatPart4, floatPart1) = (floatPart1, floatPart4);
+                    }
+
+                    result = new Color(floatPart1, floatPart2, floatPart3, floatPart4);
+                }
+                else
+                {
+                    result = new Color(floatPart1, floatPart2, floatPart3);
                 }
 
-                var result = new Color(r, g, b, a);
+                _lookup.Add(hexCode, result);
 
-                _lookup.Add(hexCode,      result);
-                _lookup.Add(cleanHexCode, result);
+                if (hexCode != cleanHexCode)
+                {
+                    _lookup.Add(cleanHexCode, result);
+                }
 
                 return result;
             }

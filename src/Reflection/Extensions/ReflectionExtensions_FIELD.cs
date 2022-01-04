@@ -2,6 +2,9 @@
 
 using System;
 using System.Reflection;
+using Appalachia.Utility.Constants;
+using Appalachia.Utility.Logging;
+using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
 #endregion
@@ -10,38 +13,6 @@ namespace Appalachia.Utility.Reflection.Extensions
 {
     public static partial class ReflectionExtensions
     {
-        private static readonly ProfilerMarker _PRF_GetBestField =
-            new(_PRF_PFX + nameof(GetBestField));
-
-        private static readonly ProfilerMarker _PRF_GetFieldsCached =
-            new(_PRF_PFX + nameof(GetFields_CACHE));
-
-        private static readonly ProfilerMarker _PRF_PopulateFields =
-            new(_PRF_PFX + nameof(PopulateFields_INTERNAL));
-
-        public static FieldInfo[] GetFields_CACHE(this Type t)
-        {
-            using (_PRF_GetFieldsCached.Auto())
-            {
-                return t.GetFields_CACHE(BindingFlags.Default);
-            }
-        }
-
-        public static FieldInfo[] GetFields_CACHE(this Type t, BindingFlags flags)
-        {
-            using (_PRF_GetFieldsCached.Auto())
-            {
-                if (_FIELD_CACHE_BASIC.ContainsKey(t) && _FIELD_CACHE_BASIC[t].ContainsKey(flags))
-                {
-                    return _FIELD_CACHE_BASIC[t][flags];
-                }
-
-                PopulateFields_INTERNAL(t, flags);
-
-                return _FIELD_CACHE_BASIC[t][flags];
-            }
-        }
-
         public static FieldInfo GetBestField(FieldInfo[] candidates, string name)
         {
             using (_PRF_GetBestField.Auto())
@@ -73,8 +44,55 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 PopulateFields_INTERNAL(t, flags);
 
-                return _FIELD_CACHE[t][flags][fieldName];
+                if (_FIELD_CACHE[t][flags].ContainsKey(fieldName))
+                {
+                    return _FIELD_CACHE[t][flags][fieldName];
+                }
+
+                AppaLog.Context.Extensions.Error(
+                    ZString.Format(
+                        "Could not find field {0} on type {1}.",
+                        fieldName.FormatFieldForLogging(),
+                        t.FormatForLogging()
+                    )
+                );
+
+                return null;
             }
         }
+
+        public static FieldInfo[] GetFields_CACHE(this Type t)
+        {
+            using (_PRF_GetFieldsCached.Auto())
+            {
+                return t.GetFields_CACHE(BindingFlags.Default);
+            }
+        }
+
+        public static FieldInfo[] GetFields_CACHE(this Type t, BindingFlags flags)
+        {
+            using (_PRF_GetFieldsCached.Auto())
+            {
+                if (_FIELD_CACHE_BASIC.ContainsKey(t) && _FIELD_CACHE_BASIC[t].ContainsKey(flags))
+                {
+                    return _FIELD_CACHE_BASIC[t][flags];
+                }
+
+                PopulateFields_INTERNAL(t, flags);
+
+                return _FIELD_CACHE_BASIC[t][flags];
+            }
+        }
+
+        #region Profiling
+
+        private static readonly ProfilerMarker _PRF_GetBestField = new(_PRF_PFX + nameof(GetBestField));
+
+        private static readonly ProfilerMarker _PRF_GetFieldsCached = new(_PRF_PFX + nameof(GetFields_CACHE));
+
+        private static readonly ProfilerMarker _PRF_PopulateFields =
+            new(_PRF_PFX + nameof(PopulateFields_INTERNAL));
+
+        #endregion
     }
 }

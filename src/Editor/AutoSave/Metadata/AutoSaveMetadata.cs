@@ -35,7 +35,7 @@ namespace Appalachia.Utility.AutoSave.Metadata
 
         public string GetSaveFileName(string identifier)
         {
-            var formattedTime = saveTime.ToString(AutoSaverConfiguration.DateTimeFormat);
+            var formattedTime = saveTime.ToString(AutoSaverConfiguration.DATE_TIME_FORMAT);
             return ZString.Format("{0}.{1}.{2}", sceneName, identifier, formattedTime);
         }
 

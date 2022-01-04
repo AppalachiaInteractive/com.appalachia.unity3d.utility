@@ -27,8 +27,8 @@ namespace Appalachia.Utility.AutoSave
             var saveNameIdentifier = AutoSaverConfiguration.FileName;
             var autosaveFileName = metadata.GetSaveFileName(saveNameIdentifier);
 
-            var filename = ZString.Format("{0}.unity", autosaveFileName);
-            var finalOutputPath = "{0}{1}".Format(relativeSavePath, filename);
+            var filename = ZString.Format("{0}.unity",     autosaveFileName);
+            var finalOutputPath = ZString.Format("{0}{1}", relativeSavePath, filename);
 
             return finalOutputPath;
         }

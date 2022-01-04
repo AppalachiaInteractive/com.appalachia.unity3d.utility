@@ -36,7 +36,7 @@ namespace Appalachia.Utility.Logging.Formatters
                     return content;
                 }
 
-                return AppaLogFormatHolder.specials.message.Format(content);
+                return AppaLogFormats.specials.message.Format(content);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Appalachia.Utility.Logging.Formatters
                 }
                 else
                 {
-                    logContext = AppaLogFormatHolder.specials.className.Format(context.GetType().Name);
+                    logContext = AppaLogFormats.specials.className.Format(context.GetType().Name);
                 }
 
                 string result;
@@ -107,8 +107,16 @@ namespace Appalachia.Utility.Logging.Formatters
         {
             using (_PRF_GetExceptionLoggingParts.Auto())
             {
-                exceptionName = AppaLogFormatHolder.specials.exceptionName.Format(exception.GetType().Name);
-                exceptionMessage = AppaLogFormatHolder.specials.exceptionMessage.Format(exception.Message);
+                exceptionName = AppaLogFormats.specials.exceptionName.Format(exception.GetType().Name);
+                exceptionMessage = AppaLogFormats.specials.exceptionMessage.Format(exception.Message);
+
+                if (exception.InnerException != null)
+                {
+                    exceptionName +=
+                        $"({AppaLogFormats.specials.exceptionName.Format(exception.InnerException.GetType().Name)})";
+                    exceptionMessage +=
+                        $": {AppaLogFormats.specials.exceptionMessage.Format(exception.InnerException.Message)}\r\n{exception.InnerException.StackTrace}";
+                }
             }
         }
 
@@ -116,7 +124,7 @@ namespace Appalachia.Utility.Logging.Formatters
         {
             using (_PRF_AdjustFileNameForLogging.Auto())
             {
-                return AppaLogFormatHolder.specials.filename.Format(fn);
+                return AppaLogFormats.specials.filename.Format(fn);
             }
         }
 
@@ -128,14 +136,14 @@ namespace Appalachia.Utility.Logging.Formatters
 
                 var logLevelResult = l switch
                 {
-                    LogLevel.Fatal     => AppaLogFormatHolder.levels.fatal.Format(logLevelUpper),
-                    LogLevel.Critical  => AppaLogFormatHolder.levels.critical.Format(logLevelUpper),
-                    LogLevel.Exception => AppaLogFormatHolder.levels.exception.Format(logLevelUpper),
-                    LogLevel.Error     => AppaLogFormatHolder.levels.error.Format(logLevelUpper),
-                    LogLevel.Warn      => AppaLogFormatHolder.levels.warn.Format(logLevelUpper),
-                    LogLevel.Info      => AppaLogFormatHolder.levels.info.Format(logLevelUpper),
-                    LogLevel.Debug     => AppaLogFormatHolder.levels.debug.Format(logLevelUpper),
-                    _                  => AppaLogFormatHolder.levels.trace.Format(logLevelUpper)
+                    LogLevel.Fatal     => AppaLogFormats.levels.fatal.Format(logLevelUpper),
+                    LogLevel.Critical  => AppaLogFormats.levels.critical.Format(logLevelUpper),
+                    LogLevel.Exception => AppaLogFormats.levels.exception.Format(logLevelUpper),
+                    LogLevel.Error     => AppaLogFormats.levels.error.Format(logLevelUpper),
+                    LogLevel.Warn      => AppaLogFormats.levels.warn.Format(logLevelUpper),
+                    LogLevel.Info      => AppaLogFormats.levels.info.Format(logLevelUpper),
+                    LogLevel.Debug     => AppaLogFormats.levels.debug.Format(logLevelUpper),
+                    _                  => AppaLogFormats.levels.trace.Format(logLevelUpper)
                 };
 
                 return logLevelResult;

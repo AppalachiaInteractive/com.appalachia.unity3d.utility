@@ -343,23 +343,23 @@ namespace Appalachia.Utility.Colors
 
             Assert.AreEqual(
                 black,
-                blackHex.ColorFromHex(),
+                blackHex.ColorFromHex(false),
                 "Black hex code should be parsed correctly."
             );
-            Assert.AreEqual(red, redHex.ColorFromHex(), "Red hex code should be parsed correctly.");
+            Assert.AreEqual(red, redHex.ColorFromHex(false), "Red hex code should be parsed correctly.");
             Assert.AreEqual(
                 green,
-                greenHex.ColorFromHex(),
+                greenHex.ColorFromHex(false),
                 "Green hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 blue,
-                blueHex.ColorFromHex(),
+                blueHex.ColorFromHex(false),
                 "Blue hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 white,
-                whiteHex.ColorFromHex(),
+                whiteHex.ColorFromHex(false),
                 "White hex code should be parsed correctly."
             );
         }
@@ -381,23 +381,23 @@ namespace Appalachia.Utility.Colors
 
             Assert.AreEqual(
                 black,
-                blackHex.ColorFromHex(),
+                blackHex.ColorFromHex(false),
                 "Black hex code should be parsed correctly."
             );
-            Assert.AreEqual(red, redHex.ColorFromHex(), "Red hex code should be parsed correctly.");
+            Assert.AreEqual(red, redHex.ColorFromHex(false), "Red hex code should be parsed correctly.");
             Assert.AreEqual(
                 green,
-                greenHex.ColorFromHex(),
+                greenHex.ColorFromHex(false),
                 "Green hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 blue,
-                blueHex.ColorFromHex(),
+                blueHex.ColorFromHex(false),
                 "Blue hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 white,
-                whiteHex.ColorFromHex(),
+                whiteHex.ColorFromHex(false),
                 "White hex code should be parsed correctly."
             );
         }
@@ -419,23 +419,23 @@ namespace Appalachia.Utility.Colors
 
             Assert.AreEqual(
                 black,
-                blackHex.ColorFromHex(),
+                blackHex.ColorFromHex(false),
                 "Black hex code should be parsed correctly."
             );
-            Assert.AreEqual(red, redHex.ColorFromHex(), "Red hex code should be parsed correctly.");
+            Assert.AreEqual(red, redHex.ColorFromHex(false), "Red hex code should be parsed correctly.");
             Assert.AreEqual(
                 green,
-                greenHex.ColorFromHex(),
+                greenHex.ColorFromHex(false),
                 "Green hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 blue,
-                blueHex.ColorFromHex(),
+                blueHex.ColorFromHex(false),
                 "Blue hex code should be parsed correctly."
             );
             Assert.AreEqual(
                 white,
-                whiteHex.ColorFromHex(),
+                whiteHex.ColorFromHex(false),
                 "White hex code should be parsed correctly."
             );
         }
@@ -444,7 +444,7 @@ namespace Appalachia.Utility.Colors
         public void TestColorHexReversabilityFull(Colors.Enum testEnum, Color referenceColor)
         {
             var hexCode = referenceColor.ToHexCodeFull();
-            var reverseColor = hexCode.ColorFromHex();
+            var reverseColor = hexCode.ColorFromHex(false);
 
             Assert.AreEqual(
                 referenceColor,
@@ -462,7 +462,7 @@ namespace Appalachia.Utility.Colors
             Color referenceColor)
         {
             var hexCode = referenceColor.ToHexCodeShort();
-            var reverseColor = hexCode.ColorFromHex();
+            var reverseColor = hexCode.ColorFromHex(false);
 
             Assert.AreEqual(
                 referenceColor,

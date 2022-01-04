@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Appalachia.Utility.Colors;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
@@ -32,6 +33,7 @@ namespace Appalachia.Utility.Constants
         private static readonly Color LogInt = new(068f / 255f, 137f / 255f, 240f / 255f, 1.0f);
         private static readonly Color LogType = new(228f / 255f, 168f / 255f, 064f / 255f, 1.0f);
         private static readonly Color LogMethod = new(174f / 255f, 084f / 255f, 047f / 255f, 1.0f);
+        private static readonly Color LogConstant = new(095f / 255f, 156f / 255f, 171f / 255f, 1.0f);
         private static readonly Color LogField = new(127f / 255f, 163f / 255f, 155f / 255f, 1.0f);
         private static readonly Color LogEvent = new(071f / 255f, 119f / 255f, 198f / 255f, 1.0f);
         private static readonly Color LogEnum = new(135f / 255f, 126f / 255f, 200f / 255f, 1.0f);
@@ -70,11 +72,24 @@ namespace Appalachia.Utility.Constants
             }
         }
 
+        private static Dictionary<Type, string> _formattedTypes;
+        
         public static string FormatForLogging(this Type value)
         {
             using (_PRF_FormatNameForLogging.Auto())
             {
-                return Color(Bold(value.Name), LogType);
+                _formattedTypes ??= new Dictionary<Type, string>();
+
+                if (_formattedTypes.ContainsKey(value))
+                {
+                    return _formattedTypes[value];
+                }
+
+                var result = Color(Bold(value.Name), LogType);
+
+                _formattedTypes.Add(value, result);
+
+                return result;
             }
         }
 
@@ -115,6 +130,14 @@ namespace Appalachia.Utility.Constants
             using (_PRF_FormatMethodForLogging.Auto())
             {
                 return Color(Bold(value), LogMethod);
+            }
+        }
+
+        public static string FormatConstantForLogging(this string value)
+        {
+            using (_PRF_FormatMethodForLogging.Auto())
+            {
+                return Color(Bold(value), LogConstant);
             }
         }
 

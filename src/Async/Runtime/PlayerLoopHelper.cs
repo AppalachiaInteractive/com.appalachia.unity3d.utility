@@ -529,13 +529,8 @@ namespace Appalachia.Utility.Async
             ref PlayerLoopSystem playerLoop,
             InjectPlayerLoopTimings injectTimings = InjectPlayerLoopTimings.All)
         {
-#if UNITY_2020_2_OR_NEWER
             yielders = new ContinuationQueue[16];
             runners = new PlayerLoopRunner[16];
-#else
-            yielders = new ContinuationQueue[14];
-            runners = new PlayerLoopRunner[14];
-#endif
 
             var copyList = playerLoop.subSystemList.ToArray();
 
@@ -752,6 +747,11 @@ namespace Appalachia.Utility.Async
 
         public static void AddAction(PlayerLoopTiming timing, IPlayerLoopItem action)
         {
+            if (runners == null)
+            {
+                throw new NotSupportedException("Can not queue actions prior to initialization!");
+            }
+            
             var runner = runners[(int)timing];
             if (runner == null)
             {
