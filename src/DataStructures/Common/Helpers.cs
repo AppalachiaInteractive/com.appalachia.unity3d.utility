@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.DataStructures.Common
 {
     public static class Helpers
     {
+        #region Constants and Static Readonly
+
+        public const int MAXIMUM_ARRAY_LENGTH_x64 = 0X7FEFFFFF; //x64
+        public const int MAXIMUM_ARRAY_LENGTH_x86 = 0x8000000;  //x86
+
+        #endregion
+
         /// <summary>
         ///     Centralize a text.
         /// </summary>
@@ -46,7 +52,7 @@ namespace Appalachia.Utility.DataStructures.Common
         }
 
         /// <summary>
-        ///     Swap two values in an IList<T> collection given their indexes.
+        ///     Swap two values in a collection given their indexes.
         /// </summary>
         public static void Swap<T>(this IList<T> list, int firstIndex, int secondIndex)
         {
@@ -63,9 +69,9 @@ namespace Appalachia.Utility.DataStructures.Common
         }
 
         /// <summary>
-        ///     Swap two values in an ArrayList<T> collection given their indexes.
+        ///     Swap two values in a collection given their indexes.
         /// </summary>
-        public static void Swap<T>(this ArrayList<T> list, int firstIndex, int secondIndex)
+        public static void Swap<T>(this List<T> list, int firstIndex, int secondIndex)
         {
             if ((list.Count < 2) ||
                 (firstIndex ==

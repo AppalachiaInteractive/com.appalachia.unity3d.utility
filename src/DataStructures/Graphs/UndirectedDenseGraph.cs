@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Appalachia.Utility.DataStructures.Common;
+using Appalachia.Utility.DataStructures.Extensions;
 using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.DataStructures.Graphs
@@ -26,14 +27,14 @@ namespace Appalachia.Utility.DataStructures.Graphs
             _verticesCount = 0;
             _verticesCapacity = (int)capacity;
 
-            _vertices = new ArrayList<object>(_verticesCapacity);
+            _vertices = new List<object>(_verticesCapacity);
             _adjacencyMatrix = new bool[_verticesCapacity, _verticesCapacity];
             _adjacencyMatrix.Populate(_verticesCapacity, _verticesCapacity);
         }
 
         #region Fields and Autoproperties
 
-        protected virtual ArrayList<object> _vertices { get; set; }
+        protected virtual List<object> _vertices { get; set; }
         protected virtual bool[,] _adjacencyMatrix { get; set; }
 
         protected virtual int _edgesCount { get; set; }
@@ -458,7 +459,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             if (_verticesCount == 0)
             {
-                return new ArrayList<T>();
+                return new List<T>();
             }
 
             if (!HasVertex(source))
@@ -466,13 +467,13 @@ namespace Appalachia.Utility.DataStructures.Graphs
                 throw new Exception("The specified starting vertex doesn't exist.");
             }
 
-            var stack = new Lists.Stack<T>(_verticesCount);
+            var stack = new Stack<T>(_verticesCount);
             var visited = new HashSet<T>();
-            var listOfNodes = new ArrayList<T>(_verticesCount);
+            var listOfNodes = new List<T>(_verticesCount);
 
             stack.Push(source);
 
-            while (!stack.IsEmpty)
+            while (!stack.IsEmpty())
             {
                 var current = stack.Pop();
 
@@ -511,7 +512,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             if (_verticesCount == 0)
             {
-                return new ArrayList<T>();
+                return new List<T>();
             }
 
             if (!HasVertex(source))
@@ -520,15 +521,15 @@ namespace Appalachia.Utility.DataStructures.Graphs
             }
 
             var visited = new HashSet<T>();
-            var queue = new Lists.Queue<T>(VerticesCount);
-            var listOfNodes = new ArrayList<T>(VerticesCount);
+            var queue = new Queue<T>(VerticesCount);
+            var listOfNodes = new List<T>(VerticesCount);
 
             listOfNodes.Add(source);
             visited.Add(source);
 
             queue.Enqueue(source);
 
-            while (!queue.IsEmpty)
+            while (!queue.IsEmpty())
             {
                 var current = queue.Dequeue();
                 var neighbors = Neighbours(current);

@@ -17,6 +17,13 @@ namespace Appalachia.Utility.Extensions
 {
     public static partial class GameObjectExtensions
     {
+        private enum DestructionMode
+        {
+            DestroyIfOnThisGameObject,
+            DestroyIfOnOtherGameObject,
+            DestroyIfNotOnChildGameObject,
+        }
+
         #region Static Fields and Autoproperties
 
         private static Dictionary<int, string> _assetGUIDLookup = new();
@@ -287,9 +294,28 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static GameObject GetChild(this MonoBehaviour go, string name)
+        {
+            using (_PRF_GetChild.Auto())
+            {
+                var t = go.transform;
+
+                for (var i = 0; i < t.childCount; i++)
+                {
+                    var child = t.GetChild(i);
+                    if (child.name == name)
+                    {
+                        return child.gameObject;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         public static GameObject GetChild(this GameObject go, string name)
         {
-            using (_PRF_AddChild.Auto())
+            using (_PRF_GetChild.Auto())
             {
                 var t = go.transform;
 
@@ -345,12 +371,51 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        /// <summary>
+        ///     Searches for a child game object by name.
+        ///     If it exists, it will be assigned to the <paramref name="target" /> argument.
+        ///     If it does not exist, it will be created and then assigned to the <paramref name="target" /> argument.
+        /// </summary>
+        /// <param name="behaviour">The current behaviour.</param>
+        /// <param name="target">The field we will assign the result to.</param>
+        /// <param name="name">The name of the game object to search for or create.</param>
+        /// <param name="ui">
+        ///     Whether or not this game object is a UI object (using <see cref="RectTransform" />) or a 3D object (using <see cref="Transform" />).
+        /// </param>
+        public static void GetOrCreateChild(
+            this MonoBehaviour behaviour,
+            ref GameObject target,
+            string name,
+            bool ui)
+        {
+            using (_PRF_GetOrCreateChild.Auto())
+            {
+                GetOrCreateChild(behaviour.gameObject, ref target, name, ui);
+            }
+        }
+
+        /// <summary>
+        ///     Searches for a child game object by name.
+        ///     If it exists, it will be assigned to the <paramref name="target" /> argument.
+        ///     If it does not exist, it will be created and then assigned to the <paramref name="target" /> argument.
+        /// </summary>
+        /// <param name="go">The current game object.</param>
+        /// <param name="target">The field we will assign the result to.</param>
+        /// <param name="name">The name of the game object to search for or create.</param>
+        /// <param name="ui">
+        ///     Whether or not this game object is a UI object (using <see cref="RectTransform" />) or a 3D object (using <see cref="Transform" />).
+        /// </param>
         public static void GetOrCreateChild(this GameObject go, ref GameObject target, string name, bool ui)
         {
-            using (_PRF_FindOrCreateChild.Auto())
+            using (_PRF_GetOrCreateChild.Auto())
             {
                 if (target != null)
                 {
+                    if (ui && (target.GetComponent<RectTransform>() == null))
+                    {
+                        target.AddComponent<RectTransform>();
+                    }
+
                     return;
                 }
 
@@ -358,6 +423,11 @@ namespace Appalachia.Utility.Extensions
 
                 if (target != null)
                 {
+                    if (ui && (target.GetComponent<RectTransform>() == null))
+                    {
+                        target.AddComponent<RectTransform>();
+                    }
+
                     return;
                 }
 
@@ -372,6 +442,14 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        /// <summary>
+        ///     Searches for a <see cref="Component" /> or <see cref="MonoBehaviour" /> on the current <see cref="GameObject" />.
+        ///     If it exists, it will be assigned to the <paramref name="component" /> argument.
+        ///     If it does not exist, it will be created and then assigned to the <paramref name="component" /> argument.
+        /// </summary>
+        /// <param name="obj">The current game object.</param>
+        /// <param name="component">The field we will assign the result to.</param>
+        /// <typeparam name="T">The <see cref="Component" /> or <see cref="MonoBehaviour" /> type to search for.</typeparam>
         public static void GetOrCreateComponent<T>(this GameObject obj, ref T component)
             where T : Component
         {
@@ -531,7 +609,7 @@ namespace Appalachia.Utility.Extensions
         public static GameObject InstantiatePrefab(
             this GameObject prefab,
             Transform parent = null,
-            Matrix4x4 worldPosition = default)
+            Matrix4x4 worldTransform = default)
         {
             using (_PRF_InstantiatePrefab.Auto())
             {
@@ -548,12 +626,12 @@ namespace Appalachia.Utility.Extensions
                     transform.SetParent(parent, false);
                 }
 
-                var column0 = worldPosition.GetColumn(0);
-                var column1 = worldPosition.GetColumn(1);
-                var column2 = worldPosition.GetColumn(2);
-                var column3 = worldPosition.GetColumn(3);
+                var column0 = worldTransform.GetColumn(0);
+                var column1 = worldTransform.GetColumn(1);
+                var column2 = worldTransform.GetColumn(2);
+                var column3 = worldTransform.GetColumn(3);
 
-                if (worldPosition != default)
+                if (worldTransform != default)
                 {
                     transform.position = column3;
                     transform.localScale = new Vector3(
@@ -751,20 +829,12 @@ namespace Appalachia.Utility.Extensions
             component = null;
         }
 
-        #region Nested type: DestructionMode
-
-        private enum DestructionMode
-        {
-            DestroyIfOnThisGameObject,
-            DestroyIfOnOtherGameObject,
-            DestroyIfNotOnChildGameObject,
-        }
-
-        #endregion
-
         #region Profiling
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetChild =
+            new ProfilerMarker(_PRF_PFX + nameof(GetChild));
 
         private static readonly ProfilerMarker _PRF_Get = new ProfilerMarker(_PRF_PFX + nameof(Get));
 
@@ -828,7 +898,7 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_SetParentTo =
             new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
 
-        private static readonly ProfilerMarker _PRF_FindOrCreateChild =
+        private static readonly ProfilerMarker _PRF_GetOrCreateChild =
             new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateChild));
 
         #endregion

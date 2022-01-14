@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Appalachia.Utility.DataStructures.Common;
+using Appalachia.Utility.DataStructures.Extensions;
 using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.DataStructures.Graphs
@@ -392,7 +393,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
             // Check for existence of source
             if (VerticesCount == 0)
             {
-                return new ArrayList<T>(0);
+                return new List<T>(0);
             }
 
             if (!HasVertex(source))
@@ -401,12 +402,12 @@ namespace Appalachia.Utility.DataStructures.Graphs
             }
 
             var visited = new HashSet<T>();
-            var stack = new Lists.Stack<T>();
-            var listOfNodes = new ArrayList<T>(VerticesCount);
+            var stack = new Stack<T>();
+            var listOfNodes = new List<T>(VerticesCount);
 
             stack.Push(source);
 
-            while (!stack.IsEmpty)
+            while (!stack.IsEmpty())
             {
                 var current = stack.Pop();
 
@@ -446,7 +447,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
             // Check for existence of source
             if (VerticesCount == 0)
             {
-                return new ArrayList<T>(0);
+                return new List<T>(0);
             }
 
             if (!HasVertex(source))
@@ -455,15 +456,15 @@ namespace Appalachia.Utility.DataStructures.Graphs
             }
 
             var visited = new HashSet<T>();
-            var queue = new Lists.Queue<T>();
-            var listOfNodes = new ArrayList<T>(VerticesCount);
+            var queue = new Queue<T>();
+            var listOfNodes = new List<T>(VerticesCount);
 
             listOfNodes.Add(source);
             visited.Add(source);
 
             queue.Enqueue(source);
 
-            while (!queue.IsEmpty)
+            while (!queue.IsEmpty())
             {
                 var current = queue.Dequeue();
                 var neighbors = Neighbours(current);

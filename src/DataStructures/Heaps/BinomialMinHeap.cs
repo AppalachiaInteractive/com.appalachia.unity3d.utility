@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Appalachia.Utility.DataStructures.Common;
-using Appalachia.Utility.DataStructures.Lists;
+using Appalachia.Utility.DataStructures.Extensions;
 
 // ReSharper disable NotResolvedInText
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -38,17 +38,17 @@ namespace Appalachia.Utility.DataStructures.Heaps
             capacity = capacity < _defaultCapacity ? _defaultCapacity : capacity;
 
             _size = 0;
-            _forest = new ArrayList<BinomialNode<T>>(capacity);
+            _forest = new List<BinomialNode<T>>(capacity);
         }
 
         #region Fields and Autoproperties
-
-        private ArrayList<BinomialNode<T>> _forest { get; set; }
 
         /// <summary>
         ///     INSTANCE VARIABLES
         /// </summary>
         private int _size { get; set; }
+
+        private List<BinomialNode<T>> _forest { get; set; }
 
         #endregion
 
@@ -76,12 +76,12 @@ namespace Appalachia.Utility.DataStructures.Heaps
             if (_size > _forest.Count)
             {
                 var newSize = Math.Max(_forest.Count, otherHeap._forest.Count) + 1;
-                _forest.Resize(newSize);
+                _forest.Capacity = newSize;
             }
 
             for (int i = 0, j = 1; j <= _size; i++, j *= 2)
             {
-                var treeRoot1 = _forest.IsEmpty ? null : _forest[i];
+                var treeRoot1 = _forest.IsEmpty() ? null : _forest[i];
                 var treeRoot2 = i < otherHeap._forest.Count ? otherHeap._forest[i] : null;
 
                 var whichCase = treeRoot1 == null ? 0 : 1;
@@ -212,7 +212,7 @@ namespace Appalachia.Utility.DataStructures.Heaps
 
             // CONSTRUCT H'' (double-prime)
             var deletedForest = new BinomialMinHeap<T>();
-            deletedForest._forest.Resize(minIndex + 1);
+            deletedForest._forest.Capacity = minIndex + 1;
             deletedForest._size = (1 << minIndex) - 1;
 
             for (var i = minIndex - 1; i >= 0; --i)
@@ -257,12 +257,12 @@ namespace Appalachia.Utility.DataStructures.Heaps
                 throw new ArgumentNullException();
             }
 
-            if (newCollection.Count > ArrayList<T>.MAXIMUM_ARRAY_LENGTH_x64)
+            if (newCollection.Count > Helpers.MAXIMUM_ARRAY_LENGTH_x64)
             {
                 throw new OverflowException();
             }
 
-            _forest = new ArrayList<BinomialNode<T>>(newCollection.Count + 1);
+            _forest = new List<BinomialNode<T>>(newCollection.Count + 1);
 
             for (var i = 0; i < newCollection.Count; ++i)
             {

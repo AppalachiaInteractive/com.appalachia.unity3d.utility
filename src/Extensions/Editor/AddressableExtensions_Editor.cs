@@ -36,6 +36,58 @@ namespace Appalachia.Utility.Extensions
 
         #endregion
 
+        public static void AddToAddressableGroup(
+            this Object obj,
+            bool setEntryToAssetName = true,
+            string groupName = "Uncategorized")
+        {
+            using (_PRF_SetAddressableGroup.Auto())
+            {
+                var settings = AddressableAssetSettingsDefaultObject.Settings;
+
+                if (settings)
+                {
+                    var group = settings.FindGroup(groupName);
+                    if (!group)
+                    {
+                        group = settings.CreateGroup(
+                            groupName,
+                            false,
+                            false,
+                            true,
+                            null,
+                            typeof(ContentUpdateGroupSchema),
+                            typeof(BundledAssetGroupSchema)
+                        );
+                    }
+
+                    var assetpath = AssetDatabase.GetAssetPath(obj);
+                    var guid = AssetDatabase.AssetPathToGUID(assetpath);
+
+                    var e = settings.CreateOrMoveEntry(guid, group, false, false);
+
+                    if (setEntryToAssetName)
+                    {
+                        e.SetAddress(obj.name, false);
+                    }
+
+                    var entriesAdded = new List<AddressableAssetEntry> { e };
+
+                    group.SetDirty(
+                        AddressableAssetSettings.ModificationEvent.EntryMoved,
+                        entriesAdded,
+                        false,
+                        true
+                    );
+                    settings.SetDirty(
+                        AddressableAssetSettings.ModificationEvent.EntryMoved,
+                        entriesAdded,
+                        true
+                    );
+                }
+            }
+        }
+
         public static bool EnsureIsAddressable<T>(this T objectAtPath, out string Guid)
             where T : ScriptableObject
         {
@@ -43,7 +95,7 @@ namespace Appalachia.Utility.Extensions
             {
                 if (!objectAtPath.IsAddressable(out var info))
                 {
-                    objectAtPath.SetAddressableGroup();
+                    objectAtPath.AddToAddressableGroup();
 
                     if (objectAtPath.IsAddressable(out var info2))
                     {
@@ -68,7 +120,7 @@ namespace Appalachia.Utility.Extensions
             {
                 if (!objectAtPath.IsAddressable(out var info))
                 {
-                    objectAtPath.SetAddressableGroup();
+                    objectAtPath.AddToAddressableGroup();
 
                     if (objectAtPath.IsAddressable(out var info2))
                     {
@@ -145,49 +197,6 @@ namespace Appalachia.Utility.Extensions
                 targetInfo = GetAddressableTargetInfo(o);
 
                 return targetInfo is { MainAssetEntry: { } };
-            }
-        }
-
-        public static void SetAddressableGroup(this Object obj, string groupName = "Uncategorized")
-        {
-            using (_PRF_SetAddressableGroup.Auto())
-            {
-                var settings = AddressableAssetSettingsDefaultObject.Settings;
-
-                if (settings)
-                {
-                    var group = settings.FindGroup(groupName);
-                    if (!group)
-                    {
-                        group = settings.CreateGroup(
-                            groupName,
-                            false,
-                            false,
-                            true,
-                            null,
-                            typeof(ContentUpdateGroupSchema),
-                            typeof(BundledAssetGroupSchema)
-                        );
-                    }
-
-                    var assetpath = AssetDatabase.GetAssetPath(obj);
-                    var guid = AssetDatabase.AssetPathToGUID(assetpath);
-
-                    var e = settings.CreateOrMoveEntry(guid, group, false, false);
-                    var entriesAdded = new List<AddressableAssetEntry> { e };
-
-                    group.SetDirty(
-                        AddressableAssetSettings.ModificationEvent.EntryMoved,
-                        entriesAdded,
-                        false,
-                        true
-                    );
-                    settings.SetDirty(
-                        AddressableAssetSettings.ModificationEvent.EntryMoved,
-                        entriesAdded,
-                        true
-                    );
-                }
             }
         }
 
@@ -390,7 +399,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(IsAddressable));
 
         private static readonly ProfilerMarker _PRF_SetAddressableGroup =
-            new ProfilerMarker(_PRF_PFX + nameof(SetAddressableGroup));
+            new ProfilerMarker(_PRF_PFX + nameof(AddToAddressableGroup));
 
         private static readonly ProfilerMarker _PRF_GetAddressableTargetInfo =
             new ProfilerMarker(_PRF_PFX + nameof(GetAddressableTargetInfo));

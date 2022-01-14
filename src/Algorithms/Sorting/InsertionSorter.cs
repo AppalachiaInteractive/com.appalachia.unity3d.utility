@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.Algorithms.Sorting
 {
@@ -37,7 +36,7 @@ namespace Appalachia.Utility.Algorithms.Sorting
         //
         // The quick insertion sort algorithm.
         // For the internal ArrayList<T>. Check the DataStructures.ArrayList.cs.
-        public static void InsertionSort<T>(this ArrayList<T> list, Comparer<T> comparer = null)
+        public static void InsertionSort<T>(this List<T> list, Comparer<T> comparer = null)
         {
             //
             // If the comparer is Null, then initialize it using a default typed comparer

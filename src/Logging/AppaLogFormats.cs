@@ -418,9 +418,9 @@ namespace Appalachia.Utility.Logging
                 exception.color = "FF4133".ColorFromHex();
                 error.color = "F25130".ColorFromHex();
                 warn.color = "EE7F30".ColorFromHex();
-                info.color = "EEDEBE".ColorFromHex();
-                debug.color = "EEE6D6".ColorFromHex();
-                trace.color = "EEEEEE".ColorFromHex();
+                info.color = "FBF7EF".ColorFromHex();
+                debug.color = "EAD6AE".ColorFromHex();
+                trace.color = "EAD6AE".ColorFromHex();
             }
 
             #region Fields and Autoproperties

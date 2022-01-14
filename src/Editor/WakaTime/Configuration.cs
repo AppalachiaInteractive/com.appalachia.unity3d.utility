@@ -12,41 +12,66 @@ namespace Appalachia.Utility.WakaTime
 {
     internal static class Configuration
     {
-        private const string _PRF_PFX = nameof(Configuration) + ".";
-        
-        internal static string ApiKey = "";
-        internal static bool WakaTimePathAuto = true;
-        internal static bool Enabled = true;
-        internal static bool Debugging = true;
-        internal static string ProjectName = "";
+        #region Constants and Static Readonly
 
-        [NonSerialized] private static string _wakaTimePath = "";
+        private const string WAKATIME_PATH_INDICATOR = "wakatime";
+
+        #endregion
+
+        #region Static Fields and Autoproperties
+
+        internal static bool Debugging = true;
+        internal static bool Enabled = true;
+        internal static bool WakaTimePathAuto = true;
+
+        internal static string ApiKey = "";
+        internal static string ProjectName = "";
 
         [NonSerialized] private static PackageInfo _package;
 
-        private static readonly ProfilerMarker _PRF_WakaTimePath = new ProfilerMarker(_PRF_PFX + nameof(WakaTimePath));
+        [NonSerialized] private static string _wakaTimePath = "";
+
+        #endregion
+
         internal static string WakaTimePath
         {
             get
             {
                 using (_PRF_WakaTimePath.Auto())
                 {
+                    string SearchForWakaTimePath(string assetsBasePath)
+                    {
+                        return Directory
+                              .EnumerateFileSystemEntries(
+                                   assetsBasePath,
+                                   "cli.py",
+                                   SearchOption.AllDirectories
+                               )
+                              .FirstOrDefault(
+                                   p => p.Contains(
+                                       WAKATIME_PATH_INDICATOR,
+                                       StringComparison.InvariantCultureIgnoreCase
+                                   )
+                               );
+                    }
+
                     if (WakaTimePathAuto)
                     {
                         if (string.IsNullOrWhiteSpace(_wakaTimePath) || !Directory.Exists(_wakaTimePath))
                         {
-                            var basePath = Application.dataPath.Replace("Assets", string.Empty);
-                         
-                            var parentBasePath = new DirectoryInfo(basePath);
+                            var assetsBasePath = Application.dataPath;
 
-                            var files = Directory.EnumerateFileSystemEntries(
-                                                      parentBasePath.FullName,
-                                                      "cli.py",
-                                                      SearchOption.AllDirectories
-                                                  )
-                                                 .Where(p => p.ToLowerInvariant().Contains("wakatime"));
+                            _wakaTimePath = SearchForWakaTimePath(assetsBasePath);
 
-                            _wakaTimePath = files.First();
+                            if (_wakaTimePath == null)
+                            {
+                                var libraryBasePath = assetsBasePath.Replace(
+                                    "Assets",
+                                    "Library/PackageCache"
+                                );
+
+                                _wakaTimePath = SearchForWakaTimePath(libraryBasePath);
+                            }
                         }
                     }
 
@@ -60,28 +85,13 @@ namespace Appalachia.Utility.WakaTime
             }
         }
 
-        private static readonly ProfilerMarker _PRF_SavePreferences = new ProfilerMarker(_PRF_PFX + nameof(SavePreferences));
-        internal static void SavePreferences()
-        {
-            using (_PRF_SavePreferences.Auto())
-            {
-                EditorPrefs.SetString(Constants.ConfigurationKeys.ApiKey, ApiKey);
-                EditorPrefs.SetBool(Constants.ConfigurationKeys.WakaTimePathAuto, WakaTimePathAuto);
-                EditorPrefs.SetString(Constants.ConfigurationKeys.WakaTimePath, WakaTimePath);
-                EditorPrefs.SetBool(Constants.ConfigurationKeys.Enabled,   Enabled);
-                EditorPrefs.SetBool(Constants.ConfigurationKeys.Debugging, Debugging);
-            }
-        }
-
-        private static readonly ProfilerMarker _PRF_RefreshPreferences = new ProfilerMarker(_PRF_PFX + nameof(RefreshPreferences));
         internal static void RefreshPreferences()
         {
             using (_PRF_RefreshPreferences.Auto())
             {
                 if (EditorPrefs.HasKey(Constants.ConfigurationKeys.WakaTimePathAuto))
                 {
-                    WakaTimePathAuto =
-                        EditorPrefs.GetBool(Constants.ConfigurationKeys.WakaTimePathAuto);
+                    WakaTimePathAuto = EditorPrefs.GetBool(Constants.ConfigurationKeys.WakaTimePathAuto);
                 }
 
                 if (EditorPrefs.HasKey(Constants.ConfigurationKeys.WakaTimePath))
@@ -109,6 +119,33 @@ namespace Appalachia.Utility.WakaTime
                     : Application.productName;
             }
         }
+
+        internal static void SavePreferences()
+        {
+            using (_PRF_SavePreferences.Auto())
+            {
+                EditorPrefs.SetString(Constants.ConfigurationKeys.ApiKey, ApiKey);
+                EditorPrefs.SetBool(Constants.ConfigurationKeys.WakaTimePathAuto, WakaTimePathAuto);
+                EditorPrefs.SetString(Constants.ConfigurationKeys.WakaTimePath, WakaTimePath);
+                EditorPrefs.SetBool(Constants.ConfigurationKeys.Enabled,   Enabled);
+                EditorPrefs.SetBool(Constants.ConfigurationKeys.Debugging, Debugging);
+            }
+        }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(Configuration) + ".";
+
+        private static readonly ProfilerMarker _PRF_WakaTimePath =
+            new ProfilerMarker(_PRF_PFX + nameof(WakaTimePath));
+
+        private static readonly ProfilerMarker _PRF_SavePreferences =
+            new ProfilerMarker(_PRF_PFX + nameof(SavePreferences));
+
+        private static readonly ProfilerMarker _PRF_RefreshPreferences =
+            new ProfilerMarker(_PRF_PFX + nameof(RefreshPreferences));
+
+        #endregion
     }
 }
 #endif

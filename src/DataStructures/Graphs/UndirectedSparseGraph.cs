@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Appalachia.Utility.DataStructures.Extensions;
 using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.DataStructures.Graphs
@@ -131,7 +132,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             get
             {
-                var list = new ArrayList<T>();
+                var list = new List<T>();
                 foreach (var vertex in _adjacencyList.Keys)
                 {
                     list.Add(vertex);
@@ -360,7 +361,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             if (VerticesCount == 0)
             {
-                return new ArrayList<T>();
+                return new List<T>();
             }
 
             if (!HasVertex(source))
@@ -369,12 +370,12 @@ namespace Appalachia.Utility.DataStructures.Graphs
             }
 
             var visited = new HashSet<T>();
-            var stack = new Lists.Stack<T>(VerticesCount);
-            var listOfNodes = new ArrayList<T>(VerticesCount);
+            var stack = new Stack<T>(VerticesCount);
+            var listOfNodes = new List<T>(VerticesCount);
 
             stack.Push(source);
 
-            while (!stack.IsEmpty)
+            while (!stack.IsEmpty())
             {
                 var current = stack.Pop();
 
@@ -413,7 +414,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             if (VerticesCount == 0)
             {
-                return new ArrayList<T>();
+                return new List<T>();
             }
 
             if (!HasVertex(source))
@@ -422,15 +423,15 @@ namespace Appalachia.Utility.DataStructures.Graphs
             }
 
             var visited = new HashSet<T>();
-            var queue = new Lists.Queue<T>(VerticesCount);
-            var listOfNodes = new ArrayList<T>(VerticesCount);
+            var queue = new Queue<T>(VerticesCount);
+            var listOfNodes = new List<T>(VerticesCount);
 
             listOfNodes.Add(source);
             visited.Add(source);
 
             queue.Enqueue(source);
 
-            while (!queue.IsEmpty)
+            while (!queue.IsEmpty())
             {
                 var current = queue.Dequeue();
                 var neighbors = Neighbours(current);

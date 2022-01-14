@@ -808,7 +808,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         /// <param name="path">Path.</param>
         public IEnumerable<T> ReturnPathFromCliquePath(IEnumerable<Clique> path)
         {
-            var returnPath = new ArrayList<T>();
+            var returnPath = new List<T>();
             IList<Clique> listPath = new List<Clique>(path);
             ISet<T> intersection;
 

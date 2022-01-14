@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Appalachia.Utility.DataStructures.Common;
-using Appalachia.Utility.DataStructures.Lists;
+using Appalachia.Utility.DataStructures.Extensions;
 
 // ReSharper disable NotResolvedInText
 
@@ -26,7 +26,7 @@ namespace Appalachia.Utility.DataStructures.Heaps
 
         public BinaryMaxHeap(int capacity, Comparer<T> comparer)
         {
-            _collection = new ArrayList<T>(capacity);
+            _collection = new List<T>(capacity);
             _heapComparer = Comparer<T>.Default;
             _heapComparer = comparer ?? Comparer<T>.Default;
         }
@@ -39,7 +39,7 @@ namespace Appalachia.Utility.DataStructures.Heaps
         ///     Instance Variables.
         ///     _collection: The list of elements. Implemented as an array-based list with auto-resizing.
         /// </summary>
-        private ArrayList<T> _collection { get; set; }
+        private List<T> _collection { get; set; }
 
         #endregion
 
@@ -192,12 +192,12 @@ namespace Appalachia.Utility.DataStructures.Heaps
             if (newCollection.Count > 0)
             {
                 // Reset and reserve the size of the newCollection
-                _collection = new ArrayList<T>(newCollection.Count);
+                _collection = new List<T>(newCollection.Count);
 
                 // Copy the elements from the newCollection to the inner collection
                 for (var i = 0; i < newCollection.Count; ++i)
                 {
-                    _collection.InsertAt(newCollection[i], i);
+                    _collection.Insert(i, newCollection[i]);
                 }
 
                 // Build the heap
@@ -227,7 +227,7 @@ namespace Appalachia.Utility.DataStructures.Heaps
                 throw new Exception("Heap is empty.");
             }
 
-            return _collection.First;
+            return _collection.GetFirst();
         }
 
         /// <summary>
@@ -294,7 +294,7 @@ namespace Appalachia.Utility.DataStructures.Heaps
         /// </summary>
         public List<T> ToList()
         {
-            return _collection.ToList();
+            return _collection;
         }
 
         /// <summary>

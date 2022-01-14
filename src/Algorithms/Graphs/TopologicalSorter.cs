@@ -27,7 +27,7 @@ namespace Appalachia.Utility.Algorithms.Graphs
                 }
 
                 var visited = new HashSet<T>();
-                var topoSortStack = new DataStructures.Lists.Stack<T>();
+                var topoSortStack = new Stack<T>();
 
                 foreach (var vertex in Graph.Vertices)
                 {
@@ -47,7 +47,7 @@ namespace Appalachia.Utility.Algorithms.Graphs
         private static void _topoSortHelper<T>(
             IGraph<T> graph,
             T source,
-            ref DataStructures.Lists.Stack<T> topoSortStack,
+            ref Stack<T> topoSortStack,
             ref HashSet<T> visited)
             where T : IComparable<T>
         {

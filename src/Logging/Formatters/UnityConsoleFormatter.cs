@@ -115,7 +115,7 @@ namespace Appalachia.Utility.Logging.Formatters
                     exceptionName +=
                         $"({AppaLogFormats.specials.exceptionName.Format(exception.InnerException.GetType().Name)})";
                     exceptionMessage +=
-                        $": {AppaLogFormats.specials.exceptionMessage.Format(exception.InnerException.Message)}\r\n{exception.InnerException.StackTrace}";
+                        $": {AppaLogFormats.specials.exceptionMessage.Format(exception.InnerException.Message)}";
                 }
             }
         }

@@ -1,3 +1,5 @@
+using Appalachia.Utility.Async;
+using Appalachia.Utility.Constants;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Diagnostics;
@@ -8,6 +10,49 @@ namespace Appalachia.Utility.Execution
 {
     public static class AppalachiaApplication
     {
+        public static bool OnMainThread
+        {
+            get
+            {
+#if UNITY_EDITOR
+                try
+                {
+                    if (!APPASERIALIZE.InSerializationWindow)
+                    {
+                        if (UnityEditor.AssetDatabase.IsAssetImportWorkerProcess())
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch
+                {
+                    //
+                }
+
+                if (PlayerLoopHelper.MainThreadId == 0)
+                {
+                    return System.Threading.Thread.CurrentThread.ManagedThreadId == 1;
+                }
+#endif
+
+                return System.Threading.Thread.CurrentThread.ManagedThreadId == PlayerLoopHelper.MainThreadId;
+            }
+        }
+
+        public static bool OnBackgroundThread
+        {
+            get
+            {
+                if (OnMainThread)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         /// <summary>
         ///     <para>Returns application install mode (Read Only).</para>
         /// </summary>
@@ -77,12 +122,11 @@ namespace Appalachia.Utility.Execution
         {
             get
             {
-                return false
 #if UNITY_EDITOR
-                     ||
-                       UnityEditor.EditorApplication.isCompiling
+                return UnityEditor.EditorApplication.isCompiling;
+#else
+                return false;
 #endif
-                    ;
             }
         }
 
@@ -145,39 +189,6 @@ namespace Appalachia.Utility.Execution
         }
 
         public static bool IsPlayer => !IsEditor;
-
-        /// <summary>
-        ///     <para>Returns true when called in any kind of built Player, or when called in the Editor in Play Mode (Read Only).</para>
-        /// </summary>
-        /// <footer>
-        ///     <a href="https://docs.unity3d.com/2021.2/Documentation/ScriptReference/30_search.html?q=Application-isPlaying">
-        ///         `Application.isPlaying` on
-        ///         docs.unity3d.com
-        ///     </a>
-        /// </footer>
-        public static bool IsPlaying
-        {
-            get
-            {
-                return Application.isPlaying
-#if UNITY_EDITOR
-                     ||
-                       UnityEditor.EditorApplication.isPlaying
-#endif
-                    ;
-            }
-            set
-            {
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = value;
-#else
-                if (!value)
-                {
-                    Application.Quit(1);
-                }
-#endif
-            }
-        }
 
         /// <summary>
         ///     <para>Returns true when called in any kind of built Player, or when called in the Editor in Play Mode (Read Only).</para>
@@ -420,6 +431,39 @@ namespace Appalachia.Utility.Execution
         ///     </a>
         /// </footer>
         public static SystemLanguage SystemLanguage => Application.systemLanguage;
+
+        /// <summary>
+        ///     <para>Returns true when called in any kind of built Player, or when called in the Editor in Play Mode (Read Only).</para>
+        /// </summary>
+        /// <footer>
+        ///     <a href="https://docs.unity3d.com/2021.2/Documentation/ScriptReference/30_search.html?q=Application-isPlaying">
+        ///         `Application.isPlaying` on
+        ///         docs.unity3d.com
+        ///     </a>
+        /// </footer>
+        public static bool IsPlaying
+        {
+            get
+            {
+                return Application.isPlaying
+#if UNITY_EDITOR
+                     ||
+                       UnityEditor.EditorApplication.isPlaying
+#endif
+                    ;
+            }
+            set
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = value;
+#else
+                if (!value)
+                {
+                    Application.Quit(1);
+                }
+#endif
+            }
+        }
 
         /// <summary>
         ///     <para>Should the player be running when the application is in the background?</para>

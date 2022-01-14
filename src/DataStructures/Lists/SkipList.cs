@@ -346,7 +346,7 @@ namespace Appalachia.Utility.DataStructures.Lists
             }
 
             // Get enumerator
-            var enumarator = GetEnumerator();
+            using var enumarator = GetEnumerator();
 
             // Copy elements as long as there is any in the list and as long as the index is within the valid range
             for (var i = arrayIndex; i < array.Length; ++i)

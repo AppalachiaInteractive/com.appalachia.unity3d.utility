@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Profiling;
 
 // ReSharper disable NotResolvedInText
 
@@ -12,7 +13,7 @@ namespace Appalachia.Utility.DataStructures.Lists
     {
         #region Constants and Static Readonly
 
-        private static readonly int _defaultBufferLength = 10;
+        protected static readonly int _defaultBufferLength = 10;
 
         #endregion
 
@@ -29,15 +30,18 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// <param name="length">The length of the buffer</param>
         public CircularBuffer(int length, bool canOverride = true)
         {
-            if (length < 1)
+            using (_PRF_CircularBuffer.Auto())
             {
-                throw new ArgumentOutOfRangeException("length can not be zero or negative");
-            }
+                if (length < 1)
+                {
+                    throw new ArgumentOutOfRangeException("length can not be zero or negative");
+                }
 
-            _circularBuffer = new T[length + 1];
-            _end = 0;
-            _start = 0;
-            CanOverride = canOverride;
+                _circularBuffer = new T[length + 1];
+                _end = 0;
+                _start = 0;
+                CanOverride = canOverride;
+            }
         }
 
         #region Fields and Autoproperties
@@ -47,9 +51,11 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// </summary>
         public bool CanOverride { get; }
 
-        private int _end;
-        private int _start;
-        private T[] _circularBuffer;
+        protected int _end;
+        protected int _start;
+        protected T[] _circularBuffer;
+
+        private int _count;
 
         #endregion
 
@@ -61,41 +67,100 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// <summary>
         ///     Checks if the buffer is filled up
         /// </summary>
-        public bool IsFilledUp =>
-            (((_end + 1) % _circularBuffer.Length) == _start) &&
-            !_circularBuffer[_start].Equals(_circularBuffer[_end]);
+        public bool IsFilledUp
+        {
+            get
+            {
+                using (_PRF_IsFilledUp.Auto())
+                {
+                    return (((_end + 1) % _circularBuffer.Length) == _start) &&
+                           !_circularBuffer[_start].Equals(_circularBuffer[_end]);
+                }
+            }
+        }
 
         /// <summary>
         ///     Returns the length of the buffer
         /// </summary>
         public int Length => _circularBuffer.Length - 1;
 
+        public T this[int index]
+        {
+            get => _circularBuffer[(_start + index) % _circularBuffer.Length];
+            set => _circularBuffer[(_start + index) % _circularBuffer.Length] = value;
+        }
+
         /// <summary>
         ///     Reads and removes the value in front of the buffer, and places the next value in front.
         /// </summary>
         public T Pop()
         {
-            var result = _circularBuffer[_start];
-            _circularBuffer[_start] = _circularBuffer[_end];
-            _start = (_start + 1) % _circularBuffer.Length;
+            using (_PRF_Pop.Auto())
+            {
+                var result = _circularBuffer[_start];
+                _circularBuffer[_start] = _circularBuffer[_end];
+                _start = (_start + 1) % _circularBuffer.Length;
 
-            //Count should not go below Zero when poping an empty buffer.
-            _count = _count > 0 ? --_count : _count;
-            return result;
+                //Count should not go below Zero when poping an empty buffer.
+                _count = _count > 0 ? --_count : _count;
+                return result;
+            }
+        }
+
+        public T RemoveFirst()
+        {
+            using (_PRF_RemoveFirst.Auto())
+            {
+                var element = _circularBuffer[_start];
+
+                Remove(element);
+
+                return element;
+            }
+        }
+
+        public T RemoveLast()
+        {
+            using (_PRF_RemoveLast.Auto())
+            {
+                var element = _circularBuffer[Count - 1];
+
+                Remove(element);
+
+                return element;
+            }
+        }
+
+        protected virtual void AddInternal(T value)
+        {
+            using (_PRF_AddInternal.Auto())
+            {
+                if ((CanOverride == false) && IsFilledUp)
+                {
+                    throw new CircularBufferFullException(
+                        $"Circular Buffer is filled up. {value} can not be inserted"
+                    );
+                }
+
+                InsertInternal(value);
+            }
         }
 
         // Inserts data into the buffer without checking if it is full
-        private void innerInsert(T value)
+        protected void InsertInternal(T value)
         {
-            _circularBuffer[_end] = value;
-            _end = (_end + 1) % _circularBuffer.Length;
-            if (_end == _start)
+            using (_PRF_InsertInternal.Auto())
             {
-                _start = (_start + 1) % _circularBuffer.Length;
-            }
+                _circularBuffer[_end] = value;
+                _end = (_end + 1) % _circularBuffer.Length;
+                if (_end == _start)
+                {
+                    _start = (_start + 1) % _circularBuffer.Length;
+                }
 
-            // Count should not be greater than the length of the buffer when overriding 
-            _count = _count < Length ? ++_count : _count;
+                // Count should not be greater than the length of the buffer when overriding 
+                _count = _count < Length ? ++_count : _count;
+            }
         }
 
         #region ICollection<T> Members
@@ -106,38 +171,11 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// <param name="value">value to be added to the buffer</param>
         public void Add(T value)
         {
-            if ((CanOverride == false) && IsFilledUp)
+            using (_PRF_Add.Auto())
             {
-                throw new CircularBufferFullException(
-                    $"Circular Buffer is filled up. {value} can not be inserted"
-                );
-            }
-
-            innerInsert(value);
-        }
-
-        #endregion
-
-        #region IEnumerable Implementation
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            for (var i = _start; i < Count; i++)
-            {
-                yield return _circularBuffer[i];
+                AddInternal(value);
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
-        #region ICollection Implementation
-
-        private int _count;
 
         /// <summary>
         ///     Returns the number of elements.
@@ -154,10 +192,13 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// </summary>
         public void Clear()
         {
-            _count = 0;
-            _start = 0;
-            _end = 0;
-            _circularBuffer = new T[Length + 1];
+            using (_PRF_Clear.Auto())
+            {
+                _count = 0;
+                _start = 0;
+                _end = 0;
+                _circularBuffer = new T[Length + 1];
+            }
         }
 
         /// <summary>
@@ -165,7 +206,10 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// </summary>
         public bool Contains(T item)
         {
-            return _circularBuffer.Contains(item);
+            using (_PRF_Contains.Auto())
+            {
+                return _circularBuffer.Contains(item);
+            }
         }
 
         /// <summary>
@@ -173,30 +217,33 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// </summary>
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null)
+            using (_PRF_CopyTo.Auto())
             {
-                throw new ArgumentNullException("array can not be null");
-            }
-
-            if ((array.Length == 0) || (arrayIndex >= array.Length) || (arrayIndex < 0))
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            // Get enumerator
-            var enumarator = GetEnumerator();
-
-            // Copy elements if there is any in the buffer and if the index is within the valid range
-            while (arrayIndex < array.Length)
-            {
-                if (enumarator.MoveNext())
+                if (array == null)
                 {
-                    array[arrayIndex] = enumarator.Current;
-                    arrayIndex++;
+                    throw new ArgumentNullException("array can not be null");
                 }
-                else
+
+                if ((array.Length == 0) || (arrayIndex >= array.Length) || (arrayIndex < 0))
                 {
-                    break;
+                    throw new IndexOutOfRangeException();
+                }
+
+                // Get enumerator
+                using var enumarator = GetEnumerator();
+
+                // Copy elements if there is any in the buffer and if the index is within the valid range
+                while (arrayIndex < array.Length)
+                {
+                    if (enumarator.MoveNext())
+                    {
+                        array[arrayIndex] = enumarator.Current;
+                        arrayIndex++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -206,28 +253,85 @@ namespace Appalachia.Utility.DataStructures.Lists
         /// </summary>
         public bool Remove(T item)
         {
-            if (!IsEmpty && Contains(item))
+            using (_PRF_Remove.Auto())
             {
-                var sourceArray = _circularBuffer.Except(new[] { item }).ToArray();
-                _circularBuffer = new T[Length + 1];
-                Array.Copy(sourceArray, _circularBuffer, sourceArray.Length);
-
-                if (!Equals(item, default(T)))
+                if (!IsEmpty && Contains(item))
                 {
-                    _end = sourceArray.Length - 1;
-                    _count = sourceArray.Length - 1;
-                }
-                else
-                {
-                    _end = sourceArray.Length;
-                    _count = sourceArray.Length;
+                    var sourceArray = _circularBuffer.Except(new[] { item }).ToArray();
+                    _circularBuffer = new T[Length + 1];
+                    Array.Copy(sourceArray, _circularBuffer, sourceArray.Length);
+
+                    if (!Equals(item, default(T)))
+                    {
+                        _end = sourceArray.Length - 1;
+                        _count = sourceArray.Length - 1;
+                    }
+                    else
+                    {
+                        _end = sourceArray.Length;
+                        _count = sourceArray.Length;
+                    }
+
+                    return true;
                 }
 
-                return true;
+                return false;
             }
-
-            return false;
         }
+
+        #endregion
+
+        #region IEnumerable<T> Members
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var i = _start; i < Count; i++)
+            {
+                yield return _circularBuffer[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(CircularBuffer<T>) + ".";
+
+        private static readonly ProfilerMarker _PRF_IsFilledUp =
+            new ProfilerMarker(_PRF_PFX + nameof(IsFilledUp));
+
+        private static readonly ProfilerMarker _PRF_CircularBuffer =
+            new ProfilerMarker(_PRF_PFX + nameof(CircularBuffer<T>));
+
+        private static readonly ProfilerMarker _PRF_AddInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(AddInternal));
+
+        private static readonly ProfilerMarker _PRF_Pop = new ProfilerMarker(_PRF_PFX + nameof(Pop));
+
+        private static readonly ProfilerMarker _PRF_InsertInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(InsertInternal));
+
+        private static readonly ProfilerMarker _PRF_Add = new ProfilerMarker(_PRF_PFX + nameof(Add));
+
+        private static readonly ProfilerMarker _PRF_Remove = new ProfilerMarker(_PRF_PFX + nameof(Remove));
+
+        private static readonly ProfilerMarker _PRF_RemoveFirst =
+            new ProfilerMarker(_PRF_PFX + nameof(RemoveFirst));
+
+        private static readonly ProfilerMarker _PRF_RemoveLast =
+            new ProfilerMarker(_PRF_PFX + nameof(RemoveLast));
+
+        private static readonly ProfilerMarker _PRF_Clear = new ProfilerMarker(_PRF_PFX + nameof(Clear));
+
+        private static readonly ProfilerMarker _PRF_Contains =
+            new ProfilerMarker(_PRF_PFX + nameof(Contains));
+
+        private static readonly ProfilerMarker _PRF_CopyTo = new ProfilerMarker(_PRF_PFX + nameof(CopyTo));
 
         #endregion
     }

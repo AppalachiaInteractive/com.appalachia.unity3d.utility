@@ -14,7 +14,13 @@ namespace Appalachia.Utility.Reflection.Extensions
 {
     public static partial class ReflectionExtensions
     {
-        #region Profiling And Tracing Markers
+        #region Constants and Static Readonly
+
+        private const string TYPE_WITH_NAMESPACE_FORMAT_STRING = "{0}.{1}";
+
+        #endregion
+
+        #region Static Fields and Autoproperties
 
         private static readonly ProfilerMarker _PRF_GetByName =
             new ProfilerMarker(_PRF_PFX + nameof(GetByName));
@@ -31,9 +37,11 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static readonly ProfilerMarker _PRF_CanConvert =
             new ProfilerMarker(_PRF_PFX + nameof(CanConvert));
 
-        #endregion
-
         private static Dictionary<string, Type> _typeByNameLookup;
+
+        private static Utf8PreparedFormat<string, string> _typeWithNamespaceFormat;
+
+        #endregion
 
         public static bool CanConvert(this Type from, Type to)
         {
@@ -62,6 +70,9 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             using (_PRF_GetByName.Auto())
             {
+                _typeWithNamespaceFormat ??=
+                    new Utf8PreparedFormat<string, string>(TYPE_WITH_NAMESPACE_FORMAT_STRING);
+
                 _typeByNameLookup ??= new Dictionary<string, Type>();
 
                 if (_typeByNameLookup.ContainsKey(nameWithNamespace))
@@ -69,18 +80,30 @@ namespace Appalachia.Utility.Reflection.Extensions
                     return _typeByNameLookup[nameWithNamespace];
                 }
 
+                Type result = null;
+                
                 foreach (var type in GetAllTypes_CACHED())
                 {
-                    if (nameWithNamespace == ZString.Format("{0}.{1}", type.Namespace, type.Name))
-                    {
-                        _typeByNameLookup.Add(nameWithNamespace, type);
-                        return type;
-                    }
-                }
-            }
+                    var formattedNameWithNamespace =
+                        _typeWithNamespaceFormat.Format(type.Namespace, type.Name);
 
-            _typeByNameLookup.Add(nameWithNamespace, null);
-            return null;
+                    if (_typeByNameLookup.ContainsKey(formattedNameWithNamespace))
+                    {
+                        continue;
+                    }
+
+                    _typeByNameLookup.Add(formattedNameWithNamespace, type);
+
+                    if (formattedNameWithNamespace != nameWithNamespace)
+                    {
+                        continue;
+                    }
+
+                    result = type;
+                }
+
+                return result;
+            }
         }
 
         public static ulong GetEnumBitmask(object value, Type enumType)
@@ -98,7 +121,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
                 catch (OverflowException)
                 {
-                    return (ulong) Convert.ToInt64(value, CultureInfo.InvariantCulture);
+                    return (ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -125,5 +148,9 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
             }
         }
+
+        #region Profiling
+
+        #endregion
     }
 }

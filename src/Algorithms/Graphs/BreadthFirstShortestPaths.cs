@@ -129,7 +129,7 @@ namespace Appalachia.Utility.Algorithms.Graphs
             }
 
             var dstIndex = _nodesToIndices[destination];
-            var stack = new DataStructures.Lists.Stack<T>();
+            var stack = new Stack<T>();
 
             int index;
             for (index = dstIndex; _distances[index] != 0; index = _predecessors[index])

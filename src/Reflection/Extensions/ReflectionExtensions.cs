@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
@@ -14,62 +15,7 @@ namespace Appalachia.Utility.Reflection.Extensions
     [DefaultExecutionOrder(-10000)]
     public static partial class ReflectionExtensions
     {
-        #region Profiling And Tracing Markers
-
-        private static Assembly[] _ASSEMBLIES_CACHE;
-        private static BindingFlags[] _baseFlags;
-        private static bool _initializedCaches;
-        private static bool _initializingCaches;
-        private static Dictionary<Assembly, Type[]> _ASSEMBLY_TYPE_CACHE;
-        private static Dictionary<MemberInfo, bool> _MEMBER_STATIC_LOOKUP_CACHE;
-        private static Dictionary<MemberInfo, Dictionary<bool, Attribute[]>> _ATTRIBUTE_BASE_CACHE = new();
-
-        private static Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>>
-            _ATTRIBUTE_CACHE = new();
-
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>
-            _FIELD_CACHE = new();
-
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>
-            _PROPERTY_CACHE = new();
-
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>>
-            _METHOD_CACHE = new();
-
-        private static Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>> _FIELD_CACHE_BASIC = new();
-
-        private static Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>> _PROPERTY_CACHE_BASIC =
-            new();
-        private static Dictionary<Type, Dictionary<BindingFlags, MethodInfo[]>> _METHOD_CACHE_BASIC = new();
-        private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
-        private static HashSet<Type> _POPULATED_TYPES_CACHE;
-        private static object READABLE_NAME_CACHE_LOCK = new();
-        private static Type[] _ALL_TYPES_CACHE;
-
-        private static readonly ProfilerMarker _PRF_InitializeCaches =
-            new(_PRF_PFX + nameof(InitializeCaches));
-
-        private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
-            new(_PRF_PFX + nameof(InitializeConstantsAndCollections));
-
-        private static readonly ProfilerMarker _PRF_InitializeAllTypesCache =
-            new(_PRF_PFX + nameof(InitializeAllTypesCache));
-
-        private static readonly ProfilerMarker _PRF_InitializeAssemblyTypeCache =
-            new(_PRF_PFX + nameof(InitializeAssemblyTypeCache));
-
-        private static readonly ProfilerMarker _PRF_GetAssemblies = new(_PRF_PFX + nameof(GetAssemblies_CACHED));
-        private static readonly ProfilerMarker _PRF_GetAllTypes = new(_PRF_PFX + nameof(GetAllTypes_CACHED));
-
-        private static readonly ProfilerMarker _PRF_SafeGetTypes = new(_PRF_PFX + nameof(GetTypes_CACHED));
-
-        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL =
-            new(_PRF_PFX + nameof(IsStatic_INTERNAL));
-
-        private static readonly ProfilerMarker _PRF_PopulateMethods_INTERNAL =
-            new(_PRF_PFX + nameof(PopulateMethods_INTERNAL));
-
-        #endregion
+        #region Constants and Static Readonly
 
         public const BindingFlags All = AllStatic | AllInstance;
 
@@ -91,11 +37,78 @@ namespace Appalachia.Utility.Reflection.Extensions
         public const BindingFlags PublicInstance = BindingFlags.Public | BindingFlags.Instance;
 
         public const BindingFlags PublicStatic = BindingFlags.Public | BindingFlags.Static;
+        public const int ASSEMBLY_ESTIMATE = 500;
         public const int TYPE_AMOUNT = 60000;
         public const int TYPE_ESTIMATE = 1000;
-        public const int ASSEMBLY_ESTIMATE = 500;
 
-        //private static Dictionary<Type, Dictionary<BindingFlags, MemberInfo[]>> _TYPE_MEMBERS_CACHE;         
+        #endregion
+
+        #region Static Fields and Autoproperties
+
+        private static Assembly[] _ASSEMBLIES_CACHE;
+        private static BindingFlags[] _baseFlags;
+        private static bool _initializedCaches;
+        private static bool _initializingCaches;
+        private static Dictionary<Assembly, Type[]> _ASSEMBLY_TYPE_CACHE;
+        private static Dictionary<MemberInfo, bool> _MEMBER_STATIC_LOOKUP_CACHE;
+        private static Dictionary<MemberInfo, Dictionary<bool, Attribute[]>> _ATTRIBUTE_BASE_CACHE = new();
+
+        private static Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>>
+            _ATTRIBUTE_CACHE = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>
+            _FIELD_CACHE = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>>
+            _METHOD_CACHE = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>
+            _PROPERTY_CACHE = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>> _FIELD_CACHE_BASIC = new();
+        private static Dictionary<Type, Dictionary<BindingFlags, MethodInfo[]>> _METHOD_CACHE_BASIC = new();
+
+        private static Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>> _PROPERTY_CACHE_BASIC =
+            new();
+
+        private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
+
+        private static HashSet<Type> _POPULATED_TYPES_CACHE;
+        private static object READABLE_NAME_CACHE_LOCK = new();
+        private static Type[] _ALL_TYPES_CACHE;
+
+        private static readonly ProfilerMarker _PRF_InitializeCaches =
+            new(_PRF_PFX + nameof(InitializeCaches));
+
+        private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
+            new(_PRF_PFX + nameof(InitializeConstantsAndCollections));
+
+        private static readonly ProfilerMarker _PRF_InitializeAllTypesCache =
+            new(_PRF_PFX + nameof(InitializeAllTypesCache));
+
+        private static readonly ProfilerMarker _PRF_InitializeAssemblyTypeCache =
+            new(_PRF_PFX + nameof(InitializeAssemblyTypeCache));
+
+        private static readonly ProfilerMarker _PRF_GetAssemblies =
+            new(_PRF_PFX + nameof(GetAssemblies_CACHED));
+
+        private static readonly ProfilerMarker _PRF_GetAllTypes = new(_PRF_PFX + nameof(GetAllTypes_CACHED));
+        private static readonly ProfilerMarker _PRF_SafeGetTypes = new(_PRF_PFX + nameof(GetTypes_CACHED));
+
+        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL =
+            new(_PRF_PFX + nameof(IsStatic_INTERNAL));
+
+        private static readonly ProfilerMarker _PRF_PopulateMethods_INTERNAL =
+            new(_PRF_PFX + nameof(PopulateMethods_INTERNAL));
+
+        private static readonly ProfilerMarker _PRF_GetTypesWithAttribute_CACHED =
+            new ProfilerMarker(_PRF_PFX + nameof(GetTypesWithAttribute_CACHED));
+
+        private static Dictionary<Type, Type[]> _typesByAttributeLookup;
+
+        private static Type[] _appalachiaTypes;
+
+        #endregion
 
         public static Type[] GetAllTypes_CACHED()
         {
@@ -107,8 +120,21 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
 
                 InitializeAllTypesCache();
-                
+
                 return _ALL_TYPES_CACHE;
+            }
+        }
+
+        public static Type[] GetAppalachiaTypes_CACHED()
+        {
+            using (_PRF_GetAppalachiaTypes_CACHED.Auto())
+            {
+                if ((_appalachiaTypes == null) || (_appalachiaTypes.Length == 0))
+                {
+                    _appalachiaTypes = GetAppalachiaTypesInternal().ToArray();
+                }
+
+                return _appalachiaTypes;
             }
         }
 
@@ -142,6 +168,39 @@ namespace Appalachia.Utility.Reflection.Extensions
                 {
                     return Type.EmptyTypes;
                 }
+            }
+        }
+
+        public static Type[] GetTypesWithAttribute_CACHED<T>()
+            where T : Attribute
+        {
+            using (_PRF_GetTypesWithAttribute_CACHED.Auto())
+            {
+                _typesByAttributeLookup ??= new Dictionary<Type, Type[]>();
+                var attributeType = typeof(T);
+
+                if (_typesByAttributeLookup.ContainsKey(attributeType))
+                {
+                    return _typesByAttributeLookup[attributeType];
+                }
+
+                var results = new List<Type>();
+                var types = GetAllTypes_CACHED();
+
+                foreach (var type in types)
+                {
+                    var atty = type.GetAttribute_CACHE<T>();
+
+                    if (atty != null)
+                    {
+                        results.Add(type);
+                    }
+                }
+
+                var resultArray = results.ToArray();
+                _typesByAttributeLookup.Add(attributeType, resultArray);
+
+                return resultArray;
             }
         }
 
@@ -183,6 +242,32 @@ namespace Appalachia.Utility.Reflection.Extensions
             }
 
             /*t.PopulateType_INTERNAL();*/
+        }
+
+        private static IEnumerable<Type> GetAppalachiaTypesInternal()
+        {
+            using (_PRF_GetAppalachiaTypesInternal.Auto())
+            {
+                var assemblies = GetAssemblies_CACHED();
+
+                foreach (var assembly in assemblies)
+                {
+                    var shortName = assembly.GetName().Name;
+
+                    if (!shortName.StartsWith("Appalachia"))
+                    {
+                        continue;
+                    }
+
+                    var assemblyTypes = assembly.GetTypes_CACHED();
+
+                    for (var typeIndex = 0; typeIndex < assemblyTypes.Length; typeIndex++)
+                    {
+                        var type = assemblyTypes[typeIndex];
+                        yield return type;
+                    }
+                }
+            }
         }
 
         private static void InitializeAllTypesCache()
@@ -439,46 +524,6 @@ namespace Appalachia.Utility.Reflection.Extensions
             }
         }
 
-        private static void PopulateProperties_INTERNAL(this Type t, BindingFlags flags)
-        {
-            using (_PRF_PopulateProperties.Auto())
-            {
-                CheckInitialization(t);
-
-                var typePropertyCacheBasic = _PROPERTY_CACHE_BASIC[t];
-                var typePropertyCache = _PROPERTY_CACHE[t];
-
-                if (!typePropertyCache.ContainsKey(flags))
-                {
-                    typePropertyCache.Add(flags, new Dictionary<string, PropertyInfo>());
-                }
-
-                var flagTypePropertyCache = typePropertyCache[flags];
-
-                PropertyInfo[] propertys;
-
-                if (!typePropertyCacheBasic.ContainsKey(flags))
-                {
-                    propertys = t.GetProperties(flags);
-
-                    typePropertyCacheBasic.Add(flags, propertys);
-                }
-                else
-                {
-                    propertys = typePropertyCacheBasic[flags];
-                }
-
-                for (var index = 0; index < propertys.Length; index++)
-                {
-                    var property = propertys[index];
-                    if (!flagTypePropertyCache.ContainsKey(property.Name))
-                    {
-                        flagTypePropertyCache.Add(property.Name, property);
-                    }
-                }
-            }
-        }
-
         private static void PopulateMethods_INTERNAL(this Type t, BindingFlags flags)
         {
             using (_PRF_PopulateMethods_INTERNAL.Auto())
@@ -533,5 +578,57 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
             }
         }
+
+        private static void PopulateProperties_INTERNAL(this Type t, BindingFlags flags)
+        {
+            using (_PRF_PopulateProperties.Auto())
+            {
+                CheckInitialization(t);
+
+                var typePropertyCacheBasic = _PROPERTY_CACHE_BASIC[t];
+                var typePropertyCache = _PROPERTY_CACHE[t];
+
+                if (!typePropertyCache.ContainsKey(flags))
+                {
+                    typePropertyCache.Add(flags, new Dictionary<string, PropertyInfo>());
+                }
+
+                var flagTypePropertyCache = typePropertyCache[flags];
+
+                PropertyInfo[] propertys;
+
+                if (!typePropertyCacheBasic.ContainsKey(flags))
+                {
+                    propertys = t.GetProperties(flags);
+
+                    typePropertyCacheBasic.Add(flags, propertys);
+                }
+                else
+                {
+                    propertys = typePropertyCacheBasic[flags];
+                }
+
+                for (var index = 0; index < propertys.Length; index++)
+                {
+                    var property = propertys[index];
+                    if (!flagTypePropertyCache.ContainsKey(property.Name))
+                    {
+                        flagTypePropertyCache.Add(property.Name, property);
+                    }
+                }
+            }
+        }
+
+        #region Profiling
+
+        private static readonly ProfilerMarker _PRF_GetAppalachiaTypes_CACHED =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAppalachiaTypes_CACHED));
+
+        private static readonly ProfilerMarker _PRF_GetAppalachiaTypesInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAppalachiaTypesInternal));
+
+        #endregion
+
+        //private static Dictionary<Type, Dictionary<BindingFlags, MemberInfo[]>> _TYPE_MEMBERS_CACHE;         
     }
 }

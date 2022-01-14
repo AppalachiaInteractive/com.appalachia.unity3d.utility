@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Appalachia.Utility.DataStructures.Common;
-using Appalachia.Utility.DataStructures.Lists;
 
 // ReSharper disable NotResolvedInText
 
@@ -31,7 +30,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
             _verticesCount = 0;
             _verticesCapacity = (int)capacity;
 
-            _vertices = new ArrayList<object>(_verticesCapacity);
+            _vertices = new List<object>(_verticesCapacity);
             _adjacencyMatrix = new long[_verticesCapacity, _verticesCapacity];
             _adjacencyMatrix.Populate(_verticesCapacity, _verticesCapacity);
         }
@@ -144,7 +143,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
         {
             _edgesCount = 0;
             _verticesCount = 0;
-            _vertices = new ArrayList<object>(_verticesCapacity);
+            _vertices = new List<object>(_verticesCapacity);
             _adjacencyMatrix = new long[_verticesCapacity, _verticesCapacity];
             _adjacencyMatrix.Populate(_verticesCapacity, _verticesCapacity);
         }

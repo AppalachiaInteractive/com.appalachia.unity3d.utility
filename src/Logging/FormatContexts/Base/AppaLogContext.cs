@@ -25,7 +25,7 @@ namespace Appalachia.Utility.Logging
 
         #endregion
 
-        public string LogPrefix
+        internal string LogPrefix
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Appalachia.Utility.Logging
             }
         }
 
-        public string LogPrefixFormatted
+        internal string LogPrefixFormatted
         {
             get
             {

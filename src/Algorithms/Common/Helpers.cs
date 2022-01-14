@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Appalachia.Utility.DataStructures.Lists;
 
 namespace Appalachia.Utility.Algorithms.Common
 {
@@ -41,7 +40,7 @@ namespace Appalachia.Utility.Algorithms.Common
         /// <summary>
         ///     Swaps two values in an ArrayList<T> collection given their indexes.
         /// </summary>
-        public static void Swap<T>(this ArrayList<T> list, int firstIndex, int secondIndex)
+        public static void Swap<T>(this List<T> list, int firstIndex, int secondIndex)
         {
             if ((list.Count < 2) ||
                 (firstIndex ==

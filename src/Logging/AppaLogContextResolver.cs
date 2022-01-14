@@ -79,8 +79,8 @@ namespace Appalachia.Utility.Logging
                     "Appalachia.Data.Core.Databases"
                 ),
                 new(
-                    () => AppaLog.Context.DebugOverlay,
-                    "Appalachia.Prototype.KOC.Application.Areas.DebugOverlay"
+                    () => AppaLog.Context.DeveloperInterface,
+                    "Appalachia.Prototype.KOC.Application.Areas.DeveloperInterface"
                 ),
                 new(
                     () => AppaLog.Context.DevConsole,

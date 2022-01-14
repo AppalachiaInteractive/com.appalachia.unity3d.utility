@@ -114,7 +114,7 @@ namespace Appalachia.Utility.Algorithms.Graphs
             }
 
             var dstIndex = _nodesToIndices[destination];
-            var stack = new DataStructures.Lists.Stack<TVertex>();
+            var stack = new Stack<TVertex>();
 
             int index;
             for (index = dstIndex; _distances[index] != 0; index = _predecessors[index])

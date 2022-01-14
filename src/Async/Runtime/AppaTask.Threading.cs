@@ -52,7 +52,7 @@ namespace Appalachia.Utility.Async
         /// <summary>
         ///     Queue the action to PlayerLoop.
         /// </summary>
-        public static void Post(Action action, PlayerLoopTiming timing = PlayerLoopTiming.Update)
+        public static void FireAndForget(Action action, PlayerLoopTiming timing = PlayerLoopTiming.Update)
         {
             PlayerLoopHelper.AddContinuation(timing, action);
         }
