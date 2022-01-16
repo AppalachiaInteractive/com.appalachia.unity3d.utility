@@ -41,6 +41,20 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static (float deltaX, float deltaY, Vector2 center) AnchorInfo(
+            this Vector2 anchorMin,
+            Vector2 anchorMax)
+        {
+            using (_PRF_FromAnchors.Auto())
+            {
+                return new(
+                    anchorMax.x - anchorMin.x,
+                    anchorMax.y - anchorMin.y,
+                    anchorMin + (.5f * (anchorMax - anchorMin))
+                );
+            }
+        }
+
         public static float RandomValue(this Vector2 value)
         {
             using (_PRF_RandomValue.Auto())
@@ -60,6 +74,9 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(Vector2Extensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_FromAnchors =
+            new ProfilerMarker(_PRF_PFX + nameof(AnchorInfo));
 
         private static readonly ProfilerMarker _PRF_RandomValue =
             new ProfilerMarker(_PRF_PFX + nameof(RandomValue));
