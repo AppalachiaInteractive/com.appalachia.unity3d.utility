@@ -382,6 +382,23 @@ namespace Appalachia.Utility.Constants
             }
         }
 
+        public static string GenericMethodException(this string methodName, Type componentType)
+        {
+            using (_PRF_GenericMethodException.Auto())
+            {
+                if (_genericMethodExceptionFormat == null)
+                {
+                    _genericMethodExceptionFormat =
+                        new Utf8PreparedFormat<string, string>(GENERIC_METHOD_EXCEPTION_FORMAT_STRING);
+                }
+
+                var methodLogFormat = methodName.FormatMethodForLogging();
+                var typeName = componentType.FormatForLogging();
+
+                return _genericMethodExceptionFormat.Format(methodLogFormat, typeName);
+            }
+        }
+
         public static string GenericMethodException<T>(this string methodName, T component)
             where T : Component
         {

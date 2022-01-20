@@ -42,7 +42,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static GameObject CreateGameObjectInScene(string name, Scene scene)
+        public static GameObject AddGameObjectInScene(string name, Scene scene)
         {
             using (_PRF_CreateGameObjectInScene.Auto())
             {
@@ -313,6 +313,25 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static Transform GetChild(this Transform go, string name)
+        {
+            using (_PRF_GetChild.Auto())
+            {
+                var t = go.transform;
+
+                for (var i = 0; i < t.childCount; i++)
+                {
+                    var child = t.GetChild(i);
+                    if (child.name == name)
+                    {
+                        return child;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         public static GameObject GetChild(this GameObject go, string name)
         {
             using (_PRF_GetChild.Auto())
@@ -329,6 +348,42 @@ namespace Appalachia.Utility.Extensions
                 }
 
                 return null;
+            }
+        }
+
+        public static Transform[] GetChildren(this Transform go)
+        {
+            using (_PRF_GetChildren.Auto())
+            {
+                var t = go.transform;
+
+                var results = new Transform[t.childCount];
+
+                for (var i = 0; i < t.childCount; i++)
+                {
+                    var child = t.GetChild(i);
+                    results[i] = child;
+                }
+
+                return results;
+            }
+        }
+
+        public static GameObject[] GetChildren(this GameObject go)
+        {
+            using (_PRF_GetChildren.Auto())
+            {
+                var t = go.transform;
+
+                var results = new GameObject[t.childCount];
+
+                for (var i = 0; i < t.childCount; i++)
+                {
+                    var child = t.GetChild(i);
+                    results[i] = child.gameObject;
+                }
+
+                return results;
             }
         }
 
@@ -363,6 +418,24 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static IEnumerable<T> GetComponentsInImmediateChildren<T>(this GameObject go)
+            where T : Component
+        {
+            using (_PRF_GetComponentInImmediateChildren.Auto())
+            {
+                var cs = go.GetComponentsInChildren<T>(true);
+
+                for (var index = 0; index < cs.Length; index++)
+                {
+                    var c = cs[index];
+                    if (c.transform.parent == go.transform)
+                    {
+                        yield return c;
+                    }
+                }
+            }
+        }
+
         public static string GetFullName(this GameObject gameObj)
         {
             using (_PRF_GetFullName.Auto())
@@ -382,7 +455,7 @@ namespace Appalachia.Utility.Extensions
         /// <param name="ui">
         ///     Whether or not this game object is a UI object (using <see cref="RectTransform" />) or a 3D object (using <see cref="Transform" />).
         /// </param>
-        public static void GetOrCreateChild(
+        public static void GetOrAddChild(
             this MonoBehaviour behaviour,
             ref GameObject target,
             string name,
@@ -390,7 +463,7 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_GetOrCreateChild.Auto())
             {
-                GetOrCreateChild(behaviour.gameObject, ref target, name, ui);
+                GetOrAddChild(behaviour.gameObject, ref target, name, ui);
             }
         }
 
@@ -405,7 +478,7 @@ namespace Appalachia.Utility.Extensions
         /// <param name="ui">
         ///     Whether or not this game object is a UI object (using <see cref="RectTransform" />) or a 3D object (using <see cref="Transform" />).
         /// </param>
-        public static void GetOrCreateChild(this GameObject go, ref GameObject target, string name, bool ui)
+        public static void GetOrAddChild(this GameObject go, ref GameObject target, string name, bool ui)
         {
             using (_PRF_GetOrCreateChild.Auto())
             {
@@ -450,7 +523,7 @@ namespace Appalachia.Utility.Extensions
         /// <param name="obj">The current game object.</param>
         /// <param name="component">The field we will assign the result to.</param>
         /// <typeparam name="T">The <see cref="Component" /> or <see cref="MonoBehaviour" /> type to search for.</typeparam>
-        public static void GetOrCreateComponent<T>(this GameObject obj, ref T component)
+        public static void GetOrAddComponent<T>(this GameObject obj, ref T component)
             where T : Component
         {
             using (_PRF_GetOrCreateComponent.Auto())
@@ -473,7 +546,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static void GetOrCreateComponentInChild<T>(
+        public static void GetOrAddComponentInChild<T>(
             this GameObject obj,
             ref T component,
             string name,
@@ -508,7 +581,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static void GetOrCreateLifetimeComponentInChild<T>(
+        public static void GetOrAddLifetimeComponentInChild<T>(
             this GameObject obj,
             ref T component,
             string name = null)
@@ -545,7 +618,7 @@ namespace Appalachia.Utility.Extensions
                     return;
                 }
 
-                obj.GetOrCreateComponentInChild(ref component, name, false);
+                obj.GetOrAddComponentInChild(ref component, name, false);
             }
         }
 
@@ -597,12 +670,28 @@ namespace Appalachia.Utility.Extensions
 
                 if (bCreate)
                 {
-                    var gameObj = CreateGameObjectInScene("! " + typeof(T).Name, scene);
+                    var gameObj = AddGameObjectInScene("! " + typeof(T).Name, scene);
                     return gameObj.AddComponent<T>();
                 }
 
                 // None found
                 return null;
+            }
+        }
+
+        public static GameObject[] GetSiblings(this GameObject go)
+        {
+            using (_PRF_GetSiblings.Auto())
+            {
+                return GetChildren(go.transform.parent.gameObject);
+            }
+        }
+
+        public static Transform[] GetSiblings(this Transform go)
+        {
+            using (_PRF_GetSiblings.Auto())
+            {
+                return GetChildren(go.transform.parent);
             }
         }
 
@@ -833,6 +922,12 @@ namespace Appalachia.Utility.Extensions
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
 
+        private static readonly ProfilerMarker _PRF_GetSiblings =
+            new ProfilerMarker(_PRF_PFX + nameof(GetSiblings));
+
+        private static readonly ProfilerMarker _PRF_GetChildren =
+            new ProfilerMarker(_PRF_PFX + nameof(GetChildren));
+
         private static readonly ProfilerMarker _PRF_GetChild =
             new ProfilerMarker(_PRF_PFX + nameof(GetChild));
 
@@ -842,7 +937,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(GetComponentInParent));
 
         private static readonly ProfilerMarker _PRF_GetOrCreateLifetimeComponentInChild =
-            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateLifetimeComponentInChild));
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrAddLifetimeComponentInChild));
 
         private static readonly ProfilerMarker _PRF_MoveToActiveScene =
             new ProfilerMarker(_PRF_PFX + nameof(MoveToActiveScene));
@@ -872,7 +967,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(DestroyComponentOnWrongGameObject));
 
         private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateComponent));
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrAddComponent));
 
         private static readonly ProfilerMarker
             _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
@@ -881,7 +976,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(GetFullName));
 
         private static readonly ProfilerMarker _PRF_CreateGameObjectInScene =
-            new ProfilerMarker(_PRF_PFX + nameof(CreateGameObjectInScene));
+            new ProfilerMarker(_PRF_PFX + nameof(AddGameObjectInScene));
 
         private static readonly ProfilerMarker _PRF_GetRequiredComponent =
             new ProfilerMarker(_PRF_PFX + nameof(GetRequiredComponent));
@@ -899,7 +994,7 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
 
         private static readonly ProfilerMarker _PRF_GetOrCreateChild =
-            new ProfilerMarker(_PRF_PFX + nameof(GetOrCreateChild));
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrAddChild));
 
         #endregion
     }

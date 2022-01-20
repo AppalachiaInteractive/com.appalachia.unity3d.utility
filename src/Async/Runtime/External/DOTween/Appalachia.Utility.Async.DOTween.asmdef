@@ -1,22 +1,6 @@
 {
-  "versionDefines": [
-    {
-      "define": "APPATASK_DOTWEEN_SUPPORT",
-      "expression": "",
-      "name": "com.demigiant.dotween"
-    }
-  ],
-  "allowUnsafeCode": false,
-  "autoReferenced": true,
-  "noEngineReferences": false,
-  "overrideReferences": false,
   "name": "Appalachia.Utility.Async.DOTween",
   "rootNamespace": "",
-  "defineConstraints": [],
-  "excludePlatforms": [],
-  "includePlatforms": [],
-  "optionalUnityReferences": [],
-  "precompiledReferences": [],
   "references": [
     "GUID:f51ebe6a0ceec4240a699833d6309b23",
     "GUID:9e24947de15b9834991c9d8411ea37cf",
@@ -26,6 +10,22 @@
     "GUID:df380645f10b7bc4b97d4f5eb6303d95",
     "GUID:84651a3751eca9349aac36a66bba901b",
     "GUID:f06555f75b070af458a003d92f9efb00",
-    "GUID:80c6d40bc76532041876b8faaf9e1539"
-  ]
+    "GUID:80c6d40bc76532041876b8faaf9e1539",
+    "GUID:d4b3f22eeaa64db4fa29746f96589703"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.demigiant.dotween",
+      "expression": "",
+      "define": "APPATASK_DOTWEEN_SUPPORT"
+    }
+  ],
+  "noEngineReferences": false
 }
