@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Utility classes with minimal dependencies to provide enhanced APIs for common tasks.")]
 [assembly: AssemblyCompany("Appalachia Interactive")]
 [assembly: AssemblyProduct("Keepers Of Creation")]
-[assembly: AssemblyCopyright("Copyright © Appalachia Interactive 2021")]
+[assembly: AssemblyCopyright("Copyright © Appalachia Interactive 2022")]
 [assembly: AssemblyTrademark("Keepers Of Creation")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
@@ -25,19 +25,19 @@ namespace Appalachia.Utility.WakaTime
         public const string AssemblyDescription = "Utility classes with minimal dependencies to provide enhanced APIs for common tasks.";
         public const string AssemblyCompany = "Appalachia Interactive";
         public const string AssemblyProduct = "Keepers Of Creation";
-        public const string AssemblyCopyright = "Copyright © Appalachia Interactive 2021";
+        public const string AssemblyCopyright = "Copyright © Appalachia Interactive 2022";
         public const string AssemblyTrademark = "Keepers Of Creation";
         public const string AssemblyCulture = "";
         public const string NeutralResourcesLanguage = "en";
         public const string AssemblyVersion = "0.2.0.0";
         public const string AssemblyFileVersion = "0.2.0.0";
-        public const int Priority = -411000;
+        public const int Priority = -458000;
         public const string Name = "WakaTime";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
         public const string Version = "0.2.0";
         public const int VersionInt = 2000;
-        public const string BuildDate = "2021-12-30T17:59:49.3467855Z";
+        public const string BuildDate = "2022-01-28T17:24:40.8181247Z";
         
         public static partial class Prefs
         {
@@ -61,12 +61,6 @@ namespace Appalachia.Utility.WakaTime
             {
                 public const int Priority = PKG.Priority;
                 public const string Base = "GameObject/" + Prefix;
-                    
-                public static partial class Create
-                {
-                    public const int Priority = GameObjects.Priority + 0;
-                    public const string Base =  "GameObject/Create/" + Prefix;
-                }
             }
 
             public static partial class Appalachia
@@ -254,7 +248,7 @@ namespace Appalachia.Utility.WakaTime
             {
                 var majorInt = version / 1_000_000;
                 var minorInt = (version / 1_000) % 1_000;
-                var patchInt = version % 1_000;
+                var patchInt = version % 1_000; 
 
                 var result = string.Format("0.1.2", majorInt, minorInt, patchInt);
 

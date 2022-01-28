@@ -295,6 +295,8 @@ namespace Appalachia.Utility.Async
         private static SynchronizationContext unitySynchronizationContext;
         private static ContinuationQueue[] yielders;
         private static PlayerLoopRunner[] runners;
+
+        public static bool IsInitialized => runners != null;
         internal static bool IsEditorApplicationQuitting { get; private set; }
 
         private static PlayerLoopSystem[] InsertRunner(

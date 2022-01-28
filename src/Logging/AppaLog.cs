@@ -16,7 +16,8 @@ namespace Appalachia.Utility.Logging
         private const bool TRACING_ENABLED = false;
         private const int MENU_PRIORITY = PKG.Menu.Appalachia.Logging.Priority;
         private const string MENU_BASE = PKG.Menu.Appalachia.Logging.Base;
-        private const string MENU_DEBUGGER = MENU_BASE + "Debugger Boundary";
+        
+        /*private const string MENU_DEBUGGER = MENU_BASE + "Debugger Boundary";*/
 
         #endregion
 
@@ -350,6 +351,8 @@ namespace Appalachia.Utility.Logging
                     }
                 }
 
+// ReSharper disable HeuristicUnreachableCode
+#pragma warning disable CS0162
                 if (TRACING_ENABLED)
                 {
                     LogInternalTrace(
@@ -364,6 +367,9 @@ namespace Appalachia.Utility.Logging
                         lineNumber
                     );
                 }
+              
+// ReSharper restore HeuristicUnreachableCode
+#pragma warning restore CS0162
             }
         }
 

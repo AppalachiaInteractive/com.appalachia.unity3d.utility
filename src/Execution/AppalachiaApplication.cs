@@ -17,7 +17,7 @@ namespace Appalachia.Utility.Execution
 #if UNITY_EDITOR
                 try
                 {
-                    if (!APPASERIALIZE.InSerializationWindow)
+                    if (!APPASERIALIZE.CouldBeInSerializationWindow)
                     {
                         if (UnityEditor.AssetDatabase.IsAssetImportWorkerProcess())
                         {

@@ -3,26 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Appalachia.Utility.Strings;
+using Unity.Profiling;
 
 namespace Appalachia.Utility.Reflection.Extensions
 {
     public static partial class ReflectionExtensions
     {
-        private static Dictionary<Type, List<Type>> _inheritorLookup;
+        #region Static Fields and Autoproperties
+
         private static Dictionary<Type, List<Type>> _concreteInheritorLookup;
+        private static Dictionary<Type, List<Type>> _inheritorLookup;
 
-        private static Dictionary<Type, List<Type>> InheritorLookup
-        {
-            get
-            {
-                if (_inheritorLookup == null)
-                {
-                    _inheritorLookup = new Dictionary<Type, List<Type>>();
-                }
-
-                return _inheritorLookup;
-            }
-        }
+        #endregion
 
         private static Dictionary<Type, List<Type>> ConcreteInheritorLookup
         {
@@ -34,6 +26,19 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
 
                 return _concreteInheritorLookup;
+            }
+        }
+
+        private static Dictionary<Type, List<Type>> InheritorLookup
+        {
+            get
+            {
+                if (_inheritorLookup == null)
+                {
+                    _inheritorLookup = new Dictionary<Type, List<Type>>();
+                }
+
+                return _inheritorLookup;
             }
         }
 
@@ -75,33 +80,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             return GetAllConcreteInheritorsWithDefaultConstructors(typeof(T));
         }
-        
-        public static bool HasPublicParameterlessConstructor<T>()
-        {
-            return HasPublicParameterlessConstructor(typeof(T));
-        }
-        
-        public static bool HasPublicParameterlessConstructor(this Type t)
-        {
-            var constructors =
-                t.GetConstructors(BindingFlags.Default | BindingFlags.Public | BindingFlags.Instance);
-            
-            foreach (var constructor in constructors)
-            {
-                if (constructor.IsPublic)
-                {
-                    var parameters = constructor.GetParameters();
 
-                    if (parameters.Length == 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-        
         public static List<Type> GetAllInheritors(this Type t)
         {
             var l = InheritorLookup;
@@ -123,133 +102,20 @@ namespace Appalachia.Utility.Reflection.Extensions
             return typeof(T).GetAllInheritors();
         }
 
-        private static List<Type> GetInheritors(Type t, bool concreteOnly)
+        public static int GetBaseClassCount(this Type type)
         {
-            var list = new List<Type>();
-            var types = GetAllTypes_CACHED();
-
-            for (var i = 0; i < types.Length; i++)
+            using (_PRF_GetBaseClassCount.Auto())
             {
-                var assemblyType = types[i];
+                var count = 0;
 
-                if (assemblyType.InheritsFrom(t))
+                while (type.BaseType != null)
                 {
-                    if (concreteOnly && assemblyType.IsAbstract)
-                    {
-                        continue;
-                    }
-
-                    list.Add(assemblyType);
+                    type = type.BaseType;
+                    count += 1;
                 }
+
+                return count;
             }
-
-            return list;
-        }
-
-        public static bool ImplementsOrInheritsFrom(this Type type, Type to)
-        {
-            return to.IsAssignableFrom(type);
-        }
-
-        public static bool InheritsFrom<TBase>(this Type type)
-        {
-            return type.InheritsFrom(typeof(TBase));
-        }
-
-        public static bool InheritsFrom(this Type type, Type baseType)
-        {
-            if (baseType.IsAssignableFrom(type))
-            {
-                return true;
-            }
-
-            if (type.IsInterface && !baseType.IsInterface)
-            {
-                return false;
-            }
-
-            if (baseType.IsInterface)
-            {
-                return type.GetInterfaces().Contains(baseType);
-            }
-
-            for (var type1 = type; type1 != null; type1 = type1.BaseType)
-            {
-                if ((type1 == baseType) ||
-                    (baseType.IsGenericTypeDefinition &&
-                     type1.IsGenericType &&
-                     (type1.GetGenericTypeDefinition() == baseType)))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static Type GetGenericBaseType(this Type type, Type baseType)
-        {
-            return type.GetGenericBaseType(baseType, out _);
-        }
-
-        public static Type GetGenericBaseType(this Type type, Type baseType, out int depthCount)
-        {
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
-            if (baseType == null)
-            {
-                throw new ArgumentNullException(nameof(baseType));
-            }
-
-            if (!baseType.IsGenericType)
-            {
-                throw new ArgumentException(ZString.Format("Type {0} is not a generic type.", baseType.Name));
-            }
-
-            if (!type.InheritsFrom(baseType))
-            {
-                throw new ArgumentException(
-                    ZString.Format("Type {0} does not inherit from {1}.", type.Name, baseType.Name)
-                );
-            }
-
-            var type1 = type;
-            depthCount = 0;
-            for (;
-                (type1 != null) &&
-                (!type1.IsGenericType || (type1.GetGenericTypeDefinition() != baseType));
-                type1 = type1.BaseType)
-            {
-                ++depthCount;
-            }
-
-            if (type1 == null)
-            {
-                throw new ArgumentException(
-                    ZString.Format(
-                        "{0} is assignable from {1}, but base type was not found?",
-                        type.Name,
-                        baseType.Name
-                    )
-                );
-            }
-
-            return type1;
-        }
-
-        public static IEnumerable<Type> GetBaseTypes(this Type type, bool includeSelf = false)
-        {
-            var first = type.GetBaseClasses(includeSelf).Concat(type.GetInterfaces());
-
-            if (includeSelf && type.IsInterface)
-            {
-                first = first.Concat(new Type[1] {type});
-            }
-
-            return first;
         }
 
         public static IEnumerable<Type> GetBaseClasses(this Type type, bool includeSelf = false)
@@ -269,5 +135,209 @@ namespace Appalachia.Utility.Reflection.Extensions
                 yield return current;
             }
         }
+
+        public static IEnumerable<Type> GetBaseTypes(this Type type, bool includeSelf = false)
+        {
+            var first = type.GetBaseClasses(includeSelf).Concat(type.GetInterfaces());
+
+            if (includeSelf && type.IsInterface)
+            {
+                first = first.Concat(new Type[1] { type });
+            }
+
+            return first;
+        }
+
+        public static Type GetGenericBaseType(this Type type, Type baseType)
+        {
+            using (_PRF_GetGenericBaseType.Auto())
+            {
+                return type.GetGenericBaseType(baseType, out _);
+            }
+        }
+
+        public static Type GetGenericBaseType(this Type type, Type baseType, out int depthCount)
+        {
+            using (_PRF_GetGenericBaseType.Auto())
+            {
+                if (type == null)
+                {
+                    throw new ArgumentNullException(nameof(type));
+                }
+
+                if (baseType == null)
+                {
+                    throw new ArgumentNullException(nameof(baseType));
+                }
+
+                if (!baseType.IsGenericType)
+                {
+                    throw new ArgumentException(
+                        ZString.Format("Type {0} is not a generic type.", baseType.Name)
+                    );
+                }
+
+                if (!type.InheritsFrom(baseType))
+                {
+                    throw new ArgumentException(
+                        ZString.Format("Type {0} does not inherit from {1}.", type.Name, baseType.Name)
+                    );
+                }
+
+                var type1 = type;
+                depthCount = 0;
+                for (;
+                     (type1 != null) &&
+                     (!type1.IsGenericType || (type1.GetGenericTypeDefinition() != baseType));
+                     type1 = type1.BaseType)
+                {
+                    ++depthCount;
+                }
+
+                if (type1 == null)
+                {
+                    throw new ArgumentException(
+                        ZString.Format(
+                            "{0} is assignable from {1}, but base type was not found?",
+                            type.Name,
+                            baseType.Name
+                        )
+                    );
+                }
+
+                return type1;
+            }
+        }
+
+        public static bool HasPublicParameterlessConstructor<T>()
+        {
+            using (_PRF_HasPublicParameterlessConstructor.Auto())
+            {
+                return HasPublicParameterlessConstructor(typeof(T));
+            }
+        }
+
+        public static bool HasPublicParameterlessConstructor(this Type t)
+        {
+            using (_PRF_HasPublicParameterlessConstructor.Auto())
+            {
+                var constructors = t.GetConstructors(
+                    BindingFlags.Default | BindingFlags.Public | BindingFlags.Instance
+                );
+
+                foreach (var constructor in constructors)
+                {
+                    if (constructor.IsPublic)
+                    {
+                        var parameters = constructor.GetParameters();
+
+                        if (parameters.Length == 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        public static bool ImplementsOrInheritsFrom(this Type type, Type to)
+        {
+            using (_PRF_ImplementsOrInheritsFrom.Auto())
+            {
+                return to.IsAssignableFrom(type);
+            }
+        }
+
+        public static bool InheritsFrom<TBase>(this Type type)
+        {
+            using (_PRF_InheritsFrom.Auto())
+            {
+                return type.InheritsFrom(typeof(TBase));
+            }
+        }
+
+        public static bool InheritsFrom(this Type type, Type baseType)
+        {
+            using (_PRF_InheritsFrom.Auto())
+            {
+                if (baseType.IsAssignableFrom(type))
+                {
+                    return true;
+                }
+
+                if (type.IsInterface && !baseType.IsInterface)
+                {
+                    return false;
+                }
+
+                if (baseType.IsInterface)
+                {
+                    return type.GetInterfaces().Contains(baseType);
+                }
+
+                for (var type1 = type; type1 != null; type1 = type1.BaseType)
+                {
+                    if ((type1 == baseType) ||
+                        (baseType.IsGenericTypeDefinition &&
+                         type1.IsGenericType &&
+                         (type1.GetGenericTypeDefinition() == baseType)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static List<Type> GetInheritors(Type t, bool concreteOnly)
+        {
+            using (_PRF_GetInheritors.Auto())
+            {
+                var list = new List<Type>();
+                var types = GetAllTypes_CACHED();
+
+                for (var i = 0; i < types.Length; i++)
+                {
+                    var assemblyType = types[i];
+
+                    if (assemblyType.InheritsFrom(t))
+                    {
+                        if (concreteOnly && assemblyType.IsAbstract)
+                        {
+                            continue;
+                        }
+
+                        list.Add(assemblyType);
+                    }
+                }
+
+                return list;
+            }
+        }
+
+        #region Profiling
+
+        private static readonly ProfilerMarker _PRF_GetGenericBaseType =
+            new ProfilerMarker(_PRF_PFX + nameof(GetGenericBaseType));
+
+        private static readonly ProfilerMarker _PRF_HasPublicParameterlessConstructor =
+            new ProfilerMarker(_PRF_PFX + nameof(HasPublicParameterlessConstructor));
+
+        private static readonly ProfilerMarker _PRF_ImplementsOrInheritsFrom =
+            new ProfilerMarker(_PRF_PFX + nameof(ImplementsOrInheritsFrom));
+
+        private static readonly ProfilerMarker _PRF_InheritsFrom =
+            new ProfilerMarker(_PRF_PFX + nameof(InheritsFrom));
+
+        private static readonly ProfilerMarker _PRF_GetInheritors =
+            new ProfilerMarker(_PRF_PFX + nameof(GetInheritors));
+
+        private static readonly ProfilerMarker _PRF_GetBaseClassCount =
+            new ProfilerMarker(_PRF_PFX + nameof(GetBaseClassCount));
+
+        #endregion
     }
 }

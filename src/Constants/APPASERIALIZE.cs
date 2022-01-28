@@ -19,14 +19,27 @@ namespace Appalachia.Utility.Constants
 
         [NonSerialized] private static int _isSerializing;
 
+        [NonSerialized] private static uint _frame;
+
         #endregion
 
-        public static bool InSerializationWindow => IsSerializing || IsDeserializing;
+        public static bool CouldBeInSerializationWindow => (_frame == 0) || InSerializationWindowGuaranteed;
+        public static bool InSerializationWindowGuaranteed => IsSerializing || IsDeserializing;
         public static bool IsDeserializing => _isDeserializing > 0;
 
         public static bool IsSerializing => _isSerializing > 0;
 
+        public static void FrameIncrement()
+        {
+            _frame += 1;
+        }
+
         public static IDisposable OnAfterDeserialize()
+        {
+            return new SerializationScope(false);
+        }
+
+        public static IDisposable OnAssetEditing()
         {
             return new SerializationScope(false);
         }
@@ -34,6 +47,14 @@ namespace Appalachia.Utility.Constants
         public static IDisposable OnBeforeSerialize()
         {
             return new SerializationScope(true);
+        }
+
+#if UNITY_EDITOR
+        [UnityEditor.Callbacks.DidReloadScripts]
+#endif
+        public static void ResetFrameCount()
+        {
+            _frame = 0;
         }
 
         [RuntimeInitializeOnLoadMethod]

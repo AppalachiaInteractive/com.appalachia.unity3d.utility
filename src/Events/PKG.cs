@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Appalachia.Utility.Extensions")]
+[assembly: AssemblyTitle("Appalachia.Utility.Events")]
 [assembly: AssemblyDescription("Utility classes with minimal dependencies to provide enhanced APIs for common tasks.")]
 [assembly: AssemblyCompany("Appalachia Interactive")]
 [assembly: AssemblyProduct("Keepers Of Creation")]
@@ -17,11 +17,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.2.0.0")]
 [assembly: AssemblyFileVersion("0.2.0.0")]
 
-namespace Appalachia.Utility.Extensions
+namespace Appalachia.Utility.Events
 {
     internal static partial class PKG
     {
-        public const string AssemblyTitle = "Appalachia.Utility.Extensions";
+        public const string AssemblyTitle = "Appalachia.Utility.Events";
         public const string AssemblyDescription = "Utility classes with minimal dependencies to provide enhanced APIs for common tasks.";
         public const string AssemblyCompany = "Appalachia Interactive";
         public const string AssemblyProduct = "Keepers Of Creation";
@@ -31,13 +31,13 @@ namespace Appalachia.Utility.Extensions
         public const string NeutralResourcesLanguage = "en";
         public const string AssemblyVersion = "0.2.0.0";
         public const string AssemblyFileVersion = "0.2.0.0";
-        public const int Priority = -465000;
-        public const string Name = "Extensions";
+        public const int Priority = -455000;
+        public const string Name = "Events";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
         public const string Version = "0.2.0";
         public const int VersionInt = 2000;
-        public const string BuildDate = "2022-01-28T17:24:40.3797258Z";
+        public const string BuildDate = "2022-01-28T17:24:40.9342301Z";
         
         public static partial class Prefs
         {
@@ -217,7 +217,7 @@ namespace Appalachia.Utility.Extensions
 
 // DO NOT MODIFY: END
 #region User Modifiable
-
+        
 #endregion // User Modifiable
 
 // DO NOT MODIFY: START       

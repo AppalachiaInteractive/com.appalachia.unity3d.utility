@@ -63,7 +63,6 @@ namespace Appalachia.Utility.Extensions.Debugging
             using (_PRF_BREAKPOINT.Auto())
             {
                 var anyTrue = false;
-                var anyFalse = false;
 
                 foreach (var condition in conditions)
                 {
@@ -82,8 +81,6 @@ namespace Appalachia.Utility.Extensions.Debugging
                     }
                     else
                     {
-                        anyFalse = true;
-
                         if (logic == LOGIC.All)
                         {
                             return;

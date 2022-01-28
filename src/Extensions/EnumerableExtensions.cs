@@ -279,7 +279,7 @@ namespace Appalachia.Utility.Extensions
         /// <summary>Convert each item in the collection.</summary>
         /// <param name="source">The collection.</param>
         /// <param name="converter">Func to convert the items.</param>
-        public static IEnumerable<T> Convert<T>(this IEnumerable source, Func<object, T> converter)
+        public static IEnumerable<TOut> Convert<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TOut> converter)
         {
             foreach (var obj in source)
             {
@@ -296,6 +296,98 @@ namespace Appalachia.Utility.Extensions
             {
                 action(obj);
                 yield return obj;
+            }
+        }
+
+        public static void SplitByTypeWithOriginals<T, T2>(
+            this IEnumerable<T> source,
+            out List<T> first,
+            out List<T2> successfulCastList,
+            out List<T> successfulCastOriginals)
+        {
+            first = new List<T>();
+            successfulCastList = new List<T2>();
+            successfulCastOriginals = new List<T>();
+            
+            foreach (var element in source)
+            {
+                if (element is T2 castElement)
+                {
+                    successfulCastList.Add(castElement);
+                    successfulCastOriginals.Add(element);
+                }
+                else
+                {
+                    first.Add(element);
+                }
+            }
+        }
+
+        public static void SplitByType<T, T2>(
+            this IEnumerable<T> source,
+            Predicate<T> valid,
+            Func<T, T2> extractor,
+            out List<T> first,
+            out List<T2> successfulCastList)
+        {
+            first = new List<T>();
+            successfulCastList = new List<T2>();
+            
+            foreach (var element in source)
+            {
+                if (valid(element))
+                {
+                    var extracted = extractor(element);
+
+                    successfulCastList.Add(extracted);
+                }
+                else
+                {
+                    first.Add(element);
+                }
+            }
+        }
+
+        public static void SplitByType<T, T2>(
+            this IEnumerable<T> source,
+            out List<T> first,
+            out List<T2> successfulCastList)
+        {
+            first = new List<T>();
+            successfulCastList = new List<T2>();
+            
+            foreach (var element in source)
+            {
+                if (element is T2 castElement)
+                {
+                    successfulCastList.Add(castElement);
+                }
+                else
+                {
+                    first.Add(element);
+                }
+            }
+        }
+
+        public static void Split<T>(
+            this IEnumerable<T> source,
+            Predicate<T> includeInFirstList,
+            out List<T> first,
+            out List<T> second)
+        {
+            first = new List<T>();
+            second = new List<T>();
+            
+            foreach (var element in source)
+            {
+                if (includeInFirstList(element))
+                {
+                    first.Add(element);
+                }
+                else
+                {
+                    second.Add(element);
+                }
             }
         }
 

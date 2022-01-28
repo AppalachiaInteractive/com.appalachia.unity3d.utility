@@ -181,6 +181,7 @@ namespace Appalachia.Utility.Logging
                     "Appalachia.Simulation.Core.Metadata.Tree",
                     "Appalachia.Simulation.Trees"
                 ),
+                new(() => AppaLog.Context.UI, "Appalachia.UI"),
                 new(() => AppaLog.Context.VFX, "Appalachia.Rendering.VFX"),
                 new(() => AppaLog.Context.Visualizers, "Appalachia.Spatial.Visualizers"),
                 new(() => AppaLog.Context.Volumes, "Appalachia.Core.Volumes"),

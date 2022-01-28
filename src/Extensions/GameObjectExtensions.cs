@@ -523,6 +523,31 @@ namespace Appalachia.Utility.Extensions
         /// <param name="obj">The current game object.</param>
         /// <param name="component">The field we will assign the result to.</param>
         /// <typeparam name="T">The <see cref="Component" /> or <see cref="MonoBehaviour" /> type to search for.</typeparam>
+        public static void GetOrAddComponent<T>(this MonoBehaviour obj, ref T component)
+            where T : Component
+        {
+            using (_PRF_GetOrCreateComponent.Auto())
+            {
+                if (component == null)
+                {
+                    component = obj.GetComponent<T>();
+
+                    if (component == null)
+                    {
+                        component = obj.gameObject.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Searches for a <see cref="Component" /> or <see cref="MonoBehaviour" /> on the current <see cref="GameObject" />.
+        ///     If it exists, it will be assigned to the <paramref name="component" /> argument.
+        ///     If it does not exist, it will be created and then assigned to the <paramref name="component" /> argument.
+        /// </summary>
+        /// <param name="obj">The current game object.</param>
+        /// <param name="component">The field we will assign the result to.</param>
+        /// <typeparam name="T">The <see cref="Component" /> or <see cref="MonoBehaviour" /> type to search for.</typeparam>
         public static void GetOrAddComponent<T>(this GameObject obj, ref T component)
             where T : Component
         {

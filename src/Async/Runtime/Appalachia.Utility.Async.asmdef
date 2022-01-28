@@ -3,32 +3,38 @@
     {
       "define": "APPATASK_ASSETBUNDLE_SUPPORT",
       "expression": "",
-      "name": "com.unity.modules.assetbundle"
+      "name": "com.unity.modules.assetbundle",
+      "Name": "AssemblyVersionDefineModel"
     },
     {
       "define": "APPATASK_PHYSICS_SUPPORT",
       "expression": "",
-      "name": "com.unity.modules.physics"
+      "name": "com.unity.modules.physics",
+      "Name": "AssemblyVersionDefineModel"
     },
     {
       "define": "APPATASK_PHYSICS2D_SUPPORT",
       "expression": "",
-      "name": "com.unity.modules.physics2d"
+      "name": "com.unity.modules.physics2d",
+      "Name": "AssemblyVersionDefineModel"
     },
     {
       "define": "APPATASK_PARTICLESYSTEM_SUPPORT",
       "expression": "",
-      "name": "com.unity.modules.particlesystem"
+      "name": "com.unity.modules.particlesystem",
+      "Name": "AssemblyVersionDefineModel"
     },
     {
       "define": "APPATASK_UGUI_SUPPORT",
       "expression": "",
-      "name": "com.unity.ugui"
+      "name": "com.unity.ugui",
+      "Name": "AssemblyVersionDefineModel"
     },
     {
       "define": "APPATASK_WEBREQUEST_SUPPORT",
       "expression": "",
-      "name": "com.unity.modules.unitywebrequest"
+      "name": "com.unity.modules.unitywebrequest",
+      "Name": "AssemblyVersionDefineModel"
     }
   ],
   "allowUnsafeCode": false,
@@ -49,6 +55,9 @@
     "GUID:d8b63aba1907145bea998dd612889d6b",
     "GUID:df380645f10b7bc4b97d4f5eb6303d95",
     "GUID:84651a3751eca9349aac36a66bba901b",
-    "GUID:f06555f75b070af458a003d92f9efb00"
-  ]
+    "GUID:f06555f75b070af458a003d92f9efb00",
+    "GUID:de4e6084e6d474788bb8c799d6b461ec",
+    "GUID:d4b3f22eeaa64db4fa29746f96589703"
+  ],
+  "Name": "AssemblyDefinitionModel"
 }

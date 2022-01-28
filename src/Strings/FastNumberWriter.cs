@@ -1,5 +1,9 @@
 ﻿using System;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
+
+#pragma warning disable CS0164
+
 // ReSharper disable UselessBinaryOperation
 
 namespace Appalachia.Utility.Strings

@@ -13,7 +13,7 @@ namespace Appalachia.Utility.Extensions
             {
                 return
 #if UNITY_EDITOR
-                    !APPASERIALIZE.InSerializationWindow &&
+                    !APPASERIALIZE.CouldBeInSerializationWindow &&
                     !Application.isPlaying &&
                     !EditorApplication.isPlayingOrWillChangePlaymode
                     /*&& !EditorApplication.isUpdating*/

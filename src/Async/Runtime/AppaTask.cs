@@ -55,6 +55,8 @@ namespace Appalachia.Utility.Async
             }
         }
 
+        public static bool ExecutionIsAllowed => PlayerLoopHelper.IsInitialized;
+
         [DebuggerHidden]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Awaiter GetAwaiter()

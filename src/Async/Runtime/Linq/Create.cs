@@ -120,7 +120,9 @@ namespace Appalachia.Utility.Async.Linq
                     return;
                 }
 
+#pragma warning disable CS0164
                 DONE:
+#pragma warning restore CS0164
                 Volatile.Write(ref state, -2);
                 completionSource.TrySetResult(false);
             }
