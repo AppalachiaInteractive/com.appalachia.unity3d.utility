@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Appalachia.Utility.Logging;
 using Appalachia.Utility.Strings;
+using Appalachia.Utility.Timing;
 using UnityEngine;
 
 namespace Appalachia.Utility.Execution
@@ -80,7 +81,7 @@ namespace Appalachia.Utility.Execution
         public bool WasAutoCancelled => _wasAutoCancelled;
 
         public bool WasCancelled => _wasCancelled;
-        public double ExecutionTime => Time.realtimeSinceStartupAsDouble - _startTime;
+        public double ExecutionTime => CoreClock.Instance.RealtimeSinceStartupAsDouble - _startTime;
         public double StartTime => _startTime;
 
         public double TimeoutSeconds => _timeoutSeconds;
@@ -213,7 +214,7 @@ namespace Appalachia.Utility.Execution
 
             _wasExecuted = true;
             _isExecuting = true;
-            _startTime = Time.realtimeSinceStartupAsDouble;
+            _startTime = CoreClock.Instance.RealtimeSinceStartupAsDouble;
 
             while (true)
             {

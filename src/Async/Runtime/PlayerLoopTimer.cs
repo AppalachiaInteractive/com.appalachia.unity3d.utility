@@ -3,7 +3,7 @@
 using System;
 using System.Threading;
 using Appalachia.Utility.Async.Internal;
-using UnityEngine;
+using Appalachia.Utility.Timing;
 
 namespace Appalachia.Utility.Async
 {
@@ -222,13 +222,13 @@ namespace Appalachia.Utility.Async
         {
             if (elapsed == 0.0f)
             {
-                if (initialFrame == Time.frameCount)
+                if (initialFrame == CoreClock.Instance.FrameCount)
                 {
                     return true;
                 }
             }
 
-            elapsed += Time.deltaTime;
+            elapsed += CoreClock.Instance.DeltaTime;
             if (elapsed >= interval)
             {
                 return false;
@@ -240,7 +240,7 @@ namespace Appalachia.Utility.Async
         protected override void ResetCore(TimeSpan? interval)
         {
             elapsed = 0.0f;
-            initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+            initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
             if (interval != null)
             {
                 this.interval = (float)interval.Value.TotalSeconds;
@@ -269,13 +269,13 @@ namespace Appalachia.Utility.Async
         {
             if (elapsed == 0.0f)
             {
-                if (initialFrame == Time.frameCount)
+                if (initialFrame == CoreClock.Instance.FrameCount)
                 {
                     return true;
                 }
             }
 
-            elapsed += Time.unscaledDeltaTime;
+            elapsed += CoreClock.Instance.UnscaledDeltaTime;
             if (elapsed >= interval)
             {
                 return false;
@@ -287,7 +287,7 @@ namespace Appalachia.Utility.Async
         protected override void ResetCore(TimeSpan? interval)
         {
             elapsed = 0.0f;
-            initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+            initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
             if (interval != null)
             {
                 this.interval = (float)interval.Value.TotalSeconds;

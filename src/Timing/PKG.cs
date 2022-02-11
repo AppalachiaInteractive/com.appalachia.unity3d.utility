@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Appalachia.Utility.Events")]
+[assembly: AssemblyTitle("Appalachia.Utility.Timing")]
 [assembly: AssemblyDescription("Utility classes with minimal dependencies to provide enhanced APIs for common tasks.")]
 [assembly: AssemblyCompany("Appalachia Interactive")]
 [assembly: AssemblyProduct("Keepers Of Creation")]
@@ -17,11 +17,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.2.0.0")]
 [assembly: AssemblyFileVersion("0.2.0.0")]
 
-namespace Appalachia.Utility.Events
+namespace Appalachia.Utility.Timing
 {
     internal static partial class PKG
     {
-        public const string AssemblyTitle = "Appalachia.Utility.Events";
+        public const string AssemblyTitle = "Appalachia.Utility.Timing";
         public const string AssemblyDescription = "Utility classes with minimal dependencies to provide enhanced APIs for common tasks.";
         public const string AssemblyCompany = "Appalachia Interactive";
         public const string AssemblyProduct = "Keepers Of Creation";
@@ -31,21 +31,34 @@ namespace Appalachia.Utility.Events
         public const string NeutralResourcesLanguage = "en";
         public const string AssemblyVersion = "0.2.0.0";
         public const string AssemblyFileVersion = "0.2.0.0";
-        public const int Priority = -455000;
-        public const string Name = "Events";
+        public const int Priority = -477000;
+        public const string Name = "Timing";
         public const string Prefix = Root + Name + "/";
         public const string Root = "Appalachia/";
         public const string Version = "0.2.0";
         public const int VersionInt = 2000;
-        public const string BuildDate = "2022-01-28T17:24:40.9342301Z";
+        public const string BuildDate = "2022-02-11T16:59:11.2050401Z";
         
         public static partial class Prefs
         {
             public const string Group = Prefix;
 
+            public static partial class General
+            {
+                public const string Group = Prefs.Group + "General";
+                private const string Base = Group + "/";                
+            }
+
+            public static partial class Colors
+            {
+                public const string Group = Prefs.Group + "Colors";
+                private const string Base = Group + "/";                
+            }
+
             public static partial class Gizmos
             {
-                public const string Base = Group + "Gizmos/";
+                public const string Group = Prefs.Group + "Gizmos";
+                private const string Base = Group + "/";                
             }
         }       
 

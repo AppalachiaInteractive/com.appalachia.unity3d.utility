@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Appalachia.Utility.Colors;
 using Appalachia.Utility.Constants;
 using Appalachia.Utility.Strings;
@@ -87,44 +86,18 @@ namespace Appalachia.Utility.Logging
             {
                 var newFormat = LogFormat.Context(s);
 
-                var hueRange = new Vector2(90f,        260f);
-                var saturationRange = new Vector2(20f, 50f);
-                var valueRange = new Vector2(70f,      100f);
+                var color = Appalachia.Utility.Colors.Colors.DeterministicColorFromString(
+                    s,
+                    new Vector2Int(90, 260),
+                    new Vector2Int(20, 50),
+                    new Vector2Int(70, 100)
+                );
 
-                var upperString = s.ToUpperInvariant();
+                newFormat.color = color;
 
-                var hueTime = GetStringHashTime(s);
-                var saturationTime = GetStringHashTime(s.Reverse());
-                var valueTime = GetStringHashTime(upperString.Reverse());
-
-                var hue = hueRange.x + ((hueRange.y - hueRange.x) * hueTime);
-                var saturation = saturationRange.x +
-                                 ((saturationRange.y - saturationRange.x) * saturationTime);
-                var value = valueRange.x + ((valueRange.y - valueRange.x) * valueTime);
-
-                newFormat.color = Colors.Colors.HSVToRGB(hue, saturation, value, 1f, false);
-
-                formatsByKey.Add(upperString, newFormat);
+                formatsByKey.Add(s.ToUpperInvariant(), newFormat);
 
                 return newFormat;
-            }
-
-            private static float GetStringHashTime(IEnumerable<char> preconfiguredString)
-            {
-                var time = 0f;
-
-                var hash = preconfiguredString.GetHashCode();
-                if (hash < 0)
-                {
-                    time = hash / (float)int.MinValue;
-                }
-                else
-                {
-                    time = hash / (float)int.MaxValue;
-                }
-
-                time = Mathf.Clamp01(time);
-                return time;
             }
         }
 

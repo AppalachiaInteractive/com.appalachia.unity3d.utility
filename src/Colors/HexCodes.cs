@@ -20,6 +20,8 @@ namespace Appalachia.Utility.Colors
 
         #region Static Fields and Autoproperties
 
+        private static Dictionary<HexCodeFormat, Dictionary<Color32, string>> _hexCodeLookup;
+
         private static Dictionary<string, Color> _lookup = new();
 
         #endregion
@@ -148,28 +150,51 @@ namespace Appalachia.Utility.Colors
             }
         }
 
+        public static string ToHexCode(this Color32 color, HexCodeFormat format)
+        {
+            _hexCodeLookup ??= new Dictionary<HexCodeFormat, Dictionary<Color32, string>>();
+
+            if (!_hexCodeLookup.ContainsKey(format))
+            {
+                _hexCodeLookup.Add(format, new Dictionary<Color32, string>());
+            }
+
+            if (_hexCodeLookup[format].ContainsKey(color))
+            {
+                return _hexCodeLookup[format][color];
+            }
+
+            var includeNumberSign = (format | HexCodeFormat.IncludeNumberSign) == format;
+            var includeAlpha = (format | HexCodeFormat.IncludeAlpha) == format;
+            var alphaFirst = (format | HexCodeFormat.AlphaFirst) == format;
+
+            var rPart = (int)color.r;
+            var gPart = (int)color.g;
+            var bPart = (int)color.b;
+            var aPart = (int)color.a;
+
+            var num = ZString.Format("{0}",  includeNumberSign ? "#" : "");
+            var r = ZString.Format("{0:X2}", rPart);
+            var g = ZString.Format("{0:X2}", gPart);
+            var b = ZString.Format("{0:X2}", bPart);
+            var a = includeAlpha ? ZString.Format("{0:X2}", aPart) : string.Empty;
+
+            var result = alphaFirst
+                ? ZString.Format("{0}{1}{2}{3}{4}", num, a, r, g, b)
+                : ZString.Format("{0}{1}{2}{3}{4}", num, r, g, b, a);
+
+            _hexCodeLookup[format].Add(color, result);
+
+            return result;
+        }
+
         public static string ToHexCode(this Color color, HexCodeFormat format)
         {
             using (_PRF_ToHexCode.Auto())
             {
-                var includeNumberSign = (format | HexCodeFormat.IncludeNumberSign) == format;
-                var includeAlpha = (format | HexCodeFormat.IncludeAlpha) == format;
-                var alphaFirst = (format | HexCodeFormat.AlphaFirst) == format;
+                Color32 clampedColor = color;
 
-                var rPart = (int)(color.r * 255f);
-                var gPart = (int)(color.g * 255f);
-                var bPart = (int)(color.b * 255f);
-                var aPart = (int)(color.a * 255f);
-
-                var num = ZString.Format("{0}",  includeNumberSign ? "#" : "");
-                var r = ZString.Format("{0:X2}", rPart);
-                var g = ZString.Format("{0:X2}", gPart);
-                var b = ZString.Format("{0:X2}", bPart);
-                var a = includeAlpha ? ZString.Format("{0:X2}", aPart) : string.Empty;
-
-                return alphaFirst
-                    ? ZString.Format("{0}{1}{2}{3}{4}", num, a, r, g, b)
-                    : ZString.Format("{0}{1}{2}{3}{4}", num, r, g, b, a);
+                return clampedColor.ToHexCode(format);
             }
         }
 

@@ -4,16 +4,16 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Appalachia.Utility.Async.Internal;
-using UnityEngine;
+using Appalachia.Utility.Timing;
 
 namespace Appalachia.Utility.Async
 {
     public enum DelayType
     {
-        /// <summary>use Time.deltaTime.</summary>
+        /// <summary>use CoreClock.Instance.DeltaTime.</summary>
         DeltaTime,
 
-        /// <summary>Ignore timescale, use Time.unscaledDeltaTime.</summary>
+        /// <summary>Ignore timescale, use CoreClock.Instance.UnscaledDeltaTime.</summary>
         UnscaledDeltaTime,
 
         /// <summary>use Stopwatch.GetTimestamp().</summary>
@@ -354,7 +354,7 @@ namespace Appalachia.Utility.Async
                     result = new NextFramePromise();
                 }
 
-                result.frameCount = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                result.frameCount = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
                 result.cancellationToken = cancellationToken;
 
                 TaskTracker.TrackActiveTask(result, 3);
@@ -400,7 +400,7 @@ namespace Appalachia.Utility.Async
                     return false;
                 }
 
-                if (frameCount == Time.frameCount)
+                if (frameCount == CoreClock.Instance.FrameCount)
                 {
                     return true;
                 }
@@ -460,7 +460,7 @@ namespace Appalachia.Utility.Async
 
                 result.delayFrameCount = delayFrameCount;
                 result.cancellationToken = cancellationToken;
-                result.initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                result.initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
 
                 TaskTracker.TrackActiveTask(result, 3);
 
@@ -514,7 +514,7 @@ namespace Appalachia.Utility.Async
                     }
 
                     // skip in initial frame.
-                    if (initialFrame == Time.frameCount)
+                    if (initialFrame == CoreClock.Instance.FrameCount)
                     {
                         return true;
                     }
@@ -581,7 +581,7 @@ namespace Appalachia.Utility.Async
                 result.elapsed = 0.0f;
                 result.delayTimeSpan = (float)delayTimeSpan.TotalSeconds;
                 result.cancellationToken = cancellationToken;
-                result.initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                result.initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
 
                 TaskTracker.TrackActiveTask(result, 3);
 
@@ -628,13 +628,13 @@ namespace Appalachia.Utility.Async
 
                 if (elapsed == 0.0f)
                 {
-                    if (initialFrame == Time.frameCount)
+                    if (initialFrame == CoreClock.Instance.FrameCount)
                     {
                         return true;
                     }
                 }
 
-                elapsed += Time.deltaTime;
+                elapsed += CoreClock.Instance.DeltaTime;
                 if (elapsed >= delayTimeSpan)
                 {
                     core.TrySetResult(null);
@@ -697,7 +697,7 @@ namespace Appalachia.Utility.Async
 
                 result.elapsed = 0.0f;
                 result.delayFrameTimeSpan = (float)delayFrameTimeSpan.TotalSeconds;
-                result.initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                result.initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
                 result.cancellationToken = cancellationToken;
 
                 TaskTracker.TrackActiveTask(result, 3);
@@ -745,13 +745,13 @@ namespace Appalachia.Utility.Async
 
                 if (elapsed == 0.0f)
                 {
-                    if (initialFrame == Time.frameCount)
+                    if (initialFrame == CoreClock.Instance.FrameCount)
                     {
                         return true;
                     }
                 }
 
-                elapsed += Time.unscaledDeltaTime;
+                elapsed += CoreClock.Instance.UnscaledDeltaTime;
                 if (elapsed >= delayFrameTimeSpan)
                 {
                     core.TrySetResult(null);

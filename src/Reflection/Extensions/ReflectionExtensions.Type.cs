@@ -73,7 +73,9 @@ namespace Appalachia.Utility.Reflection.Extensions
                 _typeWithNamespaceFormat ??=
                     new Utf8PreparedFormat<string, string>(TYPE_WITH_NAMESPACE_FORMAT_STRING);
 
-                _typeByNameLookup ??= new Dictionary<string, Type>();
+                var types = GetAllTypes_CACHED();
+
+                _typeByNameLookup ??= new Dictionary<string, Type>(types.Length);
 
                 if (_typeByNameLookup.ContainsKey(nameWithNamespace))
                 {
@@ -81,8 +83,8 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
 
                 Type result = null;
-                
-                foreach (var type in GetAllTypes_CACHED())
+
+                foreach (var type in types)
                 {
                     var formattedNameWithNamespace =
                         _typeWithNamespaceFormat.Format(type.Namespace, type.Name);

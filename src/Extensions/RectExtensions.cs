@@ -1,3 +1,4 @@
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Appalachia.Utility.Extensions
@@ -74,15 +75,15 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect AlignCenter(this Rect rect, float width)
         {
-            rect.x = (float) ((rect.x + (rect.width * 0.5)) - (width * 0.5));
+            rect.x = (float)((rect.x + (rect.width * 0.5)) - (width * 0.5));
             rect.width = width;
             return rect;
         }
 
         public static Rect AlignCenter(this Rect rect, float width, float height)
         {
-            rect.x = (float) ((rect.x + (rect.width * 0.5)) - (width * 0.5));
-            rect.y = (float) ((rect.y + (rect.height * 0.5)) - (height * 0.5));
+            rect.x = (float)((rect.x + (rect.width * 0.5)) - (width * 0.5));
+            rect.y = (float)((rect.y + (rect.height * 0.5)) - (height * 0.5));
             rect.width = width;
             rect.height = height;
             return rect;
@@ -90,15 +91,15 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect AlignCenterX(this Rect rect, float width)
         {
-            rect.x = (float) ((rect.x + (rect.width * 0.5)) - (width * 0.5));
+            rect.x = (float)((rect.x + (rect.width * 0.5)) - (width * 0.5));
             rect.width = width;
             return rect;
         }
 
         public static Rect AlignCenterXY(this Rect rect, float size)
         {
-            rect.y = (float) ((rect.y + (rect.height * 0.5)) - (size * 0.5));
-            rect.x = (float) ((rect.x + (rect.width * 0.5)) - (size * 0.5));
+            rect.y = (float)((rect.y + (rect.height * 0.5)) - (size * 0.5));
+            rect.x = (float)((rect.x + (rect.width * 0.5)) - (size * 0.5));
             rect.height = size;
             rect.width = size;
             return rect;
@@ -106,8 +107,8 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect AlignCenterXY(this Rect rect, float width, float height)
         {
-            rect.y = (float) ((rect.y + (rect.height * 0.5)) - (height * 0.5));
-            rect.x = (float) ((rect.x + (rect.width * 0.5)) - (width * 0.5));
+            rect.y = (float)((rect.y + (rect.height * 0.5)) - (height * 0.5));
+            rect.x = (float)((rect.x + (rect.width * 0.5)) - (width * 0.5));
             rect.width = width;
             rect.height = height;
             return rect;
@@ -115,7 +116,7 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect AlignCenterY(this Rect rect, float height)
         {
-            rect.y = (float) ((rect.y + (rect.height * 0.5)) - (height * 0.5));
+            rect.y = (float)((rect.y + (rect.height * 0.5)) - (height * 0.5));
             rect.height = height;
             return rect;
         }
@@ -128,7 +129,7 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect AlignMiddle(this Rect rect, float height)
         {
-            rect.y = (float) ((rect.y + (rect.height * 0.5)) - (height * 0.5));
+            rect.y = (float)((rect.y + (rect.height * 0.5)) - (height * 0.5));
             rect.height = height;
             return rect;
         }
@@ -184,25 +185,47 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect ExpandTo(this Rect rect, Vector2 pos)
         {
-            if (pos.x < (double) rect.xMin)
+            if (pos.x < (double)rect.xMin)
             {
                 rect.xMin = pos.x;
             }
-            else if (pos.x > (double) rect.xMax)
+            else if (pos.x > (double)rect.xMax)
             {
                 rect.xMax = pos.x;
             }
 
-            if (pos.y < (double) rect.yMin)
+            if (pos.y < (double)rect.yMin)
             {
                 rect.yMin = pos.y;
             }
-            else if (pos.y > (double) rect.yMax)
+            else if (pos.y > (double)rect.yMax)
             {
                 rect.yMax = pos.y;
             }
 
             return rect;
+        }
+
+        public static Vector2 GetNormalizedPositionWithin(
+            this Rect rect,
+            Vector2 position,
+            bool clamped = true)
+        {
+            using (_PRF_GetNormalizedPositionWithin.Auto())
+            {
+                var width = (position.x - rect.min.x) / rect.width;
+                var height = (position.y - rect.min.y) / rect.height;
+
+                if (clamped)
+                {
+                    width = Mathf.Clamp01(width);
+                    height = Mathf.Clamp01(height);
+                }
+
+                var result = new Vector2(width, height);
+
+                return result;
+            }
         }
 
         public static Rect HorizontalPadding(this Rect rect, float padding)
@@ -383,7 +406,7 @@ namespace Appalachia.Utility.Extensions
 
         public static Rect SplitGrid(this Rect rect, float width, float height, int index)
         {
-            var num1 = (int) (rect.width / (double) width);
+            var num1 = (int)(rect.width / (double)width);
             var num2 = num1 > 0 ? num1 : 1;
             var num3 = index % num2;
             var num4 = index / num2;
@@ -475,5 +498,14 @@ namespace Appalachia.Utility.Extensions
             rect.height -= top + bottom;
             return rect;
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(RectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_GetNormalizedPositionWithin =
+            new ProfilerMarker(_PRF_PFX + nameof(GetNormalizedPositionWithin));
+
+        #endregion
     }
 }

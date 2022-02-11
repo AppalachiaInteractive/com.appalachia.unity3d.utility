@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Appalachia.Utility.Interpolation.Modes;
+using Appalachia.Utility.Timing;
 using Unity.Profiling;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
             {
                 var m = new TMode();
                 mode = m.mode;
-                return Interpolator.Update(ref this, Time.deltaTime, m);
+                return Interpolator.Update(ref this, CoreClock.Instance.DeltaTime, m);
             }
         }
 

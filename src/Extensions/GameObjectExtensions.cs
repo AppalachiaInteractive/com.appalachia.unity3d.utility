@@ -872,6 +872,11 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_SetParentTo.Auto())
             {
+                if (go.transform.parent == parent)
+                {
+                    return go;
+                }
+
                 go.transform.SetParent(parent);
                 return go;
             }
@@ -881,6 +886,11 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_SetParentTo.Auto())
             {
+                if (go.transform.parent == parent.transform)
+                {
+                    return go;
+                }
+
                 go.transform.SetParent(parent.transform);
                 return go;
             }

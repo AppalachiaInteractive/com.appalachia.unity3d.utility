@@ -33,6 +33,10 @@ namespace Appalachia.Utility.WakaTime
 
         #endregion
 
+        private static readonly ProfilerMarker _PRF_WakaTimePath_Search =
+            new ProfilerMarker(_PRF_PFX + nameof(WakaTimePath) + ".Search");
+
+        
         internal static string WakaTimePath
         {
             get
@@ -41,23 +45,26 @@ namespace Appalachia.Utility.WakaTime
                 {
                     string SearchForWakaTimePath(string assetsBasePath)
                     {
-                        return Directory
-                              .EnumerateFileSystemEntries(
-                                   assetsBasePath,
-                                   "cli.py",
-                                   SearchOption.AllDirectories
-                               )
-                              .FirstOrDefault(
-                                   p => p.Contains(
-                                       WAKATIME_PATH_INDICATOR,
-                                       StringComparison.InvariantCultureIgnoreCase
+                        using (_PRF_WakaTimePath_Search.Auto())
+                        {
+                            return Directory
+                                  .EnumerateFileSystemEntries(
+                                       assetsBasePath,
+                                       "cli.py",
+                                       SearchOption.AllDirectories
                                    )
-                               );
+                                  .FirstOrDefault(
+                                       p => p.Contains(
+                                           WAKATIME_PATH_INDICATOR,
+                                           StringComparison.InvariantCultureIgnoreCase
+                                       )
+                                   );
+                        }
                     }
 
                     if (WakaTimePathAuto)
                     {
-                        if (string.IsNullOrWhiteSpace(_wakaTimePath) || !Directory.Exists(_wakaTimePath))
+                        if (string.IsNullOrWhiteSpace(_wakaTimePath) || !File.Exists(_wakaTimePath))
                         {
                             var assetsBasePath = Application.dataPath;
 

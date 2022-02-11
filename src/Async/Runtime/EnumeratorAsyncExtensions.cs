@@ -5,6 +5,7 @@ using System.Collections;
 using System.Reflection;
 using System.Threading;
 using Appalachia.Utility.Async.Internal;
+using Appalachia.Utility.Timing;
 using UnityEngine;
 
 // ReSharper disable All
@@ -183,10 +184,10 @@ namespace Appalachia.Utility.Async
                     // Time can not touch in threadpool.
                     if (PlayerLoopHelper.IsMainThread)
                     {
-                        initialFrame = Time.frameCount;
+                        initialFrame = CoreClock.Instance.FrameCount;
                     }
                 }
-                else if (initialFrame == Time.frameCount)
+                else if (initialFrame == CoreClock.Instance.FrameCount)
                 {
                     return true; // already executed in first frame, skip.
                 }
@@ -305,7 +306,7 @@ namespace Appalachia.Utility.Async
                 {
                     yield return null;
 
-                    elapsed += Time.deltaTime;
+                    elapsed += CoreClock.Instance.DeltaTime;
                     if (elapsed >= second)
                     {
                         break;

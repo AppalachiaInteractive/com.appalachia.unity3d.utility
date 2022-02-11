@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Appalachia.Utility.Interpolation.Modes;
+using Appalachia.Utility.Timing;
 using Unity.Profiling;
 using UnityEngine;
 
@@ -69,7 +70,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
         {
             using (_PRF_Update.Auto())
             {
-                return Update(Time.deltaTime, new E());
+                return Update(CoreClock.Instance.DeltaTime, new E());
             }
         }
 

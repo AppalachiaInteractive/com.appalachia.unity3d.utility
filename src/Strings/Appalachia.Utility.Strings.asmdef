@@ -25,8 +25,12 @@
     "GUID:029c1c1b674aaae47a6841a0b89ad80e",
     "GUID:5c01796d064528144a599661eaab93a6",
     "GUID:dc47925d1a5fa2946bdd37746b2b5d48",
+    "GUID:0b8561711c57eda4d8982b2158f581b1",
     "GUID:de4e6084e6d474788bb8c799d6b461ec",
     "GUID:d4b3f22eeaa64db4fa29746f96589703"
   ],
+  "Changed": {
+    "SubscriberCount": 0
+  },
   "Name": "AssemblyDefinitionModel"
 }

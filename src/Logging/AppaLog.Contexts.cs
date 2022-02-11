@@ -12,6 +12,7 @@ namespace Appalachia.Utility.Logging
             #region Static Fields and Autoproperties
 
             public static AppaLogContext Animal = new(nameof(Animal));
+            public static AppaLogContext Events = new(nameof(Events));
             public static AppaLogContext Animation = new(nameof(Animation));
             public static AppaLogContext Application = new(nameof(Application));
             public static AppaLogContext Area = new(nameof(Area));
@@ -96,7 +97,6 @@ namespace Appalachia.Utility.Logging
             public static AppaLogContext Timeline = new(nameof(Timeline));
             public static AppaLogContext TouchBend = new(nameof(TouchBend));
             public static AppaLogContext Trees = new(nameof(Trees));
-            public static AppaLogContext UI => new(nameof(UI));
             public static AppaLogContext Uncategorized = new(nameof(Uncategorized));
             public static AppaLogContext Utility = new(nameof(Utility));
             public static AppaLogContext VFX = new(nameof(VFX));
@@ -107,6 +107,8 @@ namespace Appalachia.Utility.Logging
             public static AppaLogContext Wind = new(nameof(Wind));
 
             #endregion
+
+            public static AppaLogContext UI => new(nameof(UI));
 
             public static AppaLogContext GetByType(Type t)
             {

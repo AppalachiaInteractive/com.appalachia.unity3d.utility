@@ -76,6 +76,8 @@ namespace Appalachia.Utility.Constants
 
         private static Dictionary<string, string> _cachedstringItalicResults;
 
+        private static Dictionary<Type, Dictionary<object, string>> _cachedFormatEnumForLogging;
+
         private static Dictionary<Type, string> _cachedTypeFormatForLoggingResults;
 
         private static Dictionary<Type, string> _formattedTypes;
@@ -203,6 +205,19 @@ namespace Appalachia.Utility.Constants
             }
         }
 
+        private static Dictionary<Type, Dictionary<object, string>> CachedFormatEnumForLogging
+        {
+            get
+            {
+                if (_cachedFormatEnumForLogging == null)
+                {
+                    _cachedFormatEnumForLogging = new Dictionary<Type, Dictionary<object, string>>();
+                }
+
+                return _cachedFormatEnumForLogging;
+            }
+        }
+
         private static Dictionary<Type, string> CachedTypeFormatForLoggingResults
         {
             get
@@ -279,7 +294,20 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
-                return Color(Bold(value.ToString()), LogEnum);
+                if (!CachedFormatEnumForLogging.ContainsKey(typeof(T)))
+                {
+                    CachedFormatEnumForLogging.Add(typeof(T), new Dictionary<object, string>());
+                }
+
+                if (!CachedFormatEnumForLogging[typeof(T)].ContainsKey(value))
+                {
+                    var result = Color(Bold(value.ToString()), LogEnum);
+                    CachedFormatEnumForLogging[typeof(T)].Add(value, result);
+
+                    return result;
+                }
+
+                return CachedFormatEnumForLogging[typeof(T)][value];
             }
         }
 

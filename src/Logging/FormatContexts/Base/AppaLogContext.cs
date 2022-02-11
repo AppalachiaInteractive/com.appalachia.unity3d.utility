@@ -251,7 +251,8 @@ namespace Appalachia.Utility.Logging
                 );
             }
         }
-        
+
+        /*
         /// <summary>
         ///     <para>Logs a trace message to the log file.</para>
         /// </summary>
@@ -282,7 +283,7 @@ namespace Appalachia.Utility.Logging
                     lineNumber
                 );
             }
-        }
+        }*/
 
         /// <summary>
         ///     <para>Logs a warning message to the console.</para>
@@ -359,7 +360,7 @@ namespace Appalachia.Utility.Logging
 
             Debug("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 7));
 
-            Trace("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 8));
+            /*Trace("Testing 1 2 3...", null, true, nameof(Test), "AppaLog.cs", line + (step * 8));*/
         }
 
         #region Profiling

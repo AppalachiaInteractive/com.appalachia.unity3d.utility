@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using UnityEngine;
+using Appalachia.Utility.Timing;
 
 namespace Appalachia.Utility.Async.Linq.UnityExtensions
 {
@@ -140,7 +140,7 @@ namespace Appalachia.Utility.Async.Linq.UnityExtensions
                     }
                 }
 
-                initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
                 dueTimePhase = true;
                 this.updateTiming = updateTiming;
                 this.ignoreTimeScale = ignoreTimeScale;
@@ -190,13 +190,15 @@ namespace Appalachia.Utility.Async.Linq.UnityExtensions
                     if (elapsed == 0)
                     {
                         // skip in initial frame.
-                        if (initialFrame == Time.frameCount)
+                        if (initialFrame == CoreClock.Instance.FrameCount)
                         {
                             return true;
                         }
                     }
 
-                    elapsed += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+                    elapsed += ignoreTimeScale
+                        ? CoreClock.Instance.UnscaledDeltaTime
+                        : CoreClock.Instance.DeltaTime;
 
                     if (elapsed >= dueTime)
                     {
@@ -213,7 +215,9 @@ namespace Appalachia.Utility.Async.Linq.UnityExtensions
                         return false;
                     }
 
-                    elapsed += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+                    elapsed += ignoreTimeScale
+                        ? CoreClock.Instance.UnscaledDeltaTime
+                        : CoreClock.Instance.DeltaTime;
 
                     if (elapsed >= period)
                     {
@@ -276,7 +280,7 @@ namespace Appalachia.Utility.Async.Linq.UnityExtensions
                     }
                 }
 
-                initialFrame = PlayerLoopHelper.IsMainThread ? Time.frameCount : -1;
+                initialFrame = PlayerLoopHelper.IsMainThread ? CoreClock.Instance.FrameCount : -1;
                 dueTimePhase = true;
                 this.dueTimeFrameCount = dueTimeFrameCount;
                 this.periodFrameCount = periodFrameCount;
@@ -334,7 +338,7 @@ namespace Appalachia.Utility.Async.Linq.UnityExtensions
                         }
 
                         // skip in initial frame.
-                        if (initialFrame == Time.frameCount)
+                        if (initialFrame == CoreClock.Instance.FrameCount)
                         {
                             return true;
                         }
