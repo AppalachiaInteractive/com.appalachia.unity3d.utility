@@ -9,14 +9,16 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
         {
         }
 
+        [DebuggerStepThrough]
+        public static implicit operator Color(GUIColorCache value)
+        {
+            return value.Value;
+        }
+
+        /// <inheritdoc />
         public override Color Default()
         {
             return Color.clear;
-        }
-
-        [DebuggerStepThrough] public static implicit operator Color(GUIColorCache value)
-        {
-            return value.Value;
         }
     }
 }

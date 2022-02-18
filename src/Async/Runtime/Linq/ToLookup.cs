@@ -497,25 +497,83 @@ namespace Appalachia.Utility.Async.Linq
             }
         }
 
+        #region Nested type: Grouping
+
+        private class
+            Grouping<TKey, TElement> : IGrouping<TKey, TElement> // , IAppaTaskAsyncGrouping<TKey, TElement>
+        {
+            public Grouping(TKey key)
+            {
+                Key = key;
+                elements = new List<TElement>();
+            }
+
+            #region Fields and Autoproperties
+
+            private readonly List<TElement> elements;
+
+            #endregion
+
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return "Key: " + Key + ", Count: " + elements.Count;
+            }
+
+            public void Add(TElement value)
+            {
+                elements.Add(value);
+            }
+
+            public IAppaTaskAsyncEnumerator<TElement> GetAsyncEnumerator(
+                CancellationToken cancellationToken = default)
+            {
+                return this.ToAppaTaskAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
+            }
+
+            #region IGrouping<TKey,TElement> Members
+
+            public TKey Key { get; private set; }
+
+            public IEnumerator<TElement> GetEnumerator()
+            {
+                return elements.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return elements.GetEnumerator();
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: Lookup
+
         // Lookup
 
         private class Lookup<TKey, TElement> : ILookup<TKey, TElement>
         {
+            #region Constants and Static Readonly
+
             private static readonly Lookup<TKey, TElement> empty =
                 new Lookup<TKey, TElement>(new Dictionary<TKey, Grouping<TKey, TElement>>());
 
-            // original lookup keeps order but this impl does not(dictionary not guarantee)
-            private readonly Dictionary<TKey, Grouping<TKey, TElement>> dict;
+            #endregion
 
             private Lookup(Dictionary<TKey, Grouping<TKey, TElement>> dict)
             {
                 this.dict = dict;
             }
 
-            public static Lookup<TKey, TElement> CreateEmpty()
-            {
-                return empty;
-            }
+            #region Fields and Autoproperties
+
+            // original lookup keeps order but this impl does not(dictionary not guarantee)
+            private readonly Dictionary<TKey, Grouping<TKey, TElement>> dict;
+
+            #endregion
 
             public static Lookup<TKey, TElement> Create(
                 ArraySegment<TElement> source,
@@ -675,6 +733,13 @@ namespace Appalachia.Utility.Async.Linq
                 return new Lookup<TKey, TElement>(dict);
             }
 
+            public static Lookup<TKey, TElement> CreateEmpty()
+            {
+                return empty;
+            }
+
+            #region ILookup<TKey,TElement> Members
+
             public IEnumerable<TElement> this[TKey key] =>
                 dict.TryGetValue(key, out var g) ? g : Enumerable.Empty<TElement>();
 
@@ -694,46 +759,10 @@ namespace Appalachia.Utility.Async.Linq
             {
                 return dict.Values.GetEnumerator();
             }
+
+            #endregion
         }
 
-        private class
-            Grouping<TKey, TElement> : IGrouping<TKey, TElement> // , IAppaTaskAsyncGrouping<TKey, TElement>
-        {
-            private readonly List<TElement> elements;
-
-            public TKey Key { get; private set; }
-
-            public Grouping(TKey key)
-            {
-                Key = key;
-                elements = new List<TElement>();
-            }
-
-            public void Add(TElement value)
-            {
-                elements.Add(value);
-            }
-
-            public IEnumerator<TElement> GetEnumerator()
-            {
-                return elements.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return elements.GetEnumerator();
-            }
-
-            public IAppaTaskAsyncEnumerator<TElement> GetAsyncEnumerator(
-                CancellationToken cancellationToken = default)
-            {
-                return this.ToAppaTaskAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
-            }
-
-            public override string ToString()
-            {
-                return "Key: " + Key + ", Count: " + elements.Count;
-            }
-        }
+        #endregion
     }
 }

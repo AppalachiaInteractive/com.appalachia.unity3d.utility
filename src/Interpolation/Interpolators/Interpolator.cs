@@ -32,6 +32,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
             }
         }
 
+        /// <inheritdoc />
         [DebuggerStepThrough]
         public override string ToString()
         {

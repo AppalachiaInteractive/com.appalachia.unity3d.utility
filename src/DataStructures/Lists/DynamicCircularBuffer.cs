@@ -16,6 +16,7 @@ namespace Appalachia.Utility.DataStructures.Lists
         {
         }
 
+        /// <inheritdoc />
         protected override void AddInternal(T value)
         {
             using (_PRF_AddInternal.Auto())

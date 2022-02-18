@@ -42,6 +42,7 @@ namespace Appalachia.Utility.Strings
             Dispose(true);
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             sb.Dispose();
@@ -49,8 +50,10 @@ namespace Appalachia.Utility.Strings
             base.Dispose(disposing);
         }
 
+        /// <inheritdoc />
         public override Encoding Encoding => encoding = encoding ?? new UnicodeEncoding(false, false);
 
+        /// <inheritdoc />
         public override void Write(char value)
         {
             AssertNotDisposed();
@@ -58,6 +61,7 @@ namespace Appalachia.Utility.Strings
             sb.Append(value);
         }
 
+        /// <inheritdoc />
         public override void Write(char[] buffer, int index, int count)
         {
             if (buffer == null)
@@ -85,6 +89,7 @@ namespace Appalachia.Utility.Strings
             sb.Append(buffer, index, count);
         }
 
+        /// <inheritdoc />
         public override void Write(string value)
         {
             AssertNotDisposed();
@@ -95,48 +100,56 @@ namespace Appalachia.Utility.Strings
             }
         }
 
+        /// <inheritdoc />
         public override Task WriteAsync(char value)
         {
             Write(value);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override Task WriteAsync(string value)
         {
             Write(value);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override Task WriteAsync(char[] buffer, int index, int count)
         {
             Write(buffer, index, count);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override Task WriteLineAsync(char value)
         {
             WriteLine(value);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override Task WriteLineAsync(string value)
         {
             WriteLine(value);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override Task WriteLineAsync(char[] buffer, int index, int count)
         {
             WriteLine(buffer, index, count);
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public override void Write(bool value)
         {
             AssertNotDisposed();
             sb.Append(value);
         }
 
+        /// <inheritdoc />
         public override void Write(decimal value)
         {
             AssertNotDisposed();
@@ -161,14 +174,16 @@ namespace Appalachia.Utility.Strings
 
 #if !NETSTANDARD2_0
 #if !UNITY_2018_3_OR_NEWER
-        public override void Write(ReadOnlySpan<char> buffer)
+        /// <inheritdoc />
+public override void Write(ReadOnlySpan<char> buffer)
         {
             AssertNotDisposed();
 
             sb.Append(buffer);
         }
 
-        public override void WriteLine(ReadOnlySpan<char> buffer)
+        /// <inheritdoc />
+public override void WriteLine(ReadOnlySpan<char> buffer)
         {
             AssertNotDisposed();
 
@@ -176,7 +191,8 @@ namespace Appalachia.Utility.Strings
             WriteLine();
         }
 
-        public override Task WriteAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken =
+        /// <inheritdoc />
+public override Task WriteAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken =
  default)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -188,7 +204,8 @@ namespace Appalachia.Utility.Strings
             return Task.CompletedTask;
         }
 
-        public override Task WriteLineAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken =
+        /// <inheritdoc />
+public override Task WriteLineAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken =
  default)
         {
             if (cancellationToken.IsCancellationRequested)

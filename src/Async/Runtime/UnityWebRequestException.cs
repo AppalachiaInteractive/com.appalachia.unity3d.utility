@@ -44,6 +44,7 @@ namespace Appalachia.Utility.Async
             ResponseHeaders = unityWebRequest.GetResponseHeaders();
         }
 
+        /// <inheritdoc />
         public override string Message
         {
             get

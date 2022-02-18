@@ -73,38 +73,15 @@ namespace Appalachia.Utility.Reflection.Extensions
 
         private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
 
+        private static Dictionary<Type, Type[]> _typesByAttributeLookup;
+
         private static HashSet<Type> _POPULATED_TYPES_CACHE;
         private static object READABLE_NAME_CACHE_LOCK = new();
         private static Type[] _ALL_TYPES_CACHE;
 
-        private static readonly ProfilerMarker _PRF_InitializeCaches =
-            new(_PRF_PFX + nameof(InitializeCaches));
+        private static Type[] _appalachiaAbstractTypes;
 
-        private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
-            new(_PRF_PFX + nameof(InitializeConstantsAndCollections));
-
-        private static readonly ProfilerMarker _PRF_InitializeAllTypesCache =
-            new(_PRF_PFX + nameof(InitializeAllTypesCache));
-
-        private static readonly ProfilerMarker _PRF_InitializeAssemblyTypeCache =
-            new(_PRF_PFX + nameof(InitializeAssemblyTypeCache));
-
-        private static readonly ProfilerMarker _PRF_GetAssemblies =
-            new(_PRF_PFX + nameof(GetAssemblies_CACHED));
-
-        private static readonly ProfilerMarker _PRF_GetAllTypes = new(_PRF_PFX + nameof(GetAllTypes_CACHED));
-        private static readonly ProfilerMarker _PRF_SafeGetTypes = new(_PRF_PFX + nameof(GetTypes_CACHED));
-
-        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL =
-            new(_PRF_PFX + nameof(IsStatic_INTERNAL));
-
-        private static readonly ProfilerMarker _PRF_PopulateMethods_INTERNAL =
-            new(_PRF_PFX + nameof(PopulateMethods_INTERNAL));
-
-        private static readonly ProfilerMarker _PRF_GetTypesWithAttribute_CACHED =
-            new ProfilerMarker(_PRF_PFX + nameof(GetTypesWithAttribute_CACHED));
-
-        private static Dictionary<Type, Type[]> _typesByAttributeLookup;
+        private static Type[] _appalachiaConcreteTypes;
 
         private static Type[] _appalachiaTypes;
 
@@ -122,6 +99,36 @@ namespace Appalachia.Utility.Reflection.Extensions
                 InitializeAllTypesCache();
 
                 return _ALL_TYPES_CACHE;
+            }
+        }
+
+        public static Type[] GetAppalachiaAbstractTypes_CACHED()
+        {
+            using (_PRF_GetAppalachiaAbstractTypes_CACHED.Auto())
+            {
+                if ((_appalachiaAbstractTypes == null) || (_appalachiaAbstractTypes.Length == 0))
+                {
+                    var allAppalachiaTypes = GetAppalachiaTypes_CACHED();
+
+                    _appalachiaAbstractTypes = allAppalachiaTypes.Where(t => t.IsAbstract).ToArray();
+                }
+
+                return _appalachiaAbstractTypes;
+            }
+        }
+
+        public static Type[] GetAppalachiaConcreteTypes_CACHED()
+        {
+            using (_PRF_GetAppalachiaConcreteTypes_CACHED.Auto())
+            {
+                if ((_appalachiaConcreteTypes == null) || (_appalachiaConcreteTypes.Length == 0))
+                {
+                    var allAppalachiaTypes = GetAppalachiaTypes_CACHED();
+
+                    _appalachiaConcreteTypes = allAppalachiaTypes.Where(t => !t.IsAbstract).ToArray();
+                }
+
+                return _appalachiaConcreteTypes;
             }
         }
 
@@ -620,6 +627,40 @@ namespace Appalachia.Utility.Reflection.Extensions
         }
 
         #region Profiling
+
+        private static readonly ProfilerMarker _PRF_InitializeCaches =
+            new(_PRF_PFX + nameof(InitializeCaches));
+
+        private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
+            new(_PRF_PFX + nameof(InitializeConstantsAndCollections));
+
+        private static readonly ProfilerMarker _PRF_InitializeAllTypesCache =
+            new(_PRF_PFX + nameof(InitializeAllTypesCache));
+
+        private static readonly ProfilerMarker _PRF_InitializeAssemblyTypeCache =
+            new(_PRF_PFX + nameof(InitializeAssemblyTypeCache));
+
+        private static readonly ProfilerMarker _PRF_GetAssemblies =
+            new(_PRF_PFX + nameof(GetAssemblies_CACHED));
+
+        private static readonly ProfilerMarker _PRF_GetAllTypes = new(_PRF_PFX + nameof(GetAllTypes_CACHED));
+
+        private static readonly ProfilerMarker _PRF_SafeGetTypes = new(_PRF_PFX + nameof(GetTypes_CACHED));
+
+        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL =
+            new(_PRF_PFX + nameof(IsStatic_INTERNAL));
+
+        private static readonly ProfilerMarker _PRF_PopulateMethods_INTERNAL =
+            new(_PRF_PFX + nameof(PopulateMethods_INTERNAL));
+
+        private static readonly ProfilerMarker _PRF_GetTypesWithAttribute_CACHED =
+            new ProfilerMarker(_PRF_PFX + nameof(GetTypesWithAttribute_CACHED));
+
+        private static readonly ProfilerMarker _PRF_GetAppalachiaAbstractTypes_CACHED =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAppalachiaAbstractTypes_CACHED));
+
+        private static readonly ProfilerMarker _PRF_GetAppalachiaConcreteTypes_CACHED =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAppalachiaConcreteTypes_CACHED));
 
         private static readonly ProfilerMarker _PRF_GetAppalachiaTypes_CACHED =
             new ProfilerMarker(_PRF_PFX + nameof(GetAppalachiaTypes_CACHED));

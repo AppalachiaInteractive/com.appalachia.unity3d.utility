@@ -18,7 +18,7 @@ namespace Appalachia.Utility.AutoSave.Configuration
         {
             var p = new MyPrefSettingsProvider("Preferences/Appalachia/Auto-Save")
             {
-                keywords = new[] {"AutoSave"}
+                keywords = new[] { "AutoSave" }
             };
             return p;
         }
@@ -26,34 +26,23 @@ namespace Appalachia.Utility.AutoSave.Configuration
         // ReSharper disable once UnusedParameter.Local
         private static void OnPreferencesGUI(string searchContext)
         {
-            EditorGUILayout.LabelField(
-                "Assets/" + AutoSaverConfiguration.Location + " - Auto-Save Location"
-            );
+            EditorGUILayout.LabelField("Assets/" + AutoSaverConfiguration.Location + " - Auto-Save Location");
             var r = EditorGUILayout.GetControlRect(GUILayout.Height(30));
             GUI.Box(r, "");
             r.x += 7;
             r.y += 7;
-            AutoSaverConfiguration.Enable = EditorGUI.ToggleLeft(
-                r,
-                "Enable",
-                AutoSaverConfiguration.Enable
-            );
+            AutoSaverConfiguration.Enable = EditorGUI.ToggleLeft(r, "Enable", AutoSaverConfiguration.Enable);
             GUI.enabled = AutoSaverConfiguration.Enable;
 
             AutoSaverConfiguration.FilesCount = Mathf.Clamp(
-                EditorGUILayout.IntField(
-                    "Maximum Files Version",
-                    AutoSaverConfiguration.FilesCount
-                ),
+                EditorGUILayout.IntField("Maximum Files Version", AutoSaverConfiguration.FilesCount),
                 1,
                 99
             );
             AutoSaverConfiguration.SaveInterval = Mathf.Clamp(
                                                       EditorGUILayout.IntField(
                                                           "Save Every (Minutes)",
-                                                          (int) (AutoSaverConfiguration
-                                                             .SaveInterval /
-                                                          60)
+                                                          (int)(AutoSaverConfiguration.SaveInterval / 60)
                                                       ),
                                                       1,
                                                       60
@@ -74,8 +63,7 @@ namespace Appalachia.Utility.AutoSave.Configuration
                 fileName = AutoSaverConfiguration.FileName;
             }
 
-            AutoSaverConfiguration.Debug =
-                EditorGUILayout.Toggle("Log", AutoSaverConfiguration.Debug);
+            AutoSaverConfiguration.Debug = EditorGUILayout.Toggle("Log", AutoSaverConfiguration.Debug);
 
             if (GUI.changed)
             {
@@ -87,19 +75,25 @@ namespace Appalachia.Utility.AutoSave.Configuration
             GUI.enabled = true;
         }
 
+        #region Nested type: MyPrefSettingsProvider
+
         private class MyPrefSettingsProvider : SettingsProvider
         {
-            public MyPrefSettingsProvider(
-                string path,
-                SettingsScope scopes = SettingsScope.User) : base(path, scopes)
+            public MyPrefSettingsProvider(string path, SettingsScope scopes = SettingsScope.User) : base(
+                path,
+                scopes
+            )
             {
             }
 
+            /// <inheritdoc />
             public override void OnGUI(string searchContext)
             {
                 OnPreferencesGUI(searchContext);
             }
         }
+
+        #endregion
     }
 }
 #endif

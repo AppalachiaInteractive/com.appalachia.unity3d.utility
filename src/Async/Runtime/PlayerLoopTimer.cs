@@ -9,16 +9,6 @@ namespace Appalachia.Utility.Async
 {
     public abstract class PlayerLoopTimer : IDisposable, IPlayerLoopItem
     {
-        private readonly CancellationToken cancellationToken;
-        private readonly Action<object> timerCallback;
-        private readonly object state;
-        private readonly PlayerLoopTiming playerLoopTiming;
-        private readonly bool periodic;
-
-        private bool isRunning;
-        private bool tryStop;
-        private bool isDisposed;
-
         protected PlayerLoopTimer(
             bool periodic,
             PlayerLoopTiming playerLoopTiming,
@@ -32,6 +22,20 @@ namespace Appalachia.Utility.Async
             this.timerCallback = timerCallback;
             this.state = state;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly Action<object> timerCallback;
+        private readonly bool periodic;
+        private readonly CancellationToken cancellationToken;
+        private readonly object state;
+        private readonly PlayerLoopTiming playerLoopTiming;
+        private bool isDisposed;
+
+        private bool isRunning;
+        private bool tryStop;
+
+        #endregion
 
         public static PlayerLoopTimer Create(
             TimeSpan interval,
@@ -154,12 +158,20 @@ namespace Appalachia.Utility.Async
             tryStop = true;
         }
 
+        protected abstract bool MoveNextCore();
+
         protected abstract void ResetCore(TimeSpan? newInterval);
+
+        #region IDisposable Members
 
         public void Dispose()
         {
             isDisposed = true;
         }
+
+        #endregion
+
+        #region IPlayerLoopItem Members
 
         bool IPlayerLoopItem.MoveNext()
         {
@@ -198,15 +210,11 @@ namespace Appalachia.Utility.Async
             return true;
         }
 
-        protected abstract bool MoveNextCore();
+        #endregion
     }
 
     internal sealed class DeltaTimePlayerLoopTimer : PlayerLoopTimer
     {
-        private int initialFrame;
-        private float elapsed;
-        private float interval;
-
         public DeltaTimePlayerLoopTimer(
             TimeSpan interval,
             bool periodic,
@@ -218,6 +226,15 @@ namespace Appalachia.Utility.Async
             ResetCore(interval);
         }
 
+        #region Fields and Autoproperties
+
+        private float elapsed;
+        private float interval;
+        private int initialFrame;
+
+        #endregion
+
+        /// <inheritdoc />
         protected override bool MoveNextCore()
         {
             if (elapsed == 0.0f)
@@ -237,6 +254,7 @@ namespace Appalachia.Utility.Async
             return true;
         }
 
+        /// <inheritdoc />
         protected override void ResetCore(TimeSpan? interval)
         {
             elapsed = 0.0f;
@@ -250,10 +268,6 @@ namespace Appalachia.Utility.Async
 
     internal sealed class IgnoreTimeScalePlayerLoopTimer : PlayerLoopTimer
     {
-        private int initialFrame;
-        private float elapsed;
-        private float interval;
-
         public IgnoreTimeScalePlayerLoopTimer(
             TimeSpan interval,
             bool periodic,
@@ -265,6 +279,15 @@ namespace Appalachia.Utility.Async
             ResetCore(interval);
         }
 
+        #region Fields and Autoproperties
+
+        private float elapsed;
+        private float interval;
+        private int initialFrame;
+
+        #endregion
+
+        /// <inheritdoc />
         protected override bool MoveNextCore()
         {
             if (elapsed == 0.0f)
@@ -284,6 +307,7 @@ namespace Appalachia.Utility.Async
             return true;
         }
 
+        /// <inheritdoc />
         protected override void ResetCore(TimeSpan? interval)
         {
             elapsed = 0.0f;
@@ -297,9 +321,6 @@ namespace Appalachia.Utility.Async
 
     internal sealed class RealtimePlayerLoopTimer : PlayerLoopTimer
     {
-        private ValueStopwatch stopwatch;
-        private long intervalTicks;
-
         public RealtimePlayerLoopTimer(
             TimeSpan interval,
             bool periodic,
@@ -311,6 +332,14 @@ namespace Appalachia.Utility.Async
             ResetCore(interval);
         }
 
+        #region Fields and Autoproperties
+
+        private long intervalTicks;
+        private ValueStopwatch stopwatch;
+
+        #endregion
+
+        /// <inheritdoc />
         protected override bool MoveNextCore()
         {
             if (stopwatch.ElapsedTicks >= intervalTicks)
@@ -321,6 +350,7 @@ namespace Appalachia.Utility.Async
             return true;
         }
 
+        /// <inheritdoc />
         protected override void ResetCore(TimeSpan? interval)
         {
             stopwatch = ValueStopwatch.StartNew();

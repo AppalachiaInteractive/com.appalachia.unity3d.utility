@@ -334,9 +334,8 @@ namespace Appalachia.Utility.Async.Linq
 
     internal abstract class AsyncEnumerableSorter<TElement>
     {
-        internal abstract AppaTask ComputeKeysAsync(TElement[] elements, int count);
-
         internal abstract int CompareKeys(int index1, int index2);
+        internal abstract AppaTask ComputeKeysAsync(TElement[] elements, int count);
 
         internal async AppaTask<int[]> SortAsync(TElement[] elements, int count)
         {
@@ -411,12 +410,6 @@ namespace Appalachia.Utility.Async.Linq
 
     internal class SyncSelectorAsyncEnumerableSorter<TElement, TKey> : AsyncEnumerableSorter<TElement>
     {
-        private readonly Func<TElement, TKey> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly AsyncEnumerableSorter<TElement> next;
-        private TKey[] keys;
-
         internal SyncSelectorAsyncEnumerableSorter(
             Func<TElement, TKey> keySelector,
             IComparer<TKey> comparer,
@@ -429,6 +422,34 @@ namespace Appalachia.Utility.Async.Linq
             this.next = next;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly AsyncEnumerableSorter<TElement> next;
+        private readonly bool descending;
+        private readonly Func<TElement, TKey> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private TKey[] keys;
+
+        #endregion
+
+        /// <inheritdoc />
+        internal override int CompareKeys(int index1, int index2)
+        {
+            var c = comparer.Compare(keys[index1], keys[index2]);
+            if (c == 0)
+            {
+                if (next == null)
+                {
+                    return index1 - index2;
+                }
+
+                return next.CompareKeys(index1, index2);
+            }
+
+            return descending ? -c : c;
+        }
+
+        /// <inheritdoc />
         internal override async AppaTask ComputeKeysAsync(TElement[] elements, int count)
         {
             keys = new TKey[count];
@@ -442,7 +463,33 @@ namespace Appalachia.Utility.Async.Linq
                 await next.ComputeKeysAsync(elements, count);
             }
         }
+    }
 
+    internal class AsyncSelectorEnumerableSorter<TElement, TKey> : AsyncEnumerableSorter<TElement>
+    {
+        internal AsyncSelectorEnumerableSorter(
+            Func<TElement, AppaTask<TKey>> keySelector,
+            IComparer<TKey> comparer,
+            bool descending,
+            AsyncEnumerableSorter<TElement> next)
+        {
+            this.keySelector = keySelector;
+            this.comparer = comparer;
+            this.descending = descending;
+            this.next = next;
+        }
+
+        #region Fields and Autoproperties
+
+        private readonly AsyncEnumerableSorter<TElement> next;
+        private readonly bool descending;
+        private readonly Func<TElement, AppaTask<TKey>> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private TKey[] keys;
+
+        #endregion
+
+        /// <inheritdoc />
         internal override int CompareKeys(int index1, int index2)
         {
             var c = comparer.Compare(keys[index1], keys[index2]);
@@ -458,28 +505,8 @@ namespace Appalachia.Utility.Async.Linq
 
             return descending ? -c : c;
         }
-    }
 
-    internal class AsyncSelectorEnumerableSorter<TElement, TKey> : AsyncEnumerableSorter<TElement>
-    {
-        private readonly Func<TElement, AppaTask<TKey>> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly AsyncEnumerableSorter<TElement> next;
-        private TKey[] keys;
-
-        internal AsyncSelectorEnumerableSorter(
-            Func<TElement, AppaTask<TKey>> keySelector,
-            IComparer<TKey> comparer,
-            bool descending,
-            AsyncEnumerableSorter<TElement> next)
-        {
-            this.keySelector = keySelector;
-            this.comparer = comparer;
-            this.descending = descending;
-            this.next = next;
-        }
-
+        /// <inheritdoc />
         internal override async AppaTask ComputeKeysAsync(TElement[] elements, int count)
         {
             keys = new TKey[count];
@@ -493,34 +520,11 @@ namespace Appalachia.Utility.Async.Linq
                 await next.ComputeKeysAsync(elements, count);
             }
         }
-
-        internal override int CompareKeys(int index1, int index2)
-        {
-            var c = comparer.Compare(keys[index1], keys[index2]);
-            if (c == 0)
-            {
-                if (next == null)
-                {
-                    return index1 - index2;
-                }
-
-                return next.CompareKeys(index1, index2);
-            }
-
-            return descending ? -c : c;
-        }
     }
 
     internal class
         AsyncSelectorWithCancellationEnumerableSorter<TElement, TKey> : AsyncEnumerableSorter<TElement>
     {
-        private readonly Func<TElement, CancellationToken, AppaTask<TKey>> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly AsyncEnumerableSorter<TElement> next;
-        private CancellationToken cancellationToken;
-        private TKey[] keys;
-
         internal AsyncSelectorWithCancellationEnumerableSorter(
             Func<TElement, CancellationToken, AppaTask<TKey>> keySelector,
             IComparer<TKey> comparer,
@@ -535,20 +539,18 @@ namespace Appalachia.Utility.Async.Linq
             this.cancellationToken = cancellationToken;
         }
 
-        internal override async AppaTask ComputeKeysAsync(TElement[] elements, int count)
-        {
-            keys = new TKey[count];
-            for (var i = 0; i < count; i++)
-            {
-                keys[i] = await keySelector(elements[i], cancellationToken);
-            }
+        #region Fields and Autoproperties
 
-            if (next != null)
-            {
-                await next.ComputeKeysAsync(elements, count);
-            }
-        }
+        private readonly AsyncEnumerableSorter<TElement> next;
+        private readonly bool descending;
+        private readonly Func<TElement, CancellationToken, AppaTask<TKey>> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private CancellationToken cancellationToken;
+        private TKey[] keys;
 
+        #endregion
+
+        /// <inheritdoc />
         internal override int CompareKeys(int index1, int index2)
         {
             var c = comparer.Compare(keys[index1], keys[index2]);
@@ -564,16 +566,41 @@ namespace Appalachia.Utility.Async.Linq
 
             return descending ? -c : c;
         }
+
+        /// <inheritdoc />
+        internal override async AppaTask ComputeKeysAsync(TElement[] elements, int count)
+        {
+            keys = new TKey[count];
+            for (var i = 0; i < count; i++)
+            {
+                keys[i] = await keySelector(elements[i], cancellationToken);
+            }
+
+            if (next != null)
+            {
+                await next.ComputeKeysAsync(elements, count);
+            }
+        }
     }
 
     internal abstract class OrderedAsyncEnumerable<TElement> : IAppaTaskOrderedAsyncEnumerable<TElement>
     {
-        protected readonly IAppaTaskAsyncEnumerable<TElement> source;
-
         public OrderedAsyncEnumerable(IAppaTaskAsyncEnumerable<TElement> source)
         {
             this.source = source;
         }
+
+        #region Fields and Autoproperties
+
+        protected readonly IAppaTaskAsyncEnumerable<TElement> source;
+
+        #endregion
+
+        internal abstract AsyncEnumerableSorter<TElement> GetAsyncEnumerableSorter(
+            AsyncEnumerableSorter<TElement> next,
+            CancellationToken cancellationToken);
+
+        #region IAppaTaskOrderedAsyncEnumerable<TElement> Members
 
         public IAppaTaskOrderedAsyncEnumerable<TElement> CreateOrderedEnumerable<TKey>(
             Func<TElement, TKey> keySelector,
@@ -617,24 +644,18 @@ namespace Appalachia.Utility.Async.Linq
             );
         }
 
-        internal abstract AsyncEnumerableSorter<TElement> GetAsyncEnumerableSorter(
-            AsyncEnumerableSorter<TElement> next,
-            CancellationToken cancellationToken);
-
         public IAppaTaskAsyncEnumerator<TElement> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _OrderedAsyncEnumerator(this, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _OrderedAsyncEnumerator
+
         private class _OrderedAsyncEnumerator : MoveNextSource, IAppaTaskAsyncEnumerator<TElement>
         {
-            protected readonly OrderedAsyncEnumerable<TElement> parent;
-            private CancellationToken cancellationToken;
-            private TElement[] buffer;
-            private int[] map;
-            private int index;
-
             public _OrderedAsyncEnumerator(
                 OrderedAsyncEnumerable<TElement> parent,
                 CancellationToken cancellationToken)
@@ -644,27 +665,15 @@ namespace Appalachia.Utility.Async.Linq
                 TaskTracker.TrackActiveTask(this, 3);
             }
 
-            public TElement Current { get; private set; }
+            #region Fields and Autoproperties
 
-            public AppaTask<bool> MoveNextAsync()
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            protected readonly OrderedAsyncEnumerable<TElement> parent;
+            private CancellationToken cancellationToken;
+            private int index;
+            private int[] map;
+            private TElement[] buffer;
 
-                if (map == null)
-                {
-                    completionSource.Reset();
-                    CreateSortSource().Forget();
-                    return new AppaTask<bool>(this, completionSource.Version);
-                }
-
-                if (index < buffer.Length)
-                {
-                    Current = buffer[map[index++]];
-                    return CompletedTasks.True;
-                }
-
-                return CompletedTasks.False;
-            }
+            #endregion
 
             private async AppaTaskVoid CreateSortSource()
             {
@@ -693,21 +702,44 @@ namespace Appalachia.Utility.Async.Linq
                 completionSource.TrySetResult(true);
             }
 
+            #region IAppaTaskAsyncEnumerator<TElement> Members
+
+            public TElement Current { get; private set; }
+
+            public AppaTask<bool> MoveNextAsync()
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (map == null)
+                {
+                    completionSource.Reset();
+                    CreateSortSource().Forget();
+                    return new AppaTask<bool>(this, completionSource.Version);
+                }
+
+                if (index < buffer.Length)
+                {
+                    Current = buffer[map[index++]];
+                    return CompletedTasks.True;
+                }
+
+                return CompletedTasks.False;
+            }
+
             public AppaTask DisposeAsync()
             {
                 TaskTracker.RemoveTracking(this);
                 return default;
             }
+
+            #endregion
         }
+
+        #endregion
     }
 
     internal class OrderedAsyncEnumerable<TElement, TKey> : OrderedAsyncEnumerable<TElement>
     {
-        private readonly Func<TElement, TKey> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly OrderedAsyncEnumerable<TElement> parent;
-
         public OrderedAsyncEnumerable(
             IAppaTaskAsyncEnumerable<TElement> source,
             Func<TElement, TKey> keySelector,
@@ -721,6 +753,16 @@ namespace Appalachia.Utility.Async.Linq
             this.parent = parent;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly bool descending;
+        private readonly Func<TElement, TKey> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private readonly OrderedAsyncEnumerable<TElement> parent;
+
+        #endregion
+
+        /// <inheritdoc />
         internal override AsyncEnumerableSorter<TElement> GetAsyncEnumerableSorter(
             AsyncEnumerableSorter<TElement> next,
             CancellationToken cancellationToken)
@@ -743,11 +785,6 @@ namespace Appalachia.Utility.Async.Linq
 
     internal class OrderedAsyncEnumerableAwait<TElement, TKey> : OrderedAsyncEnumerable<TElement>
     {
-        private readonly Func<TElement, AppaTask<TKey>> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly OrderedAsyncEnumerable<TElement> parent;
-
         public OrderedAsyncEnumerableAwait(
             IAppaTaskAsyncEnumerable<TElement> source,
             Func<TElement, AppaTask<TKey>> keySelector,
@@ -761,6 +798,16 @@ namespace Appalachia.Utility.Async.Linq
             this.parent = parent;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly bool descending;
+        private readonly Func<TElement, AppaTask<TKey>> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private readonly OrderedAsyncEnumerable<TElement> parent;
+
+        #endregion
+
+        /// <inheritdoc />
         internal override AsyncEnumerableSorter<TElement> GetAsyncEnumerableSorter(
             AsyncEnumerableSorter<TElement> next,
             CancellationToken cancellationToken)
@@ -779,11 +826,6 @@ namespace Appalachia.Utility.Async.Linq
     internal class
         OrderedAsyncEnumerableAwaitWithCancellation<TElement, TKey> : OrderedAsyncEnumerable<TElement>
     {
-        private readonly Func<TElement, CancellationToken, AppaTask<TKey>> keySelector;
-        private readonly IComparer<TKey> comparer;
-        private readonly bool descending;
-        private readonly OrderedAsyncEnumerable<TElement> parent;
-
         public OrderedAsyncEnumerableAwaitWithCancellation(
             IAppaTaskAsyncEnumerable<TElement> source,
             Func<TElement, CancellationToken, AppaTask<TKey>> keySelector,
@@ -797,6 +839,16 @@ namespace Appalachia.Utility.Async.Linq
             this.parent = parent;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly bool descending;
+        private readonly Func<TElement, CancellationToken, AppaTask<TKey>> keySelector;
+        private readonly IComparer<TKey> comparer;
+        private readonly OrderedAsyncEnumerable<TElement> parent;
+
+        #endregion
+
+        /// <inheritdoc />
         internal override AsyncEnumerableSorter<TElement> GetAsyncEnumerableSorter(
             AsyncEnumerableSorter<TElement> next,
             CancellationToken cancellationToken)

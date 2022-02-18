@@ -9,14 +9,16 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
         {
         }
 
+        [DebuggerStepThrough]
+        public static implicit operator GUILayoutOption[](GUILayoutOptionsCache value)
+        {
+            return value.Value;
+        }
+
+        /// <inheritdoc />
         public override GUILayoutOption[] Default()
         {
             return new GUILayoutOption[0];
-        }
-
-        [DebuggerStepThrough] public static implicit operator GUILayoutOption[](GUILayoutOptionsCache value)
-        {
-            return value.Value;
         }
     }
 }

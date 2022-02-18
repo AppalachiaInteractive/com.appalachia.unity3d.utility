@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -12,10 +8,6 @@ namespace Appalachia.Utility.Strings.Number
 {
     internal ref struct ValueStringBuilder
     {
-        private char[] _arrayToReturnToPool;
-        private Span<char> _chars;
-        private int _pos;
-
         public ValueStringBuilder(Span<char> initialBuffer)
         {
             _arrayToReturnToPool = null;
@@ -30,6 +22,19 @@ namespace Appalachia.Utility.Strings.Number
             _pos = 0;
         }
 
+        #region Fields and Autoproperties
+
+        private char[] _arrayToReturnToPool;
+        private int _pos;
+        private Span<char> _chars;
+
+        #endregion
+
+        public int Capacity => _chars.Length;
+
+        /// <summary>Returns the underlying storage of the builder.</summary>
+        public Span<char> RawChars => _chars;
+
         public int Length
         {
             get => _pos;
@@ -41,42 +46,6 @@ namespace Appalachia.Utility.Strings.Number
             }
         }
 
-        public int Capacity => _chars.Length;
-
-        public void EnsureCapacity(int capacity)
-        {
-            if (capacity > _chars.Length)
-            {
-                Grow(capacity - _pos);
-            }
-        }
-
-        /// <summary>
-        ///     Get a pinnable reference to the builder.
-        ///     Does not ensure there is a null char after <see cref="Length" />
-        ///     This overload is pattern matched in the C# 7.3+ compiler so you can omit
-        ///     the explicit method call, and write eg "fixed (char* c = builder)"
-        /// </summary>
-        public ref char GetPinnableReference()
-        {
-            return ref MemoryMarshal.GetReference(_chars);
-        }
-
-        /// <summary>
-        ///     Get a pinnable reference to the builder.
-        /// </summary>
-        /// <param name="terminate">Ensures that the builder has a null char after <see cref="Length" /></param>
-        public ref char GetPinnableReference(bool terminate)
-        {
-            if (terminate)
-            {
-                EnsureCapacity(Length + 1);
-                _chars[Length] = '\0';
-            }
-
-            return ref MemoryMarshal.GetReference(_chars);
-        }
-
         public ref char this[int index]
         {
             get
@@ -86,91 +55,12 @@ namespace Appalachia.Utility.Strings.Number
             }
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var s = _chars.Slice(0, _pos).ToString();
             Dispose();
             return s;
-        }
-
-        /// <summary>Returns the underlying storage of the builder.</summary>
-        public Span<char> RawChars => _chars;
-
-        /// <summary>
-        ///     Returns a span around the contents of the builder.
-        /// </summary>
-        /// <param name="terminate">Ensures that the builder has a null char after <see cref="Length" /></param>
-        public ReadOnlySpan<char> AsSpan(bool terminate)
-        {
-            if (terminate)
-            {
-                EnsureCapacity(Length + 1);
-                _chars[Length] = '\0';
-            }
-
-            return _chars.Slice(0, _pos);
-        }
-
-        public ReadOnlySpan<char> AsSpan()
-        {
-            return _chars.Slice(0, _pos);
-        }
-
-        public ReadOnlySpan<char> AsSpan(int start)
-        {
-            return _chars.Slice(start, _pos - start);
-        }
-
-        public ReadOnlySpan<char> AsSpan(int start, int length)
-        {
-            return _chars.Slice(start, length);
-        }
-
-        public bool TryCopyTo(Span<char> destination, out int charsWritten)
-        {
-            if (_chars.Slice(0, _pos).TryCopyTo(destination))
-            {
-                charsWritten = _pos;
-                Dispose();
-                return true;
-            }
-
-            charsWritten = 0;
-            Dispose();
-            return false;
-        }
-
-        public void Insert(int index, char value, int count)
-        {
-            if (_pos > (_chars.Length - count))
-            {
-                Grow(count);
-            }
-
-            var remaining = _pos - index;
-            _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
-            _chars.Slice(index, count).Fill(value);
-            _pos += count;
-        }
-
-        public void Insert(int index, string s)
-        {
-            if (s == null)
-            {
-                return;
-            }
-
-            var count = s.Length;
-
-            if (_pos > (_chars.Length - count))
-            {
-                Grow(count);
-            }
-
-            var remaining = _pos - index;
-            _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
-            s.AsSpan().CopyTo(_chars.Slice(index));
-            _pos += count;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -209,18 +99,6 @@ namespace Appalachia.Utility.Strings.Number
             {
                 AppendSlow(s);
             }
-        }
-
-        private void AppendSlow(string s)
-        {
-            var pos = _pos;
-            if (pos > (_chars.Length - s.Length))
-            {
-                Grow(s.Length);
-            }
-
-            s.AsSpan().CopyTo(_chars.Slice(pos));
-            _pos += s.Length;
         }
 
         public void Append(char c, int count)
@@ -281,11 +159,138 @@ namespace Appalachia.Utility.Strings.Number
             return _chars.Slice(origPos, length);
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void GrowAndAppend(char c)
+        /// <summary>
+        ///     Returns a span around the contents of the builder.
+        /// </summary>
+        /// <param name="terminate">Ensures that the builder has a null char after <see cref="Length" /></param>
+        public ReadOnlySpan<char> AsSpan(bool terminate)
         {
-            Grow(1);
-            Append(c);
+            if (terminate)
+            {
+                EnsureCapacity(Length + 1);
+                _chars[Length] = '\0';
+            }
+
+            return _chars.Slice(0, _pos);
+        }
+
+        public ReadOnlySpan<char> AsSpan()
+        {
+            return _chars.Slice(0, _pos);
+        }
+
+        public ReadOnlySpan<char> AsSpan(int start)
+        {
+            return _chars.Slice(start, _pos - start);
+        }
+
+        public ReadOnlySpan<char> AsSpan(int start, int length)
+        {
+            return _chars.Slice(start, length);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            var toReturn = _arrayToReturnToPool;
+            this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
+            if (toReturn != null)
+            {
+                ArrayPool<char>.Shared.Return(toReturn);
+            }
+        }
+
+        public void EnsureCapacity(int capacity)
+        {
+            if (capacity > _chars.Length)
+            {
+                Grow(capacity - _pos);
+            }
+        }
+
+        /// <summary>
+        ///     Get a pinnable reference to the builder.
+        ///     Does not ensure there is a null char after <see cref="Length" />
+        ///     This overload is pattern matched in the C# 7.3+ compiler so you can omit
+        ///     the explicit method call, and write eg "fixed (char* c = builder)"
+        /// </summary>
+        public ref char GetPinnableReference()
+        {
+            return ref MemoryMarshal.GetReference(_chars);
+        }
+
+        /// <summary>
+        ///     Get a pinnable reference to the builder.
+        /// </summary>
+        /// <param name="terminate">Ensures that the builder has a null char after <see cref="Length" /></param>
+        public ref char GetPinnableReference(bool terminate)
+        {
+            if (terminate)
+            {
+                EnsureCapacity(Length + 1);
+                _chars[Length] = '\0';
+            }
+
+            return ref MemoryMarshal.GetReference(_chars);
+        }
+
+        public void Insert(int index, char value, int count)
+        {
+            if (_pos > (_chars.Length - count))
+            {
+                Grow(count);
+            }
+
+            var remaining = _pos - index;
+            _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
+            _chars.Slice(index, count).Fill(value);
+            _pos += count;
+        }
+
+        public void Insert(int index, string s)
+        {
+            if (s == null)
+            {
+                return;
+            }
+
+            var count = s.Length;
+
+            if (_pos > (_chars.Length - count))
+            {
+                Grow(count);
+            }
+
+            var remaining = _pos - index;
+            _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
+            s.AsSpan().CopyTo(_chars.Slice(index));
+            _pos += count;
+        }
+
+        public bool TryCopyTo(Span<char> destination, out int charsWritten)
+        {
+            if (_chars.Slice(0, _pos).TryCopyTo(destination))
+            {
+                charsWritten = _pos;
+                Dispose();
+                return true;
+            }
+
+            charsWritten = 0;
+            Dispose();
+            return false;
+        }
+
+        private void AppendSlow(string s)
+        {
+            var pos = _pos;
+            if (pos > (_chars.Length - s.Length))
+            {
+                Grow(s.Length);
+            }
+
+            s.AsSpan().CopyTo(_chars.Slice(pos));
+            _pos += s.Length;
         }
 
         /// <summary>
@@ -318,15 +323,11 @@ namespace Appalachia.Utility.Strings.Number
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void GrowAndAppend(char c)
         {
-            var toReturn = _arrayToReturnToPool;
-            this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
-            if (toReturn != null)
-            {
-                ArrayPool<char>.Shared.Return(toReturn);
-            }
+            Grow(1);
+            Append(c);
         }
     }
 }

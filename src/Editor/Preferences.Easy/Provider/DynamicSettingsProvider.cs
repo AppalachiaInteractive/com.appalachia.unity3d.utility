@@ -9,10 +9,6 @@ namespace Appalachia.Utility.Preferences.Easy.Provider
 {
     public class DynamicSettingsProvider : SettingsProvider
     {
-        public readonly List<EasyEditorPrefBase> preferences;
-
-        private float _maxLabel;
-
         public DynamicSettingsProvider(
             string path,
             SettingsScope scopes,
@@ -28,13 +24,15 @@ namespace Appalachia.Utility.Preferences.Easy.Provider
             this.preferences.Sort(comparision);
         }
 
-        private static float GetLabelSize(EasyEditorPrefBase p)
-        {
-            var content = new GUIContent(p.label);
-            var width = EditorStyles.label.CalcSize(content);
-            return width.x;
-        }
+        #region Fields and Autoproperties
 
+        public readonly List<EasyEditorPrefBase> preferences;
+
+        private float _maxLabel;
+
+        #endregion
+
+        /// <inheritdoc />
         public override void OnGUI(string searchContext)
         {
             if (_maxLabel == 0f)
@@ -50,6 +48,13 @@ namespace Appalachia.Utility.Preferences.Easy.Provider
             }
 
             EditorGUIUtility.labelWidth = width;
+        }
+
+        private static float GetLabelSize(EasyEditorPrefBase p)
+        {
+            var content = new GUIContent(p.label);
+            var width = EditorStyles.label.CalcSize(content);
+            return width.x;
         }
     }
 }

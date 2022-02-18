@@ -36,6 +36,7 @@ namespace Appalachia.Utility.DataStructures.Graphs
             {
             }
 
+            /// <inheritdoc />
             public override string ToString()
             {
                 var ret = "{";

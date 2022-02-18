@@ -31,6 +31,7 @@ namespace Appalachia.Utility.Preferences.Easy
         {
         }
 
+        /// <inheritdoc />
         public override float Value
         {
             get
@@ -45,11 +46,13 @@ namespace Appalachia.Utility.Preferences.Easy
             set => EditorPrefs.SetFloat(key, value);
         }
 
+        /// <inheritdoc />
         protected override float Draw()
         {
             return EditorGUILayout.FloatField(label, Value);
         }
 
+        /// <inheritdoc />
         protected override float DrawDelayed()
         {
             return EditorGUILayout.DelayedFloatField(label, Value);

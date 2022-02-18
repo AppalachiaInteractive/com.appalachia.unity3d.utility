@@ -160,6 +160,22 @@ namespace Appalachia.Utility.Extensions
             return rect;
         }
 
+        public static Vector2 BottomLeft(this Rect rect)
+        {
+            using (_PRF_BottomLeft.Auto())
+            {
+                return new Vector2(rect.xMin, rect.yMin);
+            }
+        }
+
+        public static Vector2 BottomRight(this Rect rect)
+        {
+            using (_PRF_BottomRight.Auto())
+            {
+                return new Vector2(rect.xMax, rect.yMin);
+            }
+        }
+
         public static Rect Expand(this Rect rect, float expand)
         {
             rect.x -= expand;
@@ -485,6 +501,22 @@ namespace Appalachia.Utility.Extensions
             return rect;
         }
 
+        public static Vector2 TopLeft(this Rect rect)
+        {
+            using (_PRF_TopLeft.Auto())
+            {
+                return new Vector2(rect.xMin, rect.yMax);
+            }
+        }
+
+        public static Vector2 TopRight(this Rect rect)
+        {
+            using (_PRF_TopRight.Auto())
+            {
+                return new Vector2(rect.xMax, rect.yMax);
+            }
+        }
+
         public static Rect VerticalPadding(this Rect rect, float padding)
         {
             rect.y += padding;
@@ -502,6 +534,17 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(RectExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_TopRight =
+            new ProfilerMarker(_PRF_PFX + nameof(TopRight));
+
+        private static readonly ProfilerMarker _PRF_TopLeft = new ProfilerMarker(_PRF_PFX + nameof(TopLeft));
+
+        private static readonly ProfilerMarker _PRF_BottomRight =
+            new ProfilerMarker(_PRF_PFX + nameof(BottomRight));
+
+        private static readonly ProfilerMarker _PRF_BottomLeft =
+            new ProfilerMarker(_PRF_PFX + nameof(BottomLeft));
 
         private static readonly ProfilerMarker _PRF_GetNormalizedPositionWithin =
             new ProfilerMarker(_PRF_PFX + nameof(GetNormalizedPositionWithin));

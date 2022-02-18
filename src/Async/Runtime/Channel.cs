@@ -16,8 +16,12 @@ namespace Appalachia.Utility.Async
 
     public abstract class Channel<TWrite, TRead>
     {
+        #region Fields and Autoproperties
+
         public ChannelReader<TRead> Reader { get; protected set; }
         public ChannelWriter<TWrite> Writer { get; protected set; }
+
+        #endregion
 
         public static implicit operator ChannelReader<TRead>(Channel<TWrite, TRead> channel) =>
             channel.Reader;
@@ -32,12 +36,15 @@ namespace Appalachia.Utility.Async
 
     public abstract class ChannelReader<T>
     {
+        public abstract AppaTask Completion { get; }
+
+        public abstract IAppaTaskAsyncEnumerable<T> ReadAllAsync(
+            CancellationToken cancellationToken = default(CancellationToken));
+
         public abstract bool TryRead(out T item);
 
         public abstract AppaTask<bool> WaitToReadAsync(
             CancellationToken cancellationToken = default(CancellationToken));
-
-        public abstract AppaTask Completion { get; }
 
         public virtual AppaTask<T> ReadAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -61,15 +68,12 @@ namespace Appalachia.Utility.Async
 
             throw new ChannelClosedException();
         }
-
-        public abstract IAppaTaskAsyncEnumerable<T> ReadAllAsync(
-            CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public abstract class ChannelWriter<T>
     {
-        public abstract bool TryWrite(T item);
         public abstract bool TryComplete(Exception error = null);
+        public abstract bool TryWrite(T item);
 
         public void Complete(Exception error = null)
         {
@@ -107,14 +111,6 @@ namespace Appalachia.Utility.Async
 
     internal class SingleConsumerUnboundedChannel<T> : Channel<T>
     {
-        readonly Queue<T> items;
-        readonly SingleConsumerUnboundedChannelReader readerSource;
-        AppaTaskCompletionSource completedTaskSource;
-        AppaTask completedTask;
-
-        Exception completionError;
-        bool closed;
-
         public SingleConsumerUnboundedChannel()
         {
             items = new Queue<T>();
@@ -123,91 +119,22 @@ namespace Appalachia.Utility.Async
             Reader = readerSource;
         }
 
-        sealed class SingleConsumerUnboundedChannelWriter : ChannelWriter<T>
-        {
-            readonly SingleConsumerUnboundedChannel<T> parent;
+        #region Fields and Autoproperties
 
-            public SingleConsumerUnboundedChannelWriter(SingleConsumerUnboundedChannel<T> parent)
-            {
-                this.parent = parent;
-            }
+        readonly Queue<T> items;
+        readonly SingleConsumerUnboundedChannelReader readerSource;
+        AppaTask completedTask;
+        AppaTaskCompletionSource completedTaskSource;
+        bool closed;
 
-            public override bool TryWrite(T item)
-            {
-                bool waiting;
-                lock (parent.items)
-                {
-                    if (parent.closed) return false;
+        Exception completionError;
 
-                    parent.items.Enqueue(item);
-                    waiting = parent.readerSource.isWaiting;
-                }
+        #endregion
 
-                if (waiting)
-                {
-                    parent.readerSource.SingalContinuation();
-                }
-
-                return true;
-            }
-
-            public override bool TryComplete(Exception error = null)
-            {
-                bool waiting;
-                lock (parent.items)
-                {
-                    if (parent.closed) return false;
-                    parent.closed = true;
-                    waiting = parent.readerSource.isWaiting;
-
-                    if (parent.items.Count == 0)
-                    {
-                        if (error == null)
-                        {
-                            if (parent.completedTaskSource != null)
-                            {
-                                parent.completedTaskSource.TrySetResult();
-                            }
-                            else
-                            {
-                                parent.completedTask = AppaTask.CompletedTask;
-                            }
-                        }
-                        else
-                        {
-                            if (parent.completedTaskSource != null)
-                            {
-                                parent.completedTaskSource.TrySetException(error);
-                            }
-                            else
-                            {
-                                parent.completedTask = AppaTask.FromException(error);
-                            }
-                        }
-
-                        if (waiting)
-                        {
-                            parent.readerSource.SingalCompleted(error);
-                        }
-                    }
-
-                    parent.completionError = error;
-                }
-
-                return true;
-            }
-        }
+        #region Nested type: SingleConsumerUnboundedChannelReader
 
         sealed class SingleConsumerUnboundedChannelReader : ChannelReader<T>, IAppaTaskSource<bool>
         {
-            readonly Action<object> CancellationCallbackDelegate = CancellationCallback;
-            readonly SingleConsumerUnboundedChannel<T> parent;
-
-            CancellationToken cancellationToken;
-            CancellationTokenRegistration cancellationTokenRegistration;
-            AppaTaskCompletionSourceCore<bool> core;
-            internal bool isWaiting;
-
             public SingleConsumerUnboundedChannelReader(SingleConsumerUnboundedChannel<T> parent)
             {
                 this.parent = parent;
@@ -215,6 +142,19 @@ namespace Appalachia.Utility.Async
                 TaskTracker.TrackActiveTask(this, 4);
             }
 
+            #region Fields and Autoproperties
+
+            internal bool isWaiting;
+            readonly Action<object> CancellationCallbackDelegate = CancellationCallback;
+            readonly SingleConsumerUnboundedChannel<T> parent;
+            AppaTaskCompletionSourceCore<bool> core;
+
+            CancellationToken cancellationToken;
+            CancellationTokenRegistration cancellationTokenRegistration;
+
+            #endregion
+
+            /// <inheritdoc />
             public override AppaTask Completion
             {
                 get
@@ -231,6 +171,14 @@ namespace Appalachia.Utility.Async
                 }
             }
 
+            /// <inheritdoc />
+            public override IAppaTaskAsyncEnumerable<T> ReadAllAsync(
+                CancellationToken cancellationToken = default)
+            {
+                return new ReadAllAsyncEnumerable(this, cancellationToken);
+            }
+
+            /// <inheritdoc />
             public override bool TryRead(out T item)
             {
                 lock (parent.items)
@@ -276,6 +224,7 @@ namespace Appalachia.Utility.Async
                 return true;
             }
 
+            /// <inheritdoc />
             public override AppaTask<bool> WaitToReadAsync(CancellationToken cancellationToken)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -321,11 +270,6 @@ namespace Appalachia.Utility.Async
                 }
             }
 
-            public void SingalContinuation()
-            {
-                core.TrySetResult(true);
-            }
-
             public void SingalCancellation(CancellationToken cancellationToken)
             {
                 TaskTracker.RemoveTracking(this);
@@ -346,11 +290,18 @@ namespace Appalachia.Utility.Async
                 }
             }
 
-            public override IAppaTaskAsyncEnumerable<T> ReadAllAsync(
-                CancellationToken cancellationToken = default)
+            public void SingalContinuation()
             {
-                return new ReadAllAsyncEnumerable(this, cancellationToken);
+                core.TrySetResult(true);
             }
+
+            static void CancellationCallback(object state)
+            {
+                var self = (SingleConsumerUnboundedChannelReader)state;
+                self.SingalCancellation(self.cancellationToken);
+            }
+
+            #region IAppaTaskSource<bool> Members
 
             bool IAppaTaskSource<bool>.GetResult(short token)
             {
@@ -377,27 +328,12 @@ namespace Appalachia.Utility.Async
                 return core.UnsafeGetStatus();
             }
 
-            static void CancellationCallback(object state)
-            {
-                var self = (SingleConsumerUnboundedChannelReader)state;
-                self.SingalCancellation(self.cancellationToken);
-            }
+            #endregion
+
+            #region Nested type: ReadAllAsyncEnumerable
 
             sealed class ReadAllAsyncEnumerable : IAppaTaskAsyncEnumerable<T>, IAppaTaskAsyncEnumerator<T>
             {
-                readonly Action<object> CancellationCallback1Delegate = CancellationCallback1;
-                readonly Action<object> CancellationCallback2Delegate = CancellationCallback2;
-
-                readonly SingleConsumerUnboundedChannelReader parent;
-                CancellationToken cancellationToken1;
-                CancellationToken cancellationToken2;
-                CancellationTokenRegistration cancellationTokenRegistration1;
-                CancellationTokenRegistration cancellationTokenRegistration2;
-
-                T current;
-                bool cacheValue;
-                bool running;
-
                 public ReadAllAsyncEnumerable(
                     SingleConsumerUnboundedChannelReader parent,
                     CancellationToken cancellationToken)
@@ -405,6 +341,37 @@ namespace Appalachia.Utility.Async
                     this.parent = parent;
                     this.cancellationToken1 = cancellationToken;
                 }
+
+                #region Fields and Autoproperties
+
+                readonly Action<object> CancellationCallback1Delegate = CancellationCallback1;
+                readonly Action<object> CancellationCallback2Delegate = CancellationCallback2;
+
+                readonly SingleConsumerUnboundedChannelReader parent;
+                bool cacheValue;
+                bool running;
+                CancellationToken cancellationToken1;
+                CancellationToken cancellationToken2;
+                CancellationTokenRegistration cancellationTokenRegistration1;
+                CancellationTokenRegistration cancellationTokenRegistration2;
+
+                T current;
+
+                #endregion
+
+                static void CancellationCallback1(object state)
+                {
+                    var self = (ReadAllAsyncEnumerable)state;
+                    self.parent.SingalCancellation(self.cancellationToken1);
+                }
+
+                static void CancellationCallback2(object state)
+                {
+                    var self = (ReadAllAsyncEnumerable)state;
+                    self.parent.SingalCancellation(self.cancellationToken2);
+                }
+
+                #region IAppaTaskAsyncEnumerable<T> Members
 
                 public IAppaTaskAsyncEnumerator<T> GetAsyncEnumerator(
                     CancellationToken cancellationToken = default)
@@ -443,6 +410,10 @@ namespace Appalachia.Utility.Async
                     return this;
                 }
 
+                #endregion
+
+                #region IAppaTaskAsyncEnumerator<T> Members
+
                 public T Current
                 {
                     get
@@ -472,18 +443,97 @@ namespace Appalachia.Utility.Async
                     return default;
                 }
 
-                static void CancellationCallback1(object state)
+                #endregion
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Nested type: SingleConsumerUnboundedChannelWriter
+
+        sealed class SingleConsumerUnboundedChannelWriter : ChannelWriter<T>
+        {
+            public SingleConsumerUnboundedChannelWriter(SingleConsumerUnboundedChannel<T> parent)
+            {
+                this.parent = parent;
+            }
+
+            #region Fields and Autoproperties
+
+            readonly SingleConsumerUnboundedChannel<T> parent;
+
+            #endregion
+
+            /// <inheritdoc />
+            public override bool TryComplete(Exception error = null)
+            {
+                bool waiting;
+                lock (parent.items)
                 {
-                    var self = (ReadAllAsyncEnumerable)state;
-                    self.parent.SingalCancellation(self.cancellationToken1);
+                    if (parent.closed) return false;
+                    parent.closed = true;
+                    waiting = parent.readerSource.isWaiting;
+
+                    if (parent.items.Count == 0)
+                    {
+                        if (error == null)
+                        {
+                            if (parent.completedTaskSource != null)
+                            {
+                                parent.completedTaskSource.TrySetResult();
+                            }
+                            else
+                            {
+                                parent.completedTask = AppaTask.CompletedTask;
+                            }
+                        }
+                        else
+                        {
+                            if (parent.completedTaskSource != null)
+                            {
+                                parent.completedTaskSource.TrySetException(error);
+                            }
+                            else
+                            {
+                                parent.completedTask = AppaTask.FromException(error);
+                            }
+                        }
+
+                        if (waiting)
+                        {
+                            parent.readerSource.SingalCompleted(error);
+                        }
+                    }
+
+                    parent.completionError = error;
                 }
 
-                static void CancellationCallback2(object state)
+                return true;
+            }
+
+            /// <inheritdoc />
+            public override bool TryWrite(T item)
+            {
+                bool waiting;
+                lock (parent.items)
                 {
-                    var self = (ReadAllAsyncEnumerable)state;
-                    self.parent.SingalCancellation(self.cancellationToken2);
+                    if (parent.closed) return false;
+
+                    parent.items.Enqueue(item);
+                    waiting = parent.readerSource.isWaiting;
                 }
+
+                if (waiting)
+                {
+                    parent.readerSource.SingalContinuation();
+                }
+
+                return true;
             }
         }
+
+        #endregion
     }
 }

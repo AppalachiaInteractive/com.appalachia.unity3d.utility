@@ -8,8 +8,6 @@ namespace Appalachia.Utility.Preferences.Easy
     public class EnumEditorPref<T> : EasyEditorPref<T>
         where T : Enum
     {
-        private readonly Func<T, string> _postfixer;
-
         public EnumEditorPref(
             string path,
             string key,
@@ -37,20 +35,28 @@ namespace Appalachia.Utility.Preferences.Easy
             _postfixer = postfixer;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<T, string> _postfixer;
+
+        #endregion
+
+        /// <inheritdoc />
         public override T Value
         {
             get
             {
                 if (!EditorPrefs.HasKey(key))
                 {
-                    EditorPrefs.SetInt(key, (int) (object) defaultValue);
+                    EditorPrefs.SetInt(key, (int)(object)defaultValue);
                 }
 
-                return (T) (object) EditorPrefs.GetInt(key, (int) (object) defaultValue);
+                return (T)(object)EditorPrefs.GetInt(key, (int)(object)defaultValue);
             }
-            set => EditorPrefs.SetInt(key, (int) (object) value);
+            set => EditorPrefs.SetInt(key, (int)(object)value);
         }
 
+        /// <inheritdoc />
         protected override T Draw()
         {
             if (_postfixer != null)
@@ -59,27 +65,24 @@ namespace Appalachia.Utility.Preferences.Easy
                 {
                     var labelWidth = EditorGUIUtility.labelWidth;
 
-                    var value = (T) EditorGUILayout.EnumPopup(label, Value);
+                    var value = (T)EditorGUILayout.EnumPopup(label, Value);
 
                     var postfix = _postfixer(value);
 
                     var size = EditorStyles.label.CalcSize(new GUIContent(postfix));
 
                     EditorGUIUtility.labelWidth = 2 * size.x;
-                    EditorGUILayout.LabelField(
-                        postfix,
-                        EditorStyles.boldLabel,
-                        GUILayout.Width(2 * size.x)
-                    );
+                    EditorGUILayout.LabelField(postfix, EditorStyles.boldLabel, GUILayout.Width(2 * size.x));
 
                     EditorGUIUtility.labelWidth = labelWidth;
                     return value;
                 }
             }
 
-            return (T) EditorGUILayout.EnumPopup(label, Value);
+            return (T)EditorGUILayout.EnumPopup(label, Value);
         }
 
+        /// <inheritdoc />
         protected override T DrawDelayed()
         {
             return Draw();

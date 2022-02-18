@@ -27,6 +27,7 @@ namespace Appalachia.Utility.Logging.Formatters
 
         #endregion
 
+        /// <inheritdoc />
         protected override string AlterContent(string content, LogLevel level)
         {
             using (_PRF_AlterContent.Auto())
@@ -40,6 +41,7 @@ namespace Appalachia.Utility.Logging.Formatters
             }
         }
 
+        /// <inheritdoc />
         protected override string GetLogPrefix(
             LogLevel level,
             string prefix,

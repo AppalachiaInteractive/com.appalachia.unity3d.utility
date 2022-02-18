@@ -8,17 +8,31 @@ namespace Appalachia.Utility.TextEditor.JSON
     [Serializable]
     public class EditableJsonDocument : EditableDocument<EditableJsonDocument, JsonDocumentDrawer>
     {
-        public JObject JsonObject;
-
         private EditableJsonDocument()
         {
         }
 
-        protected override string Serialize()
+        #region Fields and Autoproperties
+
+        public JObject JsonObject;
+
+        #endregion
+
+        /// <inheritdoc />
+        protected internal override void ParseText(string text)
         {
-            return JsonObject.ToString();
+            JsonObject = JsonConvert.DeserializeObject<JObject>(text);
         }
 
+        /// <inheritdoc />
+        protected override bool CheckIsValid(string text)
+        {
+            text = text.Trim();
+            JToken.Parse(text);
+            return true;
+        }
+
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (isDisposing)
@@ -27,21 +41,16 @@ namespace Appalachia.Utility.TextEditor.JSON
             }
         }
 
-        protected override bool CheckIsValid(string text)
-        {
-            text = text.Trim();
-            JToken.Parse(text);
-            return true;
-        }
-
-        protected internal override void ParseText(string text)
-        {
-            JsonObject = JsonConvert.DeserializeObject<JObject>(text);
-        }
-
+        /// <inheritdoc />
         protected override JsonDocumentDrawer GetDocumentDrawer()
         {
             return drawerInstance ??= new JsonDocumentDrawer();
+        }
+
+        /// <inheritdoc />
+        protected override string Serialize()
+        {
+            return JsonObject.ToString();
         }
     }
 }

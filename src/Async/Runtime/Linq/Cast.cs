@@ -16,18 +16,28 @@ namespace Appalachia.Utility.Async.Linq
 
     internal sealed class Cast<TResult> : IAppaTaskAsyncEnumerable<TResult>
     {
-        private readonly IAppaTaskAsyncEnumerable<object> source;
-
         public Cast(IAppaTaskAsyncEnumerable<object> source)
         {
             this.source = source;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly IAppaTaskAsyncEnumerable<object> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TResult> Members
 
         public IAppaTaskAsyncEnumerator<TResult> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _Cast(source, cancellationToken);
         }
+
+        #endregion
+
+        #region Nested type: _Cast
 
         private class _Cast : AsyncEnumeratorBase<object, TResult>
         {
@@ -38,6 +48,7 @@ namespace Appalachia.Utility.Async.Linq
             {
             }
 
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -51,5 +62,7 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 }

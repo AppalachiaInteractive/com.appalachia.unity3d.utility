@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -11,6 +7,16 @@ namespace Appalachia.Utility.Strings.Number
 {
     internal static partial class Number
     {
+        internal enum NumberBufferKind : byte
+        {
+            Unknown = 0,
+            Integer = 1,
+            Decimal = 2,
+            FloatingPoint = 3,
+        }
+
+        #region Constants and Static Readonly
+
         // We need 1 additional byte, per length, for the terminating null
         internal const int
             DecimalNumberBufferLength = 29 + 1 + 1; // 29 for the longest input + 1 for rounding
@@ -33,15 +39,12 @@ namespace Appalachia.Utility.Strings.Number
         internal const int
             UInt64NumberBufferLength = 20 + 1; // 20 for the longest input: 18,446,744,073,709,551,615
 
+        #endregion
+
+        #region Nested type: NumberBuffer
+
         internal unsafe ref struct NumberBuffer
         {
-            public int DigitsCount;
-            public int Scale;
-            public bool IsNegative;
-            public bool HasNonZeroTail;
-            public NumberBufferKind Kind;
-            public Span<byte> Digits;
-
             public NumberBuffer(NumberBufferKind kind, byte* digits, int digitsLength)
             {
                 Debug.Assert(digits != null);
@@ -60,6 +63,51 @@ namespace Appalachia.Utility.Strings.Number
 
                 Digits[0] = (byte)'\0';
                 CheckConsistency();
+            }
+
+            #region Fields and Autoproperties
+
+            public bool HasNonZeroTail;
+            public bool IsNegative;
+            public int DigitsCount;
+            public int Scale;
+            public NumberBufferKind Kind;
+            public Span<byte> Digits;
+
+            #endregion
+
+            //
+            // Code coverage note: This only exists so that Number displays nicely in the VS watch window. So yes, I know it works.
+            //
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                var sb = new StringBuilder();
+
+                sb.Append('[');
+                sb.Append('"');
+
+                for (var i = 0; i < Digits.Length; i++)
+                {
+                    var digit = Digits[i];
+
+                    if (digit == 0)
+                    {
+                        break;
+                    }
+
+                    sb.Append((char)digit);
+                }
+
+                sb.Append('"');
+                sb.Append(", Length = ").Append(DigitsCount);
+                sb.Append(", Scale = ").Append(Scale);
+                sb.Append(", IsNegative = ").Append(IsNegative);
+                sb.Append(", HasNonZeroTail = ").Append(HasNonZeroTail);
+                sb.Append(", Kind = ").Append(Kind);
+                sb.Append(']');
+
+                return sb.ToString();
             }
 
             [Conditional("DEBUG")]
@@ -99,47 +147,8 @@ namespace Appalachia.Utility.Strings.Number
                 // This is safe to do since we are a ref struct
                 return (byte*)Unsafe.AsPointer(ref Digits[0]);
             }
-
-            //
-            // Code coverage note: This only exists so that Number displays nicely in the VS watch window. So yes, I know it works.
-            //
-            public override string ToString()
-            {
-                var sb = new StringBuilder();
-
-                sb.Append('[');
-                sb.Append('"');
-
-                for (var i = 0; i < Digits.Length; i++)
-                {
-                    var digit = Digits[i];
-
-                    if (digit == 0)
-                    {
-                        break;
-                    }
-
-                    sb.Append((char)digit);
-                }
-
-                sb.Append('"');
-                sb.Append(", Length = ").Append(DigitsCount);
-                sb.Append(", Scale = ").Append(Scale);
-                sb.Append(", IsNegative = ").Append(IsNegative);
-                sb.Append(", HasNonZeroTail = ").Append(HasNonZeroTail);
-                sb.Append(", Kind = ").Append(Kind);
-                sb.Append(']');
-
-                return sb.ToString();
-            }
         }
 
-        internal enum NumberBufferKind : byte
-        {
-            Unknown = 0,
-            Integer = 1,
-            Decimal = 2,
-            FloatingPoint = 3,
-        }
+        #endregion
     }
 }

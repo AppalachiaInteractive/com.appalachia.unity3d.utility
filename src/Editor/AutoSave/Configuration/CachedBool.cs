@@ -14,12 +14,14 @@ namespace Appalachia.Utility.AutoSave.Configuration
         {
         }
 
+        /// <inheritdoc />
         protected override bool? Get(string key, bool defaultValue)
         {
             var value = EditorPrefs.GetInt(key, defaultValue ? 1 : 0);
             return value == 1;
         }
 
+        /// <inheritdoc />
         protected override void Set(string key, bool? value)
         {
             EditorPrefs.SetInt(key, value ?? false ? 1 : 0);

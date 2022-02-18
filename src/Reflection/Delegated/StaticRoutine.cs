@@ -55,11 +55,12 @@ namespace Appalachia.Utility.Reflection.Delegated
         }
 
         public static Action CreateDelegate(
-            string typeNameWithNamespace,
+            string typeNamespace,
+            string typeName,
             string methodName,
             BindingFlags flags = ReflectionExtensions.AllStatic)
         {
-            var type = ReflectionExtensions.GetByName(typeNameWithNamespace);
+            var type = ReflectionExtensions.GetByName(typeNamespace, typeName);
 
             var bestMethod = type.PrepareAndGetBestMethod(methodName, flags, null);
 

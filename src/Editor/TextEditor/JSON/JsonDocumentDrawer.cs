@@ -11,31 +11,38 @@ using UnityEngine;
 
 namespace Appalachia.Utility.TextEditor.JSON
 {
+    [Serializable]
     public class JsonDocumentDrawer : HierarchyDocumentDrawer<EditableJsonDocument>
     {
-        [UnityEditor.MenuItem(PKG.Menu.Assets.Base + "Create/Text/JSON", priority = 200)]
-        public static void CreateNew()
+        public static void Rename(JToken token, string newName)
         {
-            CreateNewFile(new JObject().ToString(), "json");
+            var parent = token.Parent;
+            if (parent == null)
+            {
+                throw new InvalidOperationException("The parent is missing.");
+            }
+
+            var newToken = new JProperty(newName, token);
+            parent.Replace(newToken);
         }
 
+        /// <inheritdoc />
         public override void InitializeGUICollection(GUICollection collection)
         {
             var objectColor = new Color(1f,   0.46f, 0.25f, 1.0f);
             var foldoutColor = new Color(1f,  0.75f, 0.28f, 1.0f);
             var labelColor = new Color(0.48f, 0.8f,  0.8f,  1.0f);
 
-            var foldoutStyle = new GUIStyle(EditorStyles.foldout) {fontStyle = FontStyle.Bold};
+            var foldoutStyle = new GUIStyle(EditorStyles.foldout) { fontStyle = FontStyle.Bold };
 
-            var textStyle =
-                new GUIStyle(EditorStyles.toolbarTextField) {fontStyle = FontStyle.Bold};
+            var textStyle = new GUIStyle(EditorStyles.toolbarTextField) { fontStyle = FontStyle.Bold };
 
             collection.AddStyle(JSGUIKeys.Object, foldoutStyle);
             collection.AddColor(JSGUIKeys.Object, objectColor);
 
             collection.AddStyle(
                 JSGUIKeys.Label,
-                new GUIStyle(EditorStyles.boldLabel) {padding = new RectOffset(5, 0, 0, 0)}
+                new GUIStyle(EditorStyles.boldLabel) { padding = new RectOffset(5, 0, 0, 0) }
             );
             collection.AddOptions(JSGUIKeys.Label, GUILayout.ExpandWidth(false));
             collection.AddColor(JSGUIKeys.Label, labelColor);
@@ -50,6 +57,7 @@ namespace Appalachia.Utility.TextEditor.JSON
             collection.AddColor(JSGUIKeys.Foldout, foldoutColor);
         }
 
+        /// <inheritdoc />
         protected override void DrawDocument(EditableJsonDocument document)
         {
             EditorGUI.indentLevel++;
@@ -86,83 +94,112 @@ namespace Appalachia.Utility.TextEditor.JSON
             EditorGUI.indentLevel--;
         }
 
-        protected string GetFoldoutHeader(
-            bool isObject,
-            bool isArray,
-            string propertyName,
-            int valueCount)
+        protected void AssignFieldResult(JToken token, JToken newValue, int? arrayIndex)
         {
-            var foldoutHeader = isObject
-                ? ZString.Format("{0}  {{{1}}}", propertyName, valueCount)
-                : isArray
-                    ? ZString.Format("{0}  [{1}]", propertyName, valueCount)
-                    : propertyName;
-
-            return foldoutHeader;
-        }
-
-        protected void SetLabelWidth(string key, string label)
-        {
-            var style = guiCollection.GetStyle(key);
-            var labelWidth = style.Value.CalcSize(new GUIContent(label)).x;
-            var hierarchyOffset = (EditorGUI.indentLevel * 15f) + 7f;
-            EditorGUIUtility.labelWidth = hierarchyOffset + labelWidth;
-        }
-
-        protected void PrefixLabel(string label, string followingStyleKey, string styleKey)
-        {
-            var style = guiCollection.GetStyle(styleKey);
-            var followingStyle = guiCollection.GetStyle(followingStyleKey);
-            SetLabelWidth(styleKey, label);
-
-            var originalFgColor = GUI.color;
-            var color = guiCollection.GetColor(styleKey);
-
-            GUI.color = color;
-
-            EditorGUILayout.PrefixLabel(label, followingStyle, style);
-
-            GUI.color = originalFgColor;
-        }
-
-        protected void DrawToken(JToken token, int? propertyIndex, int? arrayIndex)
-        {
-            switch (token.Type)
+            if (arrayIndex.HasValue)
             {
-                case JTokenType.Object:
-                    DrawObject(token.Value<JObject>(), propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Array:
-                    DrawArray(token.Value<JArray>(), propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Property:
-                    DrawProperty(token.Value<JProperty>(), propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Integer:
-                    DrawInteger(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Float:
-                    DrawFloat(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.String:
-                    DrawString(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Boolean:
-                    DrawBoolean(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Date:
-                    DrawDate(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Guid:
-                    DrawGuid(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.Uri:
-                    DrawUri(token, propertyIndex, arrayIndex);
-                    break;
-                case JTokenType.TimeSpan:
-                    DrawTimeSpan(token, propertyIndex, arrayIndex);
-                    break;
+                var jArray = token.Parent.Value<JArray>();
+                jArray[arrayIndex.Value] = newValue;
             }
+            else
+            {
+                var jProperty = token.Parent.Value<JProperty>();
+                jProperty.Value = newValue;
+            }
+        }
+
+        protected void DrawArray(JArray jArray, int? propertyIndex, int? arrayIndex)
+        {
+            var arrayElements = jArray.Values().ToArray();
+
+            EditorGUI.indentLevel++;
+            for (var innerArrayIndex = 0; innerArrayIndex < arrayElements.Length; innerArrayIndex++)
+            {
+                var element = arrayElements[innerArrayIndex];
+
+                var horizontal = false;
+                if ((element.Type != JTokenType.Array) && (element.Type != JTokenType.Object))
+                {
+                    horizontal = true;
+                    EditorGUILayout.BeginHorizontal();
+                }
+
+                PrefixLabel(ZString.Format("[{0}]", innerArrayIndex), JSGUIKeys.TextField, JSGUIKeys.Label);
+                DrawToken(element, null, innerArrayIndex);
+
+                if (horizontal)
+                {
+                    EditorGUILayout.EndHorizontal();
+                }
+            }
+
+            EditorGUI.indentLevel--;
+        }
+
+        protected void DrawBoolean(JToken token, int? propertyIndex, int? arrayIndex)
+        {
+            EditorGUIUtility.labelWidth = 0.1f;
+            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
+            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+
+            var value = EditorGUILayout.Toggle(" ", token.Value<bool>(), style, options);
+
+            AssignFieldResult(token, value, arrayIndex);
+        }
+
+        protected void DrawDate(JToken token, int? propertyIndex, int? arrayIndex)
+        {
+            EditorGUIUtility.labelWidth = 0.1f;
+            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
+            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+
+            var value = EditorGUILayout.TextField(
+                " ",
+                token.Value<DateTime>().ToString("yyyy-MM-dd HH:mm:ss"),
+                style,
+                options
+            );
+
+            if (DateTime.TryParse(value, out var parsed))
+            {
+                AssignFieldResult(token, parsed, arrayIndex);
+            }
+        }
+
+        protected void DrawFloat(JToken token, int? propertyIndex, int? arrayIndex)
+        {
+            EditorGUIUtility.labelWidth = 0.1f;
+            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
+            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+
+            var value = EditorGUILayout.FloatField(" ", token.Value<float>(), style, options);
+
+            AssignFieldResult(token, value, arrayIndex);
+        }
+
+        protected void DrawGuid(JToken token, int? propertyIndex, int? arrayIndex)
+        {
+            EditorGUIUtility.labelWidth = 0.1f;
+            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
+            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+
+            var value = EditorGUILayout.TextField(" ", token.Value<Guid>().ToString(), style, options);
+
+            if (Guid.TryParse(value, out var parsed))
+            {
+                AssignFieldResult(token, parsed, arrayIndex);
+            }
+        }
+
+        protected void DrawInteger(JToken token, int? propertyIndex, int? arrayIndex)
+        {
+            EditorGUIUtility.labelWidth = 0.1f;
+            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
+            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+
+            var value = EditorGUILayout.IntField(" ", token.Value<int>(), style, options);
+
+            AssignFieldResult(token, value, arrayIndex);
         }
 
         protected void DrawObject(JObject jObject, int? propertyIndex, int? arrayIndex)
@@ -170,9 +207,7 @@ namespace Appalachia.Utility.TextEditor.JSON
             var properties = jObject.Properties().ToArray();
             var propertyTokens = jObject.PropertyValues().ToArray();
 
-            for (var innerPropertyIndex = 0;
-                innerPropertyIndex < properties.Length;
-                innerPropertyIndex++)
+            for (var innerPropertyIndex = 0; innerPropertyIndex < properties.Length; innerPropertyIndex++)
             {
                 var property = properties[innerPropertyIndex];
                 var propertyToken = propertyTokens[innerPropertyIndex];
@@ -232,70 +267,6 @@ namespace Appalachia.Utility.TextEditor.JSON
             PrefixLabel(jProperty.Name, JSGUIKeys.TextField, JSGUIKeys.Label);
         }
 
-        protected void DrawArray(JArray jArray, int? propertyIndex, int? arrayIndex)
-        {
-            var arrayElements = jArray.Values().ToArray();
-
-            EditorGUI.indentLevel++;
-            for (var innerArrayIndex = 0; innerArrayIndex < arrayElements.Length; innerArrayIndex++)
-            {
-                var element = arrayElements[innerArrayIndex];
-
-                var horizontal = false;
-                if ((element.Type != JTokenType.Array) && (element.Type != JTokenType.Object))
-                {
-                    horizontal = true;
-                    EditorGUILayout.BeginHorizontal();
-                }
-
-                PrefixLabel(ZString.Format("[{0}]", innerArrayIndex), JSGUIKeys.TextField, JSGUIKeys.Label);
-                DrawToken(element, null, innerArrayIndex);
-
-                if (horizontal)
-                {
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-
-            EditorGUI.indentLevel--;
-        }
-
-        protected void AssignFieldResult(JToken token, JToken newValue, int? arrayIndex)
-        {
-            if (arrayIndex.HasValue)
-            {
-                var jArray = token.Parent.Value<JArray>();
-                jArray[arrayIndex.Value] = newValue;
-            }
-            else
-            {
-                var jProperty = token.Parent.Value<JProperty>();
-                jProperty.Value = newValue;
-            }
-        }
-
-        protected void DrawInteger(JToken token, int? propertyIndex, int? arrayIndex)
-        {
-            EditorGUIUtility.labelWidth = 0.1f;
-            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
-            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
-
-            var value = EditorGUILayout.IntField(" ", token.Value<int>(), style, options);
-
-            AssignFieldResult(token, value, arrayIndex);
-        }
-
-        protected void DrawFloat(JToken token, int? propertyIndex, int? arrayIndex)
-        {
-            EditorGUIUtility.labelWidth = 0.1f;
-            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
-            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
-
-            var value = EditorGUILayout.FloatField(" ", token.Value<float>(), style, options);
-
-            AssignFieldResult(token, value, arrayIndex);
-        }
-
         protected void DrawString(JToken token, int? propertyIndex, int? arrayIndex)
         {
             EditorGUIUtility.labelWidth = 0.1f;
@@ -307,52 +278,57 @@ namespace Appalachia.Utility.TextEditor.JSON
             AssignFieldResult(token, value, arrayIndex);
         }
 
-        protected void DrawBoolean(JToken token, int? propertyIndex, int? arrayIndex)
+        protected void DrawTimeSpan(JToken token, int? propertyIndex, int? arrayIndex)
         {
             EditorGUIUtility.labelWidth = 0.1f;
             var style = guiCollection.GetStyle(JSGUIKeys.TextField);
             var options = guiCollection.GetOptions(JSGUIKeys.TextField);
 
-            var value = EditorGUILayout.Toggle(" ", token.Value<bool>(), style, options);
+            var value = EditorGUILayout.TextField(" ", token.Value<TimeSpan>().ToString(), style, options);
 
-            AssignFieldResult(token, value, arrayIndex);
-        }
-
-        protected void DrawDate(JToken token, int? propertyIndex, int? arrayIndex)
-        {
-            EditorGUIUtility.labelWidth = 0.1f;
-            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
-            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
-
-            var value = EditorGUILayout.TextField(
-                " ",
-                token.Value<DateTime>().ToString("yyyy-MM-dd HH:mm:ss"),
-                style,
-                options
-            );
-
-            if (DateTime.TryParse(value, out var parsed))
+            if (TimeSpan.TryParse(value, out var parsed))
             {
                 AssignFieldResult(token, parsed, arrayIndex);
             }
         }
 
-        protected void DrawGuid(JToken token, int? propertyIndex, int? arrayIndex)
+        protected void DrawToken(JToken token, int? propertyIndex, int? arrayIndex)
         {
-            EditorGUIUtility.labelWidth = 0.1f;
-            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
-            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
-
-            var value = EditorGUILayout.TextField(
-                " ",
-                token.Value<Guid>().ToString(),
-                style,
-                options
-            );
-
-            if (Guid.TryParse(value, out var parsed))
+            switch (token.Type)
             {
-                AssignFieldResult(token, parsed, arrayIndex);
+                case JTokenType.Object:
+                    DrawObject(token.Value<JObject>(), propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Array:
+                    DrawArray(token.Value<JArray>(), propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Property:
+                    DrawProperty(token.Value<JProperty>(), propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Integer:
+                    DrawInteger(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Float:
+                    DrawFloat(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.String:
+                    DrawString(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Boolean:
+                    DrawBoolean(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Date:
+                    DrawDate(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Guid:
+                    DrawGuid(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.Uri:
+                    DrawUri(token, propertyIndex, arrayIndex);
+                    break;
+                case JTokenType.TimeSpan:
+                    DrawTimeSpan(token, propertyIndex, arrayIndex);
+                    break;
             }
         }
 
@@ -362,12 +338,7 @@ namespace Appalachia.Utility.TextEditor.JSON
             var style = guiCollection.GetStyle(JSGUIKeys.TextField);
             var options = guiCollection.GetOptions(JSGUIKeys.TextField);
 
-            var value = EditorGUILayout.TextField(
-                " ",
-                token.Value<Uri>().ToString(),
-                style,
-                options
-            );
+            var value = EditorGUILayout.TextField(" ", token.Value<Uri>().ToString(), style, options);
 
             if (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out var parsed))
             {
@@ -375,23 +346,39 @@ namespace Appalachia.Utility.TextEditor.JSON
             }
         }
 
-        protected void DrawTimeSpan(JToken token, int? propertyIndex, int? arrayIndex)
+        protected string GetFoldoutHeader(bool isObject, bool isArray, string propertyName, int valueCount)
         {
-            EditorGUIUtility.labelWidth = 0.1f;
-            var style = guiCollection.GetStyle(JSGUIKeys.TextField);
-            var options = guiCollection.GetOptions(JSGUIKeys.TextField);
+            var foldoutHeader = isObject
+                ? ZString.Format("{0}  {{{1}}}", propertyName, valueCount)
+                : isArray
+                    ? ZString.Format("{0}  [{1}]", propertyName, valueCount)
+                    : propertyName;
 
-            var value = EditorGUILayout.TextField(
-                " ",
-                token.Value<TimeSpan>().ToString(),
-                style,
-                options
-            );
+            return foldoutHeader;
+        }
 
-            if (TimeSpan.TryParse(value, out var parsed))
-            {
-                AssignFieldResult(token, parsed, arrayIndex);
-            }
+        protected void PrefixLabel(string label, string followingStyleKey, string styleKey)
+        {
+            var style = guiCollection.GetStyle(styleKey);
+            var followingStyle = guiCollection.GetStyle(followingStyleKey);
+            SetLabelWidth(styleKey, label);
+
+            var originalFgColor = GUI.color;
+            var color = guiCollection.GetColor(styleKey);
+
+            GUI.color = color;
+
+            EditorGUILayout.PrefixLabel(label, followingStyle, style);
+
+            GUI.color = originalFgColor;
+        }
+
+        protected void SetLabelWidth(string key, string label)
+        {
+            var style = guiCollection.GetStyle(key);
+            var labelWidth = style.Value.CalcSize(new GUIContent(label)).x;
+            var hierarchyOffset = (EditorGUI.indentLevel * 15f) + 7f;
+            EditorGUIUtility.labelWidth = hierarchyOffset + labelWidth;
         }
 
         /*
@@ -594,26 +581,20 @@ namespace Appalachia.Utility.TextEditor.JSON
             return uniqueName;
         }
 
-        public static void Rename(JToken token, string newName)
-        {
-            var parent = token.Parent;
-            if (parent == null)
-            {
-                throw new InvalidOperationException("The parent is missing.");
-            }
-
-            var newToken = new JProperty(newName, token);
-            parent.Replace(newToken);
-        }
+        #region Nested type: JSGUIKeys
 
         private static class JSGUIKeys
         {
-            private const string Prefix = "JSGUIKEYS.";
-            public const string Object = Prefix + "Object";
+            #region Constants and Static Readonly
+
+            public const string Foldout = Prefix + "Foldout";
             public const string Label = Prefix + "Label";
             public const string NumberField = Prefix + "NumberField";
+            public const string Object = Prefix + "Object";
             public const string TextField = Prefix + "TextField";
-            public const string Foldout = Prefix + "Foldout";
+            private const string Prefix = "JSGUIKEYS.";
+
+            #endregion
 
             public static string GetLevel(int i)
             {
@@ -622,5 +603,17 @@ namespace Appalachia.Utility.TextEditor.JSON
                 return ZString.Format("{0}{1}", pfx, i);
             }
         }
+
+        #endregion
+
+        #region Menu Items
+
+        [MenuItem(PKG.Menu.Assets.Base + "Create/Text/JSON", priority = 200)]
+        public static void CreateNew()
+        {
+            CreateNewFile(new JObject().ToString(), "json");
+        }
+
+        #endregion
     }
 }

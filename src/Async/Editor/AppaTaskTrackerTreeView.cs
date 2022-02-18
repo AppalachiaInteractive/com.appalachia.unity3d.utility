@@ -13,13 +13,28 @@ namespace Appalachia.Utility.Async
 {
     public class AppaTaskTrackerViewItem : TreeViewItem
     {
+        public AppaTaskTrackerViewItem(int id) : base(id)
+        {
+        }
+
+        #region Static Fields and Autoproperties
+
         private static Regex removeHref = new Regex("<a href.+>(.+)</a>", RegexOptions.Compiled);
 
-        public string TaskType { get; set; }
+        #endregion
+
+        #region Fields and Autoproperties
+
         public string Elapsed { get; set; }
+
+        public string PositionFirstLine { get; private set; }
         public string Status { get; set; }
 
+        public string TaskType { get; set; }
+
         private string position;
+
+        #endregion
 
         public string Position
         {
@@ -30,8 +45,6 @@ namespace Appalachia.Utility.Async
                 PositionFirstLine = GetFirstLine(position);
             }
         }
-
-        public string PositionFirstLine { get; private set; }
 
         private static string GetFirstLine(string str)
         {
@@ -48,17 +61,15 @@ namespace Appalachia.Utility.Async
 
             return removeHref.Replace(sb.ToString(), "$1");
         }
-
-        public AppaTaskTrackerViewItem(int id) : base(id)
-        {
-        }
     }
 
     public class AppaTaskTrackerTreeView : TreeView
     {
+        #region Constants and Static Readonly
+
         private const string sortedColumnIndexStateKey = "AppaTaskTrackerTreeView_sortedColumnIndex";
 
-        public IReadOnlyList<TreeViewItem> CurrentBindingItems;
+        #endregion
 
         public AppaTaskTrackerTreeView() : this(
             new TreeViewState(),
@@ -99,12 +110,85 @@ namespace Appalachia.Utility.Async
             header.sortedColumnIndex = SessionState.GetInt(sortedColumnIndexStateKey, 1);
         }
 
+        #region Fields and Autoproperties
+
+        public IReadOnlyList<TreeViewItem> CurrentBindingItems;
+
+        #endregion
+
         public void ReloadAndSort()
         {
             var currentSelected = state.selectedIDs;
             Reload();
             Header_sortingChanged(multiColumnHeader);
             state.selectedIDs = currentSelected;
+        }
+
+        /// <inheritdoc />
+        protected override TreeViewItem BuildRoot()
+        {
+            var root = new TreeViewItem { depth = -1 };
+
+            var children = new List<TreeViewItem>();
+
+            TaskTracker.ForEachActiveTask(
+                (trackingId, awaiterType, status, created, stackTrace) =>
+                {
+                    children.Add(
+                        new AppaTaskTrackerViewItem(trackingId)
+                        {
+                            TaskType = awaiterType,
+                            Status = status.ToString(),
+                            Elapsed = (DateTime.UtcNow - created).TotalSeconds.ToString("00.00"),
+                            Position = stackTrace
+                        }
+                    );
+                }
+            );
+
+            CurrentBindingItems = children;
+            root.children = CurrentBindingItems as List<TreeViewItem>;
+            return root;
+        }
+
+        /// <inheritdoc />
+        protected override bool CanMultiSelect(TreeViewItem item)
+        {
+            return false;
+        }
+
+        /// <inheritdoc />
+        protected override void RowGUI(RowGUIArgs args)
+        {
+            var item = args.item as AppaTaskTrackerViewItem;
+
+            for (var visibleColumnIndex = 0;
+                 visibleColumnIndex < args.GetNumVisibleColumns();
+                 visibleColumnIndex++)
+            {
+                var rect = args.GetCellRect(visibleColumnIndex);
+                var columnIndex = args.GetColumn(visibleColumnIndex);
+
+                var labelStyle = args.selected ? EditorStyles.whiteLabel : EditorStyles.label;
+                labelStyle.alignment = TextAnchor.MiddleLeft;
+                switch (columnIndex)
+                {
+                    case 0:
+                        EditorGUI.LabelField(rect, item.TaskType, labelStyle);
+                        break;
+                    case 1:
+                        EditorGUI.LabelField(rect, item.Elapsed, labelStyle);
+                        break;
+                    case 2:
+                        EditorGUI.LabelField(rect, item.Status, labelStyle);
+                        break;
+                    case 3:
+                        EditorGUI.LabelField(rect, item.PositionFirstLine, labelStyle);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
+                }
+            }
         }
 
         private void Header_sortingChanged(MultiColumnHeader multiColumnHeader)
@@ -144,70 +228,6 @@ namespace Appalachia.Utility.Async
 
             CurrentBindingItems = rootItem.children = orderedEnumerable.Cast<TreeViewItem>().ToList();
             BuildRows(rootItem);
-        }
-
-        protected override TreeViewItem BuildRoot()
-        {
-            var root = new TreeViewItem { depth = -1 };
-
-            var children = new List<TreeViewItem>();
-
-            TaskTracker.ForEachActiveTask(
-                (trackingId, awaiterType, status, created, stackTrace) =>
-                {
-                    children.Add(
-                        new AppaTaskTrackerViewItem(trackingId)
-                        {
-                            TaskType = awaiterType,
-                            Status = status.ToString(),
-                            Elapsed = (DateTime.UtcNow - created).TotalSeconds.ToString("00.00"),
-                            Position = stackTrace
-                        }
-                    );
-                }
-            );
-
-            CurrentBindingItems = children;
-            root.children = CurrentBindingItems as List<TreeViewItem>;
-            return root;
-        }
-
-        protected override bool CanMultiSelect(TreeViewItem item)
-        {
-            return false;
-        }
-
-        protected override void RowGUI(RowGUIArgs args)
-        {
-            var item = args.item as AppaTaskTrackerViewItem;
-
-            for (var visibleColumnIndex = 0;
-                 visibleColumnIndex < args.GetNumVisibleColumns();
-                 visibleColumnIndex++)
-            {
-                var rect = args.GetCellRect(visibleColumnIndex);
-                var columnIndex = args.GetColumn(visibleColumnIndex);
-
-                var labelStyle = args.selected ? EditorStyles.whiteLabel : EditorStyles.label;
-                labelStyle.alignment = TextAnchor.MiddleLeft;
-                switch (columnIndex)
-                {
-                    case 0:
-                        EditorGUI.LabelField(rect, item.TaskType, labelStyle);
-                        break;
-                    case 1:
-                        EditorGUI.LabelField(rect, item.Elapsed, labelStyle);
-                        break;
-                    case 2:
-                        EditorGUI.LabelField(rect, item.Status, labelStyle);
-                        break;
-                    case 3:
-                        EditorGUI.LabelField(rect, item.PositionFirstLine, labelStyle);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
-                }
-            }
         }
     }
 }

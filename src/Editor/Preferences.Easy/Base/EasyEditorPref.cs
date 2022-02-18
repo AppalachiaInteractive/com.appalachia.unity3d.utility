@@ -6,12 +6,8 @@ using UnityEngine;
 
 namespace Appalachia.Utility.Preferences.Easy.Base
 {
-    public abstract class EasyEditorPref<T> : EasyEditorPrefBase,
-                                              IEquatable<EasyEditorPref<T>>,
-                                              IEquatable<T>
+    public abstract class EasyEditorPref<T> : EasyEditorPrefBase, IEquatable<EasyEditorPref<T>>, IEquatable<T>
     {
-        public readonly T defaultValue;
-
         protected EasyEditorPref(
             string path,
             string key,
@@ -37,38 +33,99 @@ namespace Appalachia.Utility.Preferences.Easy.Base
             this.defaultValue = defaultValue;
         }
 
+        #region Fields and Autoproperties
+
+        public readonly T defaultValue;
+
+        #endregion
+
         public abstract T Value { get; set; }
 
-        [DebuggerStepThrough] public bool Equals(EasyEditorPref<T> other)
+        [DebuggerStepThrough]
+        public static bool operator ==(EasyEditorPref<T> left, EasyEditorPref<T> right)
         {
-            if (ReferenceEquals(null, other))
+            return Equals(left, right);
+        }
+
+        [DebuggerStepThrough]
+        public static bool operator ==(EasyEditorPref<T> left, T right)
+        {
+            if (left == null)
             {
                 return false;
             }
 
-            if (ReferenceEquals(this, other))
+            return Equals(left.Value, right);
+        }
+
+        [DebuggerStepThrough]
+        public static implicit operator T(EasyEditorPref<T> wrapper)
+        {
+            return wrapper.Value;
+        }
+
+        [DebuggerStepThrough]
+        public static bool operator !=(EasyEditorPref<T> left, EasyEditorPref<T> right)
+        {
+            return !Equals(left, right);
+        }
+
+        [DebuggerStepThrough]
+        public static bool operator !=(EasyEditorPref<T> left, T right)
+        {
+            if (left == null)
             {
-                return true;
+                return false;
             }
 
-            return (key == other.key) && EqualityComparer<T>.Default.Equals(Value, other.Value);
+            return !Equals(left.Value, right);
         }
 
-        [DebuggerStepThrough] public bool Equals(T other)
+        /// <inheritdoc />
+        public override void DrawDelayedUI()
         {
-            return !ReferenceEquals(null, other) &&
-                   EqualityComparer<T>.Default.Equals(Value, other);
+            DrawInternal(DrawDelayed);
         }
 
+        /// <inheritdoc />
         public override void DrawUI()
         {
             DrawInternal(Draw);
         }
 
-        public override void DrawDelayedUI()
+        [DebuggerStepThrough]
+        public override bool Equals(object obj)
         {
-            DrawInternal(DrawDelayed);
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
+            return Equals((EasyEditorPref<T>)obj);
         }
+
+        [DebuggerStepThrough]
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((key != null ? key.GetHashCode() : 0) * 397) ^
+                       EqualityComparer<T>.Default.GetHashCode(Value);
+            }
+        }
+
+        protected abstract T Draw();
+        protected abstract T DrawDelayed();
 
         private void DrawInternal(Func<T> drawAction)
         {
@@ -96,11 +153,7 @@ namespace Appalachia.Utility.Preferences.Easy.Base
                     var l = new GUIContent(actionLabel ?? "   ");
 
                     var width = EditorStyles.miniButton.CalcSize(l).x;
-                    if (GUILayout.Button(
-                        l,
-                        EditorStyles.miniButton,
-                        GUILayout.Width(width + 10f)
-                    ))
+                    if (GUILayout.Button(l, EditorStyles.miniButton, GUILayout.Width(width + 10f)))
                     {
                         actionButton();
                     }
@@ -115,71 +168,34 @@ namespace Appalachia.Utility.Preferences.Easy.Base
             GUI.enabled = guiEnabled;
         }
 
-        protected abstract T Draw();
-        protected abstract T DrawDelayed();
+        #region IEquatable<EasyEditorPref<T>> Members
 
-        [DebuggerStepThrough] public override bool Equals(object obj)
+        [DebuggerStepThrough]
+        public bool Equals(EasyEditorPref<T> other)
         {
-            if (ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
 
-            if (ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
 
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((EasyEditorPref<T>) obj);
+            return (key == other.key) && EqualityComparer<T>.Default.Equals(Value, other.Value);
         }
 
-        [DebuggerStepThrough] public override int GetHashCode()
+        #endregion
+
+        #region IEquatable<T> Members
+
+        [DebuggerStepThrough]
+        public bool Equals(T other)
         {
-            unchecked
-            {
-                return ((key != null ? key.GetHashCode() : 0) * 397) ^
-                       EqualityComparer<T>.Default.GetHashCode(Value);
-            }
+            return !ReferenceEquals(null, other) && EqualityComparer<T>.Default.Equals(Value, other);
         }
 
-        [DebuggerStepThrough] public static bool operator ==(EasyEditorPref<T> left, EasyEditorPref<T> right)
-        {
-            return Equals(left, right);
-        }
-
-        [DebuggerStepThrough] public static bool operator !=(EasyEditorPref<T> left, EasyEditorPref<T> right)
-        {
-            return !Equals(left, right);
-        }
-
-        [DebuggerStepThrough] public static bool operator ==(EasyEditorPref<T> left, T right)
-        {
-            if (left == null)
-            {
-                return false;
-            }
-
-            return Equals(left.Value, right);
-        }
-
-        [DebuggerStepThrough] public static bool operator !=(EasyEditorPref<T> left, T right)
-        {
-            if (left == null)
-            {
-                return false;
-            }
-
-            return !Equals(left.Value, right);
-        }
-
-        [DebuggerStepThrough] public static implicit operator T(EasyEditorPref<T> wrapper)
-        {
-            return wrapper.Value;
-        }
+        #endregion
     }
 }

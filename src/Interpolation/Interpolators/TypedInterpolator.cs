@@ -20,6 +20,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
             }
         }
 
+        /// <inheritdoc />
         [DebuggerStepThrough]
         public override string ToString()
         {
@@ -87,6 +88,7 @@ namespace Appalachia.Utility.Interpolation.Interpolators
         #region Profiling
 
         private const string _PRF_PFX = nameof(TypedInterpolator<TMode>) + ".";
+
         private static readonly ProfilerMarker _PRF_Target = new ProfilerMarker(_PRF_PFX + nameof(Target));
         private static readonly ProfilerMarker _PRF_Reset = new ProfilerMarker(_PRF_PFX + nameof(Reset));
         private static readonly ProfilerMarker _PRF_Update = new ProfilerMarker(_PRF_PFX + nameof(Update));

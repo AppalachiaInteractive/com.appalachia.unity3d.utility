@@ -38,6 +38,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(CanConvert));
 
         private static Dictionary<string, Type> _typeByNameLookup;
+        private static HashSet<Type> _typesInNameLookup;
 
         private static Utf8PreparedFormat<string, string> _typeWithNamespaceFormat;
 
@@ -66,16 +67,19 @@ namespace Appalachia.Utility.Reflection.Extensions
             }
         }
 
-        public static Type GetByName(string nameWithNamespace)
+        public static Type GetByName(string typeNamespace, string typeName)
         {
             using (_PRF_GetByName.Auto())
             {
                 _typeWithNamespaceFormat ??=
                     new Utf8PreparedFormat<string, string>(TYPE_WITH_NAMESPACE_FORMAT_STRING);
 
+                var nameWithNamespace = _typeWithNamespaceFormat.Format(typeNamespace, typeName);
+
                 var types = GetAllTypes_CACHED();
 
                 _typeByNameLookup ??= new Dictionary<string, Type>(types.Length);
+                _typesInNameLookup ??= new();
 
                 if (_typeByNameLookup.ContainsKey(nameWithNamespace))
                 {
@@ -86,6 +90,13 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 foreach (var type in types)
                 {
+                    if (_typesInNameLookup.Contains(type))
+                    {
+                        continue;
+                    }
+
+                    _typesInNameLookup.Add(type);
+
                     var formattedNameWithNamespace =
                         _typeWithNamespaceFormat.Format(type.Namespace, type.Name);
 
@@ -102,6 +113,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                     }
 
                     result = type;
+                    break;
                 }
 
                 return result;

@@ -69,14 +69,20 @@ namespace Appalachia.Utility.Async.Linq
 
     internal sealed class SkipWhile<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, bool> predicate;
-
         public SkipWhile(IAppaTaskAsyncEnumerable<TSource> source, Func<TSource, bool> predicate)
         {
             this.source = source;
             this.predicate = predicate;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, bool> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
 
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
@@ -84,10 +90,12 @@ namespace Appalachia.Utility.Async.Linq
             return new _SkipWhile(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhile
+
         private class _SkipWhile : AsyncEnumeratorBase<TSource, TSource>
         {
-            private Func<TSource, bool> predicate;
-
             public _SkipWhile(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, bool> predicate,
@@ -96,6 +104,13 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, bool> predicate;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -116,18 +131,26 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 
     internal sealed class SkipWhileInt<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, int, bool> predicate;
-
         public SkipWhileInt(IAppaTaskAsyncEnumerable<TSource> source, Func<TSource, int, bool> predicate)
         {
             this.source = source;
             this.predicate = predicate;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, int, bool> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
 
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
@@ -135,11 +158,12 @@ namespace Appalachia.Utility.Async.Linq
             return new _SkipWhileInt(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhileInt
+
         private class _SkipWhileInt : AsyncEnumeratorBase<TSource, TSource>
         {
-            private Func<TSource, int, bool> predicate;
-            private int index;
-
             public _SkipWhileInt(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, int, bool> predicate,
@@ -148,6 +172,14 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, int, bool> predicate;
+            private int index;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -168,13 +200,12 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 
     internal sealed class SkipWhileAwait<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, AppaTask<bool>> predicate;
-
         public SkipWhileAwait(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, AppaTask<bool>> predicate)
@@ -183,16 +214,27 @@ namespace Appalachia.Utility.Async.Linq
             this.predicate = predicate;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, AppaTask<bool>> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _SkipWhileAwait(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhileAwait
+
         private class _SkipWhileAwait : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, bool>
         {
-            private Func<TSource, AppaTask<bool>> predicate;
-
             public _SkipWhileAwait(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, AppaTask<bool>> predicate,
@@ -201,6 +243,13 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, AppaTask<bool>> predicate;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<bool> TransformAsync(TSource sourceCurrent)
             {
                 if (predicate == null)
@@ -211,6 +260,7 @@ namespace Appalachia.Utility.Async.Linq
                 return predicate(sourceCurrent);
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(bool awaitResult, out bool terminateIteration)
             {
                 if (!awaitResult)
@@ -225,13 +275,12 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 
     internal sealed class SkipWhileIntAwait<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, int, AppaTask<bool>> predicate;
-
         public SkipWhileIntAwait(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, int, AppaTask<bool>> predicate)
@@ -240,17 +289,27 @@ namespace Appalachia.Utility.Async.Linq
             this.predicate = predicate;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, int, AppaTask<bool>> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _SkipWhileIntAwait(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhileIntAwait
+
         private class _SkipWhileIntAwait : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, bool>
         {
-            private Func<TSource, int, AppaTask<bool>> predicate;
-            private int index;
-
             public _SkipWhileIntAwait(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, int, AppaTask<bool>> predicate,
@@ -259,6 +318,14 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, int, AppaTask<bool>> predicate;
+            private int index;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<bool> TransformAsync(TSource sourceCurrent)
             {
                 if (predicate == null)
@@ -269,6 +336,7 @@ namespace Appalachia.Utility.Async.Linq
                 return predicate(sourceCurrent, checked(index++));
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(bool awaitResult, out bool terminateIteration)
             {
                 terminateIteration = false;
@@ -282,13 +350,12 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 
     internal sealed class SkipWhileAwaitWithCancellation<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, CancellationToken, AppaTask<bool>> predicate;
-
         public SkipWhileAwaitWithCancellation(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, CancellationToken, AppaTask<bool>> predicate)
@@ -297,17 +364,28 @@ namespace Appalachia.Utility.Async.Linq
             this.predicate = predicate;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, CancellationToken, AppaTask<bool>> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _SkipWhileAwaitWithCancellation(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhileAwaitWithCancellation
+
         private class
             _SkipWhileAwaitWithCancellation : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, bool>
         {
-            private Func<TSource, CancellationToken, AppaTask<bool>> predicate;
-
             public _SkipWhileAwaitWithCancellation(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, CancellationToken, AppaTask<bool>> predicate,
@@ -316,6 +394,13 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, CancellationToken, AppaTask<bool>> predicate;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<bool> TransformAsync(TSource sourceCurrent)
             {
                 if (predicate == null)
@@ -326,6 +411,7 @@ namespace Appalachia.Utility.Async.Linq
                 return predicate(sourceCurrent, cancellationToken);
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(bool awaitResult, out bool terminateIteration)
             {
                 terminateIteration = false;
@@ -339,13 +425,12 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 
     internal sealed class SkipWhileIntAwaitWithCancellation<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, int, CancellationToken, AppaTask<bool>> predicate;
-
         public SkipWhileIntAwaitWithCancellation(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, int, CancellationToken, AppaTask<bool>> predicate)
@@ -354,18 +439,28 @@ namespace Appalachia.Utility.Async.Linq
             this.predicate = predicate;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, int, CancellationToken, AppaTask<bool>> predicate;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _SkipWhileIntAwaitWithCancellation(source, predicate, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _SkipWhileIntAwaitWithCancellation
+
         private class
             _SkipWhileIntAwaitWithCancellation : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, bool>
         {
-            private Func<TSource, int, CancellationToken, AppaTask<bool>> predicate;
-            private int index;
-
             public _SkipWhileIntAwaitWithCancellation(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, int, CancellationToken, AppaTask<bool>> predicate,
@@ -374,6 +469,14 @@ namespace Appalachia.Utility.Async.Linq
                 this.predicate = predicate;
             }
 
+            #region Fields and Autoproperties
+
+            private Func<TSource, int, CancellationToken, AppaTask<bool>> predicate;
+            private int index;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<bool> TransformAsync(TSource sourceCurrent)
             {
                 if (predicate == null)
@@ -384,6 +487,7 @@ namespace Appalachia.Utility.Async.Linq
                 return predicate(sourceCurrent, checked(index++), cancellationToken);
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(bool awaitResult, out bool terminateIteration)
             {
                 terminateIteration = false;
@@ -397,5 +501,7 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 }

@@ -83,14 +83,20 @@ namespace Appalachia.Utility.Async.Linq
 
     internal sealed class Distinct<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly IEqualityComparer<TSource> comparer;
-
         public Distinct(IAppaTaskAsyncEnumerable<TSource> source, IEqualityComparer<TSource> comparer)
         {
             this.source = source;
             this.comparer = comparer;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private readonly IEqualityComparer<TSource> comparer;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
 
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
@@ -98,10 +104,12 @@ namespace Appalachia.Utility.Async.Linq
             return new _Distinct(source, comparer, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _Distinct
+
         private class _Distinct : AsyncEnumeratorBase<TSource, TSource>
         {
-            private readonly HashSet<TSource> set;
-
             public _Distinct(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 IEqualityComparer<TSource> comparer,
@@ -110,6 +118,13 @@ namespace Appalachia.Utility.Async.Linq
                 set = new HashSet<TSource>(comparer);
             }
 
+            #region Fields and Autoproperties
+
+            private readonly HashSet<TSource> set;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -130,14 +145,12 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 
     internal sealed class Distinct<TSource, TKey> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, TKey> keySelector;
-        private readonly IEqualityComparer<TKey> comparer;
-
         public Distinct(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, TKey> keySelector,
@@ -148,17 +161,28 @@ namespace Appalachia.Utility.Async.Linq
             this.comparer = comparer;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, TKey> keySelector;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private readonly IEqualityComparer<TKey> comparer;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _Distinct(source, keySelector, comparer, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _Distinct
+
         private class _Distinct : AsyncEnumeratorBase<TSource, TSource>
         {
-            private readonly HashSet<TKey> set;
-            private readonly Func<TSource, TKey> keySelector;
-
             public _Distinct(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, TKey> keySelector,
@@ -169,6 +193,14 @@ namespace Appalachia.Utility.Async.Linq
                 this.keySelector = keySelector;
             }
 
+            #region Fields and Autoproperties
+
+            private readonly Func<TSource, TKey> keySelector;
+            private readonly HashSet<TKey> set;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -189,14 +221,12 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 
     internal sealed class DistinctAwait<TSource, TKey> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, AppaTask<TKey>> keySelector;
-        private readonly IEqualityComparer<TKey> comparer;
-
         public DistinctAwait(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, AppaTask<TKey>> keySelector,
@@ -207,17 +237,28 @@ namespace Appalachia.Utility.Async.Linq
             this.comparer = comparer;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, AppaTask<TKey>> keySelector;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private readonly IEqualityComparer<TKey> comparer;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _DistinctAwait(source, keySelector, comparer, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _DistinctAwait
+
         private class _DistinctAwait : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, TKey>
         {
-            private readonly HashSet<TKey> set;
-            private readonly Func<TSource, AppaTask<TKey>> keySelector;
-
             public _DistinctAwait(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, AppaTask<TKey>> keySelector,
@@ -228,11 +269,20 @@ namespace Appalachia.Utility.Async.Linq
                 this.keySelector = keySelector;
             }
 
+            #region Fields and Autoproperties
+
+            private readonly Func<TSource, AppaTask<TKey>> keySelector;
+            private readonly HashSet<TKey> set;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<TKey> TransformAsync(TSource sourceCurrent)
             {
                 return keySelector(sourceCurrent);
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(TKey awaitResult, out bool terminateIteration)
             {
                 if (set.Add(awaitResult))
@@ -246,14 +296,12 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 
     internal sealed class DistinctAwaitWithCancellation<TSource, TKey> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> source;
-        private readonly Func<TSource, CancellationToken, AppaTask<TKey>> keySelector;
-        private readonly IEqualityComparer<TKey> comparer;
-
         public DistinctAwaitWithCancellation(
             IAppaTaskAsyncEnumerable<TSource> source,
             Func<TSource, CancellationToken, AppaTask<TKey>> keySelector,
@@ -264,18 +312,29 @@ namespace Appalachia.Utility.Async.Linq
             this.comparer = comparer;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly Func<TSource, CancellationToken, AppaTask<TKey>> keySelector;
+        private readonly IAppaTaskAsyncEnumerable<TSource> source;
+        private readonly IEqualityComparer<TKey> comparer;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _DistinctAwaitWithCancellation(source, keySelector, comparer, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _DistinctAwaitWithCancellation
+
         private class
             _DistinctAwaitWithCancellation : AsyncEnumeratorAwaitSelectorBase<TSource, TSource, TKey>
         {
-            private readonly HashSet<TKey> set;
-            private readonly Func<TSource, CancellationToken, AppaTask<TKey>> keySelector;
-
             public _DistinctAwaitWithCancellation(
                 IAppaTaskAsyncEnumerable<TSource> source,
                 Func<TSource, CancellationToken, AppaTask<TKey>> keySelector,
@@ -286,11 +345,20 @@ namespace Appalachia.Utility.Async.Linq
                 this.keySelector = keySelector;
             }
 
+            #region Fields and Autoproperties
+
+            private readonly Func<TSource, CancellationToken, AppaTask<TKey>> keySelector;
+            private readonly HashSet<TKey> set;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override AppaTask<TKey> TransformAsync(TSource sourceCurrent)
             {
                 return keySelector(sourceCurrent, cancellationToken);
             }
 
+            /// <inheritdoc />
             protected override bool TrySetCurrentCore(TKey awaitResult, out bool terminateIteration)
             {
                 if (set.Add(awaitResult))
@@ -304,5 +372,7 @@ namespace Appalachia.Utility.Async.Linq
                 return false;
             }
         }
+
+        #endregion
     }
 }

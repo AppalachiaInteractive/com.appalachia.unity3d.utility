@@ -4,23 +4,27 @@ namespace Appalachia.Utility.TextEditor.Text
 {
     public class EditableTextDocument : EditableDocument<EditableTextDocument, TextDocumentDrawer>
     {
+        /// <inheritdoc />
         protected internal override void ParseText(string text)
         {
         }
 
-        protected override string Serialize()
+        /// <inheritdoc />
+        protected override bool CheckIsValid(string text)
         {
-            return RawText;
+            return true;
         }
 
+        /// <inheritdoc />
         protected override TextDocumentDrawer GetDocumentDrawer()
         {
             return drawerInstance ??= new TextDocumentDrawer();
         }
 
-        protected override bool CheckIsValid(string text)
+        /// <inheritdoc />
+        protected override string Serialize()
         {
-            return true;
+            return RawText;
         }
     }
 }

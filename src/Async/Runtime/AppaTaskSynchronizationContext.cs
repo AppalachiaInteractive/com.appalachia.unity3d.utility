@@ -6,25 +6,45 @@ namespace Appalachia.Utility.Async
 {
     public class AppaTaskSynchronizationContext : SynchronizationContext
     {
-        private const int MaxArrayLength = 0X7FEFFFFF;
+        #region Constants and Static Readonly
+
         private const int InitialSize = 16;
+        private const int MaxArrayLength = 0X7FEFFFFF;
 
-        private static SpinLock gate = new SpinLock(false);
+        #endregion
+
+        #region Static Fields and Autoproperties
+
         private static bool dequing;
-
         private static int actionListCount;
+        private static SpinLock gate = new SpinLock(false);
         private static Callback[] actionList = new Callback[InitialSize];
-
         private static int waitingListCount;
         private static Callback[] waitingList = new Callback[InitialSize];
 
         private static int opCount;
 
-        public override void Send(SendOrPostCallback d, object state)
+        #endregion
+
+        /// <inheritdoc />
+        public override SynchronizationContext CreateCopy()
         {
-            d(state);
+            return this;
         }
 
+        /// <inheritdoc />
+        public override void OperationCompleted()
+        {
+            Interlocked.Decrement(ref opCount);
+        }
+
+        /// <inheritdoc />
+        public override void OperationStarted()
+        {
+            Interlocked.Increment(ref opCount);
+        }
+
+        /// <inheritdoc />
         public override void Post(SendOrPostCallback d, object state)
         {
             var lockTaken = false;
@@ -80,19 +100,10 @@ namespace Appalachia.Utility.Async
             }
         }
 
-        public override void OperationStarted()
+        /// <inheritdoc />
+        public override void Send(SendOrPostCallback d, object state)
         {
-            Interlocked.Increment(ref opCount);
-        }
-
-        public override void OperationCompleted()
-        {
-            Interlocked.Decrement(ref opCount);
-        }
-
-        public override SynchronizationContext CreateCopy()
-        {
-            return this;
+            d(state);
         }
 
         // delegate entrypoint.
@@ -151,17 +162,23 @@ namespace Appalachia.Utility.Async
             }
         }
 
+        #region Nested type: Callback
+
         [StructLayout(LayoutKind.Auto)]
         private readonly struct Callback
         {
-            private readonly SendOrPostCallback callback;
-            private readonly object state;
-
             public Callback(SendOrPostCallback callback, object state)
             {
                 this.callback = callback;
                 this.state = state;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly object state;
+            private readonly SendOrPostCallback callback;
+
+            #endregion
 
             public void Invoke()
             {
@@ -175,5 +192,7 @@ namespace Appalachia.Utility.Async
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -8,6 +8,9 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
     public abstract class DocumentDrawer<TDocument> : DrawerBase
         where TDocument : EditableDocumentBase
     {
+        protected abstract void DrawDocument(TDocument document);
+
+        /// <inheritdoc />
         protected override void OnDraw(EditableDocumentBase document)
         {
             var cast = document as TDocument;
@@ -21,8 +24,6 @@ namespace Appalachia.Utility.TextEditor.Core.Drawers
                 DrawDocument(cast);
             }
         }
-
-        protected abstract void DrawDocument(TDocument document);
 
         protected void DrawTextMode(TDocument document)
         {

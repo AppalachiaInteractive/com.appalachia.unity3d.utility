@@ -9,14 +9,16 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
         {
         }
 
+        [DebuggerStepThrough]
+        public static implicit operator GUIStyle(GUIStyleCache value)
+        {
+            return value.Value;
+        }
+
+        /// <inheritdoc />
         public override GUIStyle Default()
         {
             return GUIStyle.none;
-        }
-
-        [DebuggerStepThrough] public static implicit operator GUIStyle(GUIStyleCache value)
-        {
-            return value.Value;
         }
     }
 }

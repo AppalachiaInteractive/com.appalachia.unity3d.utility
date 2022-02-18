@@ -12,7 +12,11 @@ namespace Appalachia.Utility.Async
 {
     internal static class AwaiterActions
     {
+        #region Constants and Static Readonly
+
         internal static readonly Action<object> InvokeContinuationDelegate = Continuation;
+
+        #endregion
 
         [DebuggerHidden]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,6 +104,7 @@ namespace Appalachia.Utility.Async
 
 #endif
 
+        /// <inheritdoc />
         public override string ToString()
         {
             if (source == null)
@@ -147,12 +152,18 @@ namespace Appalachia.Utility.Async
 
         private sealed class AsyncUnitSource : IAppaTaskSource<AsyncUnit>
         {
-            private readonly IAppaTaskSource source;
-
             public AsyncUnitSource(IAppaTaskSource source)
             {
                 this.source = source;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly IAppaTaskSource source;
+
+            #endregion
+
+            #region IAppaTaskSource<AsyncUnit> Members
 
             public AsyncUnit GetResult(short token)
             {
@@ -179,16 +190,24 @@ namespace Appalachia.Utility.Async
             {
                 GetResult(token);
             }
+
+            #endregion
         }
 
         private sealed class IsCanceledSource : IAppaTaskSource<bool>
         {
-            private readonly IAppaTaskSource source;
-
             public IsCanceledSource(IAppaTaskSource source)
             {
                 this.source = source;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly IAppaTaskSource source;
+
+            #endregion
+
+            #region IAppaTaskSource<bool> Members
 
             public bool GetResult(short token)
             {
@@ -220,18 +239,26 @@ namespace Appalachia.Utility.Async
             {
                 source.OnCompleted(continuation, state, token);
             }
+
+            #endregion
         }
 
         private sealed class MemoizeSource : IAppaTaskSource
         {
-            private IAppaTaskSource source;
-            private ExceptionDispatchInfo exception;
-            private AppaTaskStatus status;
-
             public MemoizeSource(IAppaTaskSource source)
             {
                 this.source = source;
             }
+
+            #region Fields and Autoproperties
+
+            private AppaTaskStatus status;
+            private ExceptionDispatchInfo exception;
+            private IAppaTaskSource source;
+
+            #endregion
+
+            #region IAppaTaskSource Members
 
             public void GetResult(short token)
             {
@@ -301,18 +328,24 @@ namespace Appalachia.Utility.Async
 
                 return source.UnsafeGetStatus();
             }
+
+            #endregion
         }
 
         public readonly struct Awaiter : ICriticalNotifyCompletion
         {
-            private readonly AppaTask task;
-
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Awaiter(in AppaTask task)
             {
                 this.task = task;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly AppaTask task;
+
+            #endregion
 
             public bool IsCompleted
             {
@@ -332,6 +365,25 @@ namespace Appalachia.Utility.Async
 
                 task.source.GetResult(task.token);
             }
+
+            /// <summary>
+            ///     If register manually continuation, you can use it instead of for compiler OnCompleted methods.
+            /// </summary>
+            [DebuggerHidden]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SourceOnCompleted(Action<object> continuation, object state)
+            {
+                if (task.source == null)
+                {
+                    continuation(state);
+                }
+                else
+                {
+                    task.source.OnCompleted(continuation, state, task.token);
+                }
+            }
+
+            #region ICriticalNotifyCompletion Members
 
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -369,22 +421,7 @@ namespace Appalachia.Utility.Async
                 }
             }
 
-            /// <summary>
-            ///     If register manually continuation, you can use it instead of for compiler OnCompleted methods.
-            /// </summary>
-            [DebuggerHidden]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void SourceOnCompleted(Action<object> continuation, object state)
-            {
-                if (task.source == null)
-                {
-                    continuation(state);
-                }
-                else
-                {
-                    task.source.OnCompleted(continuation, state, task.token);
-                }
-            }
+            #endregion
         }
     }
 
@@ -497,6 +534,7 @@ namespace Appalachia.Utility.Async
             return new AppaTask<(bool, T)>(new IsCanceledSource(source), token);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return source == null ? result?.ToString() : "(" + source.UnsafeGetStatus() + ")";
@@ -504,14 +542,20 @@ namespace Appalachia.Utility.Async
 
         private sealed class IsCanceledSource : IAppaTaskSource<(bool, T)>
         {
-            private readonly IAppaTaskSource<T> source;
-
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public IsCanceledSource(IAppaTaskSource<T> source)
             {
                 this.source = source;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly IAppaTaskSource<T> source;
+
+            #endregion
+
+            #region IAppaTaskSource<(bool, T)> Members
 
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -553,19 +597,27 @@ namespace Appalachia.Utility.Async
             {
                 source.OnCompleted(continuation, state, token);
             }
+
+            #endregion
         }
 
         private sealed class MemoizeSource : IAppaTaskSource<T>
         {
-            private IAppaTaskSource<T> source;
-            private T result;
-            private ExceptionDispatchInfo exception;
-            private AppaTaskStatus status;
-
             public MemoizeSource(IAppaTaskSource<T> source)
             {
                 this.source = source;
             }
+
+            #region Fields and Autoproperties
+
+            private AppaTaskStatus status;
+            private ExceptionDispatchInfo exception;
+            private IAppaTaskSource<T> source;
+            private T result;
+
+            #endregion
+
+            #region IAppaTaskSource<T> Members
 
             public T GetResult(short token)
             {
@@ -641,18 +693,24 @@ namespace Appalachia.Utility.Async
 
                 return source.UnsafeGetStatus();
             }
+
+            #endregion
         }
 
         public readonly struct Awaiter : ICriticalNotifyCompletion
         {
-            private readonly AppaTask<T> task;
-
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Awaiter(in AppaTask<T> task)
             {
                 this.task = task;
             }
+
+            #region Fields and Autoproperties
+
+            private readonly AppaTask<T> task;
+
+            #endregion
 
             public bool IsCompleted
             {
@@ -673,6 +731,26 @@ namespace Appalachia.Utility.Async
 
                 return s.GetResult(task.token);
             }
+
+            /// <summary>
+            ///     If register manually continuation, you can use it instead of for compiler OnCompleted methods.
+            /// </summary>
+            [DebuggerHidden]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SourceOnCompleted(Action<object> continuation, object state)
+            {
+                var s = task.source;
+                if (s == null)
+                {
+                    continuation(state);
+                }
+                else
+                {
+                    s.OnCompleted(continuation, state, task.token);
+                }
+            }
+
+            #region ICriticalNotifyCompletion Members
 
             [DebuggerHidden]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -704,23 +782,7 @@ namespace Appalachia.Utility.Async
                 }
             }
 
-            /// <summary>
-            ///     If register manually continuation, you can use it instead of for compiler OnCompleted methods.
-            /// </summary>
-            [DebuggerHidden]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void SourceOnCompleted(Action<object> continuation, object state)
-            {
-                var s = task.source;
-                if (s == null)
-                {
-                    continuation(state);
-                }
-                else
-                {
-                    s.OnCompleted(continuation, state, task.token);
-                }
-            }
+            #endregion
         }
     }
 }

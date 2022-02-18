@@ -28,15 +28,16 @@ namespace Appalachia.Utility.Constants
         public static readonly Color RichYellow = new(211f / 255f, 170f / 255f, 095f / 255f, 1.0f);
         public static readonly Color Tan = new(175f / 255f, 165f / 255f, 143f / 255f, 1.0f);
         public static readonly Color Yellow = new(217f / 255f, 183f / 255f, 118f / 255f, 1.0f);
-        private static readonly Color LogConstant = new(095f / 255f, 156f / 255f, 171f / 255f, 1.0f);
-        private static readonly Color LogEnum = new(135f / 255f, 126f / 255f, 200f / 255f, 1.0f);
-        private static readonly Color LogEvent = new(071f / 255f, 119f / 255f, 198f / 255f, 1.0f);
-        private static readonly Color LogField = new(127f / 255f, 163f / 255f, 155f / 255f, 1.0f);
-        private static readonly Color LogInt = new(068f / 255f, 137f / 255f, 240f / 255f, 1.0f);
-        private static readonly Color LogMethod = new(174f / 255f, 084f / 255f, 047f / 255f, 1.0f);
+        private static readonly Color LogConstant = new(048f / 255f, 105f / 255f, 0851f / 255f, 1.0f);
+        private static readonly Color LogEnum = new(101f / 255f, 135f / 255f, 134f / 255f, 1.0f);
+        private static readonly Color LogEvent = new(087f / 255f, 091f / 255f, 1028f / 255f, 1.0f);
+        private static readonly Color LogField = new(106f / 255f, 128f / 255f, 099f / 255f, 1.0f);
+        private static readonly Color LogInt = new(079f / 255f, 123f / 255f, 180f / 255f, 1.0f);
+        private static readonly Color LogMethod = new(166f / 255f, 090f / 255f, 050f / 255f, 1.0f);
 
         private static readonly Color LogName = Green;
-        private static readonly Color LogType = new(228f / 255f, 168f / 255f, 064f / 255f, 1.0f);
+        private static readonly Color LogPath = new(176f / 255f, 083f / 255f, 070f / 255f, 1.0f);
+        private static readonly Color LogType = new(191f / 255f, 144f / 255f, 067f / 255f, 1.0f);
         private const string COMPONENT_FORMAT_STRING = "{0}.{1}";
         private const string GENERIC_METHOD_EXCEPTION_FORMAT_STRING = "Error in {0} of {1}.";
 
@@ -58,23 +59,30 @@ namespace Appalachia.Utility.Constants
 
         #region Static Fields and Autoproperties
 
-        private static Dictionary<int, string> _cachedintFormatForLoggingResults;
+        private static Dictionary<double, string> _cachedDoubleFormatForLoggingResults;
 
-        private static Dictionary<object, string> _cachedobjectFormatForLoggingResults;
+        private static Dictionary<float, string> _cachedFloatFormatForLoggingResults;
 
-        private static Dictionary<string, string> _cachedstringBoldResults;
+        private static Dictionary<int, string> _cachedIntFormatForLoggingResults;
 
-        private static Dictionary<string, string> _cachedstringFormatConstantForLoggingResults;
+        private static Dictionary<object, string> _cachedObjectFormatForLoggingResults;
 
-        private static Dictionary<string, string> _cachedstringFormatEventForLoggingResults;
+        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>>
+            _cachedCallerMemberFormatResults;
 
-        private static Dictionary<string, string> _cachedstringFormatFieldForLoggingResults;
+        private static Dictionary<string, string> _cachedStringBoldResults;
 
-        private static Dictionary<string, string> _cachedstringFormatMethodForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatConstantForLoggingResults;
 
-        private static Dictionary<string, string> _cachedstringFormatNameForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatEventForLoggingResults;
 
-        private static Dictionary<string, string> _cachedstringItalicResults;
+        private static Dictionary<string, string> _cachedStringFormatFieldForLoggingResults;
+
+        private static Dictionary<string, string> _cachedStringFormatMethodForLoggingResults;
+
+        private static Dictionary<string, string> _cachedStringFormatNameForLoggingResults;
+
+        private static Dictionary<string, string> _cachedStringItalicResults;
 
         private static Dictionary<Type, Dictionary<object, string>> _cachedFormatEnumForLogging;
 
@@ -88,120 +96,161 @@ namespace Appalachia.Utility.Constants
 
         #endregion
 
-        private static Dictionary<int, string> CachedintFormatForLoggingResults
+        private static Dictionary<double, string> CachedDoubleFormatForLoggingResults
         {
             get
             {
-                if (_cachedintFormatForLoggingResults == null)
+                if (_cachedDoubleFormatForLoggingResults == null)
                 {
-                    _cachedintFormatForLoggingResults = new Dictionary<int, string>();
+                    _cachedDoubleFormatForLoggingResults = new Dictionary<double, string>();
                 }
 
-                return _cachedintFormatForLoggingResults;
+                return _cachedDoubleFormatForLoggingResults;
             }
         }
 
-        private static Dictionary<object, string> CachedobjectFormatForLoggingResults
+        private static Dictionary<float, string> CachedFloatFormatForLoggingResults
         {
             get
             {
-                if (_cachedobjectFormatForLoggingResults == null)
+                if (_cachedFloatFormatForLoggingResults == null)
                 {
-                    _cachedobjectFormatForLoggingResults = new Dictionary<object, string>();
+                    _cachedFloatFormatForLoggingResults = new Dictionary<float, string>();
                 }
 
-                return _cachedobjectFormatForLoggingResults;
+                return _cachedFloatFormatForLoggingResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringBoldResults
+        private static Dictionary<int, string> CachedIntFormatForLoggingResults
         {
             get
             {
-                if (_cachedstringBoldResults == null)
+                if (_cachedIntFormatForLoggingResults == null)
                 {
-                    _cachedstringBoldResults = new Dictionary<string, string>();
+                    _cachedIntFormatForLoggingResults = new Dictionary<int, string>();
                 }
 
-                return _cachedstringBoldResults;
+                return _cachedIntFormatForLoggingResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringFormatConstantForLoggingResults
+        private static Dictionary<object, string> CachedObjectFormatForLoggingResults
         {
             get
             {
-                if (_cachedstringFormatConstantForLoggingResults == null)
+                if (_cachedObjectFormatForLoggingResults == null)
                 {
-                    _cachedstringFormatConstantForLoggingResults = new Dictionary<string, string>();
+                    _cachedObjectFormatForLoggingResults = new Dictionary<object, string>();
                 }
 
-                return _cachedstringFormatConstantForLoggingResults;
+                return _cachedObjectFormatForLoggingResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringFormatEventForLoggingResults
+        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>>
+            CachedCallerMemberFormatResults
         {
             get
             {
-                if (_cachedstringFormatEventForLoggingResults == null)
+                if (_cachedCallerMemberFormatResults == null)
                 {
-                    _cachedstringFormatEventForLoggingResults = new Dictionary<string, string>();
+                    _cachedCallerMemberFormatResults =
+                        new Dictionary<string, Dictionary<string, Dictionary<int, string>>>();
                 }
 
-                return _cachedstringFormatEventForLoggingResults;
+                return _cachedCallerMemberFormatResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringFormatFieldForLoggingResults
+        private static Dictionary<string, string> CachedStringBoldResults
         {
             get
             {
-                if (_cachedstringFormatFieldForLoggingResults == null)
+                if (_cachedStringBoldResults == null)
                 {
-                    _cachedstringFormatFieldForLoggingResults = new Dictionary<string, string>();
+                    _cachedStringBoldResults = new Dictionary<string, string>();
                 }
 
-                return _cachedstringFormatFieldForLoggingResults;
+                return _cachedStringBoldResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringFormatMethodForLoggingResults
+        private static Dictionary<string, string> CachedStringFormatConstantForLoggingResults
         {
             get
             {
-                if (_cachedstringFormatMethodForLoggingResults == null)
+                if (_cachedStringFormatConstantForLoggingResults == null)
                 {
-                    _cachedstringFormatMethodForLoggingResults = new Dictionary<string, string>();
+                    _cachedStringFormatConstantForLoggingResults = new Dictionary<string, string>();
                 }
 
-                return _cachedstringFormatMethodForLoggingResults;
+                return _cachedStringFormatConstantForLoggingResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringFormatNameForLoggingResults
+        private static Dictionary<string, string> CachedStringFormatEventForLoggingResults
         {
             get
             {
-                if (_cachedstringFormatNameForLoggingResults == null)
+                if (_cachedStringFormatEventForLoggingResults == null)
                 {
-                    _cachedstringFormatNameForLoggingResults = new Dictionary<string, string>();
+                    _cachedStringFormatEventForLoggingResults = new Dictionary<string, string>();
                 }
 
-                return _cachedstringFormatNameForLoggingResults;
+                return _cachedStringFormatEventForLoggingResults;
             }
         }
 
-        private static Dictionary<string, string> CachedstringItalicResults
+        private static Dictionary<string, string> CachedStringFormatFieldForLoggingResults
         {
             get
             {
-                if (_cachedstringItalicResults == null)
+                if (_cachedStringFormatFieldForLoggingResults == null)
                 {
-                    _cachedstringItalicResults = new Dictionary<string, string>();
+                    _cachedStringFormatFieldForLoggingResults = new Dictionary<string, string>();
                 }
 
-                return _cachedstringItalicResults;
+                return _cachedStringFormatFieldForLoggingResults;
+            }
+        }
+
+        private static Dictionary<string, string> CachedStringFormatMethodForLoggingResults
+        {
+            get
+            {
+                if (_cachedStringFormatMethodForLoggingResults == null)
+                {
+                    _cachedStringFormatMethodForLoggingResults = new Dictionary<string, string>();
+                }
+
+                return _cachedStringFormatMethodForLoggingResults;
+            }
+        }
+
+        private static Dictionary<string, string> CachedStringFormatNameForLoggingResults
+        {
+            get
+            {
+                if (_cachedStringFormatNameForLoggingResults == null)
+                {
+                    _cachedStringFormatNameForLoggingResults = new Dictionary<string, string>();
+                }
+
+                return _cachedStringFormatNameForLoggingResults;
+            }
+        }
+
+        private static Dictionary<string, string> CachedStringItalicResults
+        {
+            get
+            {
+                if (_cachedStringItalicResults == null)
+                {
+                    _cachedStringItalicResults = new Dictionary<string, string>();
+                }
+
+                return _cachedStringItalicResults;
             }
         }
 
@@ -235,12 +284,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_Bold.Auto())
             {
-                if (!CachedstringBoldResults.ContainsKey(value))
+                if (!CachedStringBoldResults.ContainsKey(value))
                 {
-                    CachedstringBoldResults.Add(value, BOLD.Format(value));
+                    CachedStringBoldResults.Add(value, BOLD.Format(value));
                 }
 
-                return CachedstringBoldResults[value];
+                return CachedStringBoldResults[value];
             }
         }
 
@@ -251,6 +300,47 @@ namespace Appalachia.Utility.Constants
                 var hex = color.ToHexCode(HexCodeFormat.RichText);
 
                 return COLOR.Format(hex, value);
+            }
+        }
+
+        public static string FormatCallerMembersForLogging(
+            this string callerFilePath,
+            string callerMemberName,
+            int callerLineNumber)
+        {
+            using (_PRF_FormatCallerMembersForLogging.Auto())
+            {
+                if (!CachedCallerMemberFormatResults.ContainsKey(callerFilePath))
+                {
+                    CachedCallerMemberFormatResults.Add(
+                        callerFilePath,
+                        new Dictionary<string, Dictionary<int, string>>()
+                    );
+                }
+
+                var callerFilePathDictionary = CachedCallerMemberFormatResults[callerFilePath];
+                if (!callerFilePathDictionary.ContainsKey(callerMemberName))
+                {
+                    callerFilePathDictionary.Add(callerMemberName, new Dictionary<int, string>());
+                }
+
+                var callerMemberNameDictionary = callerFilePathDictionary[callerMemberName];
+
+                if (!callerFilePathDictionary[callerMemberName].ContainsKey(callerLineNumber))
+                {
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(callerFilePath)
+                                         .Bold()
+                                         .Color(LogType);
+                    var lineNumber = callerLineNumber.FormatNumberForLogging();
+                    var memberName = callerMemberName.Bold().Color(LogMethod);
+                    var filePath = callerFilePath.Italic().Color(LogPath);
+
+                    var result = $"{fileName}.{memberName}:{lineNumber} [{filePath}]";
+
+                    callerMemberNameDictionary.Add(callerLineNumber, result);
+                }
+
+                return callerMemberNameDictionary[callerLineNumber];
             }
         }
 
@@ -280,12 +370,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatConstantForLogging.Auto())
             {
-                if (!CachedstringFormatConstantForLoggingResults.ContainsKey(value))
+                if (!CachedStringFormatConstantForLoggingResults.ContainsKey(value))
                 {
-                    CachedstringFormatConstantForLoggingResults.Add(value, Color(Bold(value), LogConstant));
+                    CachedStringFormatConstantForLoggingResults.Add(value, Color(Bold(value), LogConstant));
                 }
 
-                return CachedstringFormatConstantForLoggingResults[value];
+                return CachedStringFormatConstantForLoggingResults[value];
             }
         }
 
@@ -315,12 +405,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatEventForLogging.Auto())
             {
-                if (!CachedstringFormatEventForLoggingResults.ContainsKey(value))
+                if (!CachedStringFormatEventForLoggingResults.ContainsKey(value))
                 {
-                    CachedstringFormatEventForLoggingResults.Add(value, Color(Bold(value), LogEvent));
+                    CachedStringFormatEventForLoggingResults.Add(value, Color(Bold(value), LogEvent));
                 }
 
-                return CachedstringFormatEventForLoggingResults[value];
+                return CachedStringFormatEventForLoggingResults[value];
             }
         }
 
@@ -328,12 +418,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatFieldForLogging.Auto())
             {
-                if (!CachedstringFormatFieldForLoggingResults.ContainsKey(value))
+                if (!CachedStringFormatFieldForLoggingResults.ContainsKey(value))
                 {
-                    CachedstringFormatFieldForLoggingResults.Add(value, Color(Bold(value), LogField));
+                    CachedStringFormatFieldForLoggingResults.Add(value, Color(Bold(value), LogField));
                 }
 
-                return CachedstringFormatFieldForLoggingResults[value];
+                return CachedStringFormatFieldForLoggingResults[value];
             }
         }
 
@@ -354,12 +444,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
-                if (!CachedintFormatForLoggingResults.ContainsKey(value))
+                if (!CachedIntFormatForLoggingResults.ContainsKey(value))
                 {
-                    CachedintFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogInt));
+                    CachedIntFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogInt));
                 }
 
-                return CachedintFormatForLoggingResults[value];
+                return CachedIntFormatForLoggingResults[value];
             }
         }
 
@@ -367,12 +457,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
-                if (!CachedobjectFormatForLoggingResults.ContainsKey(value))
+                if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
                 {
-                    CachedobjectFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogName));
+                    CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogName));
                 }
 
-                return CachedobjectFormatForLoggingResults[value];
+                return CachedObjectFormatForLoggingResults[value];
             }
         }
 
@@ -388,12 +478,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatMethodForLogging.Auto())
             {
-                if (!CachedstringFormatMethodForLoggingResults.ContainsKey(value))
+                if (!CachedStringFormatMethodForLoggingResults.ContainsKey(value))
                 {
-                    CachedstringFormatMethodForLoggingResults.Add(value, Color(Bold(value), LogMethod));
+                    CachedStringFormatMethodForLoggingResults.Add(value, Color(Bold(value), LogMethod));
                 }
 
-                return CachedstringFormatMethodForLoggingResults[value];
+                return CachedStringFormatMethodForLoggingResults[value];
             }
         }
 
@@ -401,12 +491,51 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatNameForLogging.Auto())
             {
-                if (!CachedstringFormatNameForLoggingResults.ContainsKey(value))
+                if (!CachedStringFormatNameForLoggingResults.ContainsKey(value))
                 {
-                    CachedstringFormatNameForLoggingResults.Add(value, Color(Bold(value), LogName));
+                    CachedStringFormatNameForLoggingResults.Add(value, Color(Bold(value), LogName));
                 }
 
-                return CachedstringFormatNameForLoggingResults[value];
+                return CachedStringFormatNameForLoggingResults[value];
+            }
+        }
+
+        public static string FormatNumberForLogging(this int value)
+        {
+            using (_PRF_FormatForLogging.Auto())
+            {
+                if (!CachedIntFormatForLoggingResults.ContainsKey(value))
+                {
+                    CachedIntFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogInt));
+                }
+
+                return CachedIntFormatForLoggingResults[value];
+            }
+        }
+
+        public static string FormatNumberForLogging(this double value)
+        {
+            using (_PRF_FormatForLogging.Auto())
+            {
+                if (!CachedDoubleFormatForLoggingResults.ContainsKey(value))
+                {
+                    CachedDoubleFormatForLoggingResults.Add(value, Color(Bold(value.ToString("F3")), LogInt));
+                }
+
+                return CachedDoubleFormatForLoggingResults[value];
+            }
+        }
+
+        public static string FormatNumberForLogging(this float value)
+        {
+            using (_PRF_FormatForLogging.Auto())
+            {
+                if (!CachedFloatFormatForLoggingResults.ContainsKey(value))
+                {
+                    CachedFloatFormatForLoggingResults.Add(value, Color(Bold(value.ToString("F3")), LogInt));
+                }
+
+                return CachedFloatFormatForLoggingResults[value];
             }
         }
 
@@ -466,12 +595,12 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_Italic.Auto())
             {
-                if (!CachedstringItalicResults.ContainsKey(value))
+                if (!CachedStringItalicResults.ContainsKey(value))
                 {
-                    CachedstringItalicResults.Add(value, ITALIC.Format(value));
+                    CachedStringItalicResults.Add(value, ITALIC.Format(value));
                 }
 
-                return CachedstringItalicResults[value];
+                return CachedStringItalicResults[value];
             }
         }
 
@@ -516,6 +645,9 @@ namespace Appalachia.Utility.Constants
         #region Profiling
 
         private const string _PRF_PFX = nameof(RICH) + ".";
+
+        private static readonly ProfilerMarker _PRF_FormatCallerMembersForLogging =
+            new ProfilerMarker(_PRF_PFX + nameof(FormatCallerMembersForLogging));
 
         private static readonly ProfilerMarker _PRF_GenericMethodException =
             new ProfilerMarker(_PRF_PFX + nameof(GenericMethodException));

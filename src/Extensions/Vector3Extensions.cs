@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Appalachia.Utility.Strings;
+using Unity.Profiling;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -19,9 +20,11 @@ namespace Appalachia.Utility.Extensions
             Vector3 second,
             float anticipationDuration)
         {
-            return new(second.x + ((anticipationDuration / elapsed) * (second.x - first.x)), second.y +
-                ((anticipationDuration / elapsed) * (second.y - first.y)), second.z +
-                ((anticipationDuration / elapsed) * (second.z - first.z)));
+            return new(
+                second.x + ((anticipationDuration / elapsed) * (second.x - first.x)),
+                second.y + ((anticipationDuration / elapsed) * (second.y - first.y)),
+                second.z + ((anticipationDuration / elapsed) * (second.z - first.z))
+            );
         }
 
         public static Vector2 ClampEulerTo180Range(this Vector3 input)
@@ -128,16 +131,6 @@ namespace Appalachia.Utility.Extensions
             return (vector3.x > other.x) && (vector3.y > other.y) && (vector3.z > other.z);
         }
 
-        public static bool GreaterThan(this Vector2 vector3, Vector2 other)
-        {
-            return (vector3.x > other.x) && (vector3.y > other.y);
-        }
-
-        public static bool IsUniform(this Vector2 vector)
-        {
-            return Math.Abs(vector.x - vector.y) < float.Epsilon;
-        }
-
         public static bool IsUniform(this Vector3 vector)
         {
             return (Math.Abs(vector.x - vector.y) < float.Epsilon) &&
@@ -154,45 +147,6 @@ namespace Appalachia.Utility.Extensions
         public static bool LessThan(this Vector3 vector3, Vector3 other)
         {
             return (vector3.x < other.x) && (vector3.y < other.y) && (vector3.z < other.z);
-        }
-
-        public static bool LessThan(this Vector2 vector3, Vector2 other)
-        {
-            return (vector3.x < other.x) && (vector3.y < other.y);
-        }
-
-        public static Vector2[] Normalize(
-            this IEnumerable<Vector2> args,
-            Vector2 min,
-            Vector2 max,
-            bool clamped)
-        {
-            return args.Select(
-                            v =>
-                            {
-                                var x = (v.x - min.x) / (max.x - min.x);
-                                var y = (v.y - min.y) / (max.y - min.y);
-                                return clamped ? new Vector2(x, y).normalized : new Vector2(x, y);
-                            }
-                        )
-                       .ToArray();
-        }
-
-        public static Vector2[] Normalize(this IEnumerable<Vector2> args, bool clamped)
-        {
-            var min = Vector2.positiveInfinity;
-            var max = Vector2.negativeInfinity;
-
-            foreach (var arg in args)
-            {
-                min.x = arg.x < min.x ? arg.x : min.x;
-                min.y = arg.y < min.y ? arg.y : min.y;
-
-                max.x = arg.x > max.x ? arg.x : max.x;
-                max.y = arg.y > max.y ? arg.y : max.y;
-            }
-
-            return Normalize(args, min, max, clamped);
         }
 
         public static Vector3[] Normalize(
@@ -232,59 +186,6 @@ namespace Appalachia.Utility.Extensions
             return Normalize(args, min, max, clamped);
         }
 
-        public static Vector4[] Normalize(
-            this IEnumerable<Vector4> args,
-            Vector4 min,
-            Vector4 max,
-            bool clamped)
-        {
-            return args.Select(
-                            v =>
-                            {
-                                var x = (v.x - min.x) / (max.x - min.x);
-                                var y = (v.y - min.y) / (max.y - min.y);
-                                var z = (v.z - min.z) / (max.z - min.z);
-                                var w = (v.w - min.w) / (max.w - min.w);
-                                return clamped ? new Vector4(x, y, z, w).normalized : new Vector4(x, y, z, w);
-                            }
-                        )
-                       .ToArray();
-        }
-
-        public static Vector4[] Normalize(this IEnumerable<Vector4> args, bool clamped)
-        {
-            var min = Vector4.positiveInfinity;
-            var max = Vector4.negativeInfinity;
-
-            foreach (var arg in args)
-            {
-                min.x = arg.x < min.x ? arg.x : min.x;
-                min.y = arg.y < min.y ? arg.y : min.y;
-                min.z = arg.z < min.z ? arg.z : min.z;
-                min.w = arg.w < min.w ? arg.w : min.w;
-
-                max.x = arg.x > max.x ? arg.x : max.x;
-                max.y = arg.y > max.y ? arg.y : max.y;
-                max.z = arg.z > max.z ? arg.z : max.z;
-                max.w = arg.w > max.w ? arg.w : max.w;
-            }
-
-            return Normalize(args, min, max, clamped);
-        }
-
-        public static Vector2[] NormalizeFrom0(this IEnumerable<Vector2> args, bool clamped)
-        {
-            var max = Vector2.negativeInfinity;
-
-            foreach (var arg in args)
-            {
-                max.x = arg.x > max.x ? arg.x : max.x;
-                max.y = arg.y > max.y ? arg.y : max.y;
-            }
-
-            return Normalize(args, Vector2.zero, max, clamped);
-        }
-
         public static Vector3[] NormalizeFrom0(this IEnumerable<Vector3> args, bool clamped)
         {
             var max = Vector3.negativeInfinity;
@@ -299,21 +200,6 @@ namespace Appalachia.Utility.Extensions
             return Normalize(args, Vector3.zero, max, clamped);
         }
 
-        public static Vector4[] NormalizeFrom0(this IEnumerable<Vector4> args, bool clamped)
-        {
-            var max = Vector4.negativeInfinity;
-
-            foreach (var arg in args)
-            {
-                max.x = arg.x > max.x ? arg.x : max.x;
-                max.y = arg.y > max.y ? arg.y : max.y;
-                max.z = arg.z > max.z ? arg.z : max.z;
-                max.w = arg.w > max.w ? arg.w : max.w;
-            }
-
-            return Normalize(args, Vector4.zero, max, clamped);
-        }
-
         public static bool NotRoughlyOne(this Vector3 input)
         {
             return !Roughly(input, 1);
@@ -326,8 +212,11 @@ namespace Appalachia.Utility.Extensions
 
         public static Vector3 RandomPointWithinBoundingBox(this Vector3 size)
         {
-            return new(Random.Range(-.5f * size.x, .5f * size.x), Random.Range(-.5f * size.y, .5f * size.y),
-                Random.Range(-.5f * size.z,        .5f * size.z));
+            return new(
+                Random.Range(-.5f * size.x, .5f * size.x),
+                Random.Range(-.5f * size.y, .5f * size.y),
+                Random.Range(-.5f * size.z, .5f * size.z)
+            );
         }
 
         public static Vector3 RandomPointWithinBoundingBox(this Vector3 size, Vector3 center)
@@ -411,6 +300,14 @@ namespace Appalachia.Utility.Extensions
             return (source * (1 - ratioSum)) + (other1 * ratio1) + (other2 * ratio2) + (other3 * ratio3);
         }
 
+        public static Vector3 Reciprocal(this Vector3 value)
+        {
+            using (_PRF_Reciprocal.Auto())
+            {
+                return new(1f / value.x, 1f / value.y, 1f / value.z);
+            }
+        }
+
         public static bool Roughly(this Vector3 input, float scalar)
         {
             return input.x.RoughlyEqual(scalar) &&
@@ -433,20 +330,6 @@ namespace Appalachia.Utility.Extensions
         public static bool RoughlyZero(this Vector3 input)
         {
             return Roughly(input, 0);
-        }
-
-        public static Vector2 Round(this Vector2 vector3, int decimalPlaces = 2)
-        {
-            float multiplier = 1;
-            for (var i = 0; i < decimalPlaces; i++)
-            {
-                multiplier *= 10f;
-            }
-
-            return new Vector2(
-                Mathf.Round(vector3.x * multiplier) / multiplier,
-                Mathf.Round(vector3.y * multiplier) / multiplier
-            );
         }
 
         public static Vector3 Round(this Vector3 vector3, int decimalPlaces = 2)
@@ -483,13 +366,6 @@ namespace Appalachia.Utility.Extensions
         public static Vector3 ScaleBy(this Vector3 vector, Vector3 scaleBy)
         {
             return new(vector.x * scaleBy.x, vector.y * scaleBy.y, vector.z * scaleBy.z);
-        }
-
-        public static Vector3 ViewRotationToEulerAngles(this Vector2 input)
-        {
-            input.y = -input.y;
-
-            return new Vector3(input.y, input.x, 0);
         }
 
         public static Vector2 xx(this Vector3 vector3)
@@ -671,5 +547,14 @@ namespace Appalachia.Utility.Extensions
         {
             return new(vector3.z, vector3.z, vector3.z);
         }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(Vector3Extensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_Reciprocal =
+            new ProfilerMarker(_PRF_PFX + nameof(Reciprocal));
+
+        #endregion
     }
 }

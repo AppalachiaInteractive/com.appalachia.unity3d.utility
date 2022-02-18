@@ -31,6 +31,7 @@ namespace Appalachia.Utility.Preferences.Easy
         {
         }
 
+        /// <inheritdoc />
         public override bool Value
         {
             get
@@ -45,11 +46,13 @@ namespace Appalachia.Utility.Preferences.Easy
             set => EditorPrefs.SetBool(key, value);
         }
 
+        /// <inheritdoc />
         protected override bool Draw()
         {
             return EditorGUILayout.Toggle(label, Value);
         }
 
+        /// <inheritdoc />
         protected override bool DrawDelayed()
         {
             return EditorGUILayout.Toggle(label, Value);

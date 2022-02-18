@@ -9,14 +9,16 @@ namespace Appalachia.Utility.TextEditor.Core.GUICache
         {
         }
 
+        [DebuggerStepThrough]
+        public static implicit operator GUIContent(GUIContentCache value)
+        {
+            return value.Value;
+        }
+
+        /// <inheritdoc />
         public override GUIContent Default()
         {
             return GUIContent.none;
-        }
-
-        [DebuggerStepThrough] public static implicit operator GUIContent(GUIContentCache value)
-        {
-            return value.Value;
         }
     }
 }

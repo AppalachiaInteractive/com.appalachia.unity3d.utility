@@ -16,18 +16,28 @@ namespace Appalachia.Utility.Async.Linq
 
     internal sealed class OfType<TResult> : IAppaTaskAsyncEnumerable<TResult>
     {
-        private readonly IAppaTaskAsyncEnumerable<object> source;
-
         public OfType(IAppaTaskAsyncEnumerable<object> source)
         {
             this.source = source;
         }
+
+        #region Fields and Autoproperties
+
+        private readonly IAppaTaskAsyncEnumerable<object> source;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TResult> Members
 
         public IAppaTaskAsyncEnumerator<TResult> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _OfType(source, cancellationToken);
         }
+
+        #endregion
+
+        #region Nested type: _OfType
 
         private class _OfType : AsyncEnumeratorBase<object, TResult>
         {
@@ -36,6 +46,7 @@ namespace Appalachia.Utility.Async.Linq
             {
             }
 
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -55,5 +66,7 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
         }
+
+        #endregion
     }
 }

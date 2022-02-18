@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Appalachia.Utility.Strings;
 using Unity.Mathematics;
@@ -15,30 +16,6 @@ namespace Appalachia.Utility.Extensions
 {
     public static class TransformExtensions
     {
-        #region Profiling
-
-        private const string _PRF_PFX = nameof(TransformExtensions) + ".";
-
-        private static readonly ProfilerMarker _PRF_DestroyChildren =
-            new ProfilerMarker(_PRF_PFX + nameof(DestroyChildren));
-
-        private static readonly ProfilerMarker _PRF_FindInParents =
-            new ProfilerMarker(_PRF_PFX + nameof(FindInParents));
-
-        private static readonly ProfilerMarker _PRF_FullPath =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFullPath));
-
-        private static readonly ProfilerMarker _PRF_GetPathRelativeTo =
-            new ProfilerMarker(_PRF_PFX + nameof(GetPathRelativeTo));
-
-        private static readonly ProfilerMarker _PRF_localToParentMatrix =
-            new ProfilerMarker(_PRF_PFX + nameof(localToParentMatrix));
-
-        private static readonly ProfilerMarker _PRF_SetMatrix4x4ToTransform =
-            new ProfilerMarker(_PRF_PFX + nameof(SetMatrix4x4ToTransform));
-
-        #endregion
-
         #region Constants and Static Readonly
 
         private static readonly Matrix4x4 _matrix_trs_zero = Matrix4x4.TRS(
@@ -51,17 +28,6 @@ namespace Appalachia.Utility.Extensions
 
         #endregion
 
-        private static readonly ProfilerMarker _PRF_SetToOrigin =
-            new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
-
-        public static void SetToOrigin(this Transform transform)
-        {
-            using (_PRF_SetToOrigin.Auto())
-            {
-                transform.SetMatrix4x4ToTransform(Matrix4x4.identity);
-            }
-        }
-        
         public static void DestroyChildren(this Transform transform)
         {
             using (_PRF_DestroyChildren.Auto())
@@ -184,5 +150,72 @@ namespace Appalachia.Utility.Extensions
                 t.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
             }
         }
+
+        public static void SetToOrigin(this Transform transform)
+        {
+            using (_PRF_SetToOrigin.Auto())
+            {
+                transform.SetMatrix4x4ToTransform(Matrix4x4.identity);
+            }
+        }
+
+        public static void SortChildren(this Transform transform, Comparison<Transform> comparison = default)
+        {
+            using (_PRF_SortChildren.Auto())
+            {
+                var sorted = new List<Transform>();
+
+                for (var childIndex = 0; childIndex < transform.childCount; childIndex++)
+                {
+                    var child = transform.GetChild(childIndex);
+
+                    sorted.Add(child);
+                }
+
+                if (comparison == default)
+                {
+                    comparison = (a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal);
+                }
+
+                sorted.Sort(comparison);
+
+                for (var childIndex = 0; childIndex < sorted.Count; childIndex++)
+                {
+                    var child = sorted[childIndex];
+
+                    child.SetSiblingIndex(childIndex);
+                }
+            }
+        }
+
+        #region Profiling
+
+        private const string _PRF_PFX = nameof(TransformExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_DestroyChildren =
+            new ProfilerMarker(_PRF_PFX + nameof(DestroyChildren));
+
+        private static readonly ProfilerMarker _PRF_FindInParents =
+            new ProfilerMarker(_PRF_PFX + nameof(FindInParents));
+
+        private static readonly ProfilerMarker _PRF_FullPath =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFullPath));
+
+        private static readonly ProfilerMarker _PRF_GetPathRelativeTo =
+            new ProfilerMarker(_PRF_PFX + nameof(GetPathRelativeTo));
+
+        private static readonly ProfilerMarker _PRF_localToParentMatrix =
+            new ProfilerMarker(_PRF_PFX + nameof(localToParentMatrix));
+
+        private static readonly ProfilerMarker _PRF_SetMatrix4x4ToTransform =
+            new ProfilerMarker(_PRF_PFX + nameof(SetMatrix4x4ToTransform));
+
+        private static readonly ProfilerMarker _PRF_SortChildren =
+            new ProfilerMarker(_PRF_PFX + nameof(SortChildren));
+
+        private static readonly ProfilerMarker _PRF_SetToOrigin =
+            new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
+
+        #endregion
     }
 }

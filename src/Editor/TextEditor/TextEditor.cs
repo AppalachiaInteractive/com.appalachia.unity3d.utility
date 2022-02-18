@@ -17,10 +17,21 @@ namespace Appalachia.Utility.TextEditor
     [CustomEditor(typeof(TextAsset), true)]
     public class TextEditor : Editor
     {
+        #region Constants and Static Readonly
+
         private const int kMaxChars = 7000;
+
+        #endregion
+
+        #region Fields and Autoproperties
+
         private EditableDocumentBase _document;
-        private TextAsset m_TextAsset;
         [NonSerialized] private GUIStyle m_TextStyle;
+        private TextAsset m_TextAsset;
+
+        #endregion
+
+        #region Event Functions
 
         private void OnEnable()
         {
@@ -36,6 +47,9 @@ namespace Appalachia.Utility.TextEditor
             _document?.Dispose();
         }
 
+        #endregion
+
+        /// <inheritdoc />
         public override void OnInspectorGUI()
         {
             if (m_TextStyle == null)

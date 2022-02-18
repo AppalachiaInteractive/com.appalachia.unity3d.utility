@@ -31,6 +31,7 @@ namespace Appalachia.Utility.Preferences.Easy
         {
         }
 
+        /// <inheritdoc />
         public override int Value
         {
             get
@@ -45,11 +46,13 @@ namespace Appalachia.Utility.Preferences.Easy
             set => EditorPrefs.SetInt(key, value);
         }
 
+        /// <inheritdoc />
         protected override int Draw()
         {
             return EditorGUILayout.IntField(label, Value);
         }
 
+        /// <inheritdoc />
         protected override int DrawDelayed()
         {
             return EditorGUILayout.DelayedIntField(label, Value);

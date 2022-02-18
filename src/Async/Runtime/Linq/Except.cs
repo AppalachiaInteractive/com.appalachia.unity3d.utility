@@ -32,10 +32,6 @@ namespace Appalachia.Utility.Async.Linq
 
     internal sealed class Except<TSource> : IAppaTaskAsyncEnumerable<TSource>
     {
-        private readonly IAppaTaskAsyncEnumerable<TSource> first;
-        private readonly IAppaTaskAsyncEnumerable<TSource> second;
-        private readonly IEqualityComparer<TSource> comparer;
-
         public Except(
             IAppaTaskAsyncEnumerable<TSource> first,
             IAppaTaskAsyncEnumerable<TSource> second,
@@ -46,22 +42,28 @@ namespace Appalachia.Utility.Async.Linq
             this.comparer = comparer;
         }
 
+        #region Fields and Autoproperties
+
+        private readonly IAppaTaskAsyncEnumerable<TSource> first;
+        private readonly IAppaTaskAsyncEnumerable<TSource> second;
+        private readonly IEqualityComparer<TSource> comparer;
+
+        #endregion
+
+        #region IAppaTaskAsyncEnumerable<TSource> Members
+
         public IAppaTaskAsyncEnumerator<TSource> GetAsyncEnumerator(
             CancellationToken cancellationToken = default)
         {
             return new _Except(first, second, comparer, cancellationToken);
         }
 
+        #endregion
+
+        #region Nested type: _Except
+
         private class _Except : AsyncEnumeratorBase<TSource, TSource>
         {
-            private static Action<object> HashSetAsyncCoreDelegate = HashSetAsyncCore;
-
-            private readonly IEqualityComparer<TSource> comparer;
-            private readonly IAppaTaskAsyncEnumerable<TSource> second;
-
-            private HashSet<TSource> set;
-            private AppaTask<HashSet<TSource>>.Awaiter awaiter;
-
             public _Except(
                 IAppaTaskAsyncEnumerable<TSource> first,
                 IAppaTaskAsyncEnumerable<TSource> second,
@@ -72,6 +74,24 @@ namespace Appalachia.Utility.Async.Linq
                 this.comparer = comparer;
             }
 
+            #region Static Fields and Autoproperties
+
+            private static Action<object> HashSetAsyncCoreDelegate = HashSetAsyncCore;
+
+            #endregion
+
+            #region Fields and Autoproperties
+
+            private readonly IAppaTaskAsyncEnumerable<TSource> second;
+
+            private readonly IEqualityComparer<TSource> comparer;
+            private AppaTask<HashSet<TSource>>.Awaiter awaiter;
+
+            private HashSet<TSource> set;
+
+            #endregion
+
+            /// <inheritdoc />
             protected override bool OnFirstIteration()
             {
                 if (set != null)
@@ -93,17 +113,7 @@ namespace Appalachia.Utility.Async.Linq
                 return true;
             }
 
-            private static void HashSetAsyncCore(object state)
-            {
-                var self = (_Except)state;
-
-                if (self.TryGetResult(self.awaiter, out var result))
-                {
-                    self.set = result;
-                    self.SourceMoveNext();
-                }
-            }
-
+            /// <inheritdoc />
             protected override bool TryMoveNextCore(bool sourceHasCurrent, out bool result)
             {
                 if (sourceHasCurrent)
@@ -123,6 +133,19 @@ namespace Appalachia.Utility.Async.Linq
                 result = false;
                 return true;
             }
+
+            private static void HashSetAsyncCore(object state)
+            {
+                var self = (_Except)state;
+
+                if (self.TryGetResult(self.awaiter, out var result))
+                {
+                    self.set = result;
+                    self.SourceMoveNext();
+                }
+            }
         }
+
+        #endregion
     }
 }

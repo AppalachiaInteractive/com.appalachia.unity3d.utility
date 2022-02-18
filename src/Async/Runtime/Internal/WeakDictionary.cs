@@ -10,13 +10,6 @@ namespace Appalachia.Utility.Async.Internal
     internal class WeakDictionary<TKey, TValue>
         where TKey : class
     {
-        private Entry[] buckets;
-        private int size;
-        private SpinLock gate; // mutable struct(not readonly)
-
-        private readonly float loadFactor;
-        private readonly IEqualityComparer<TKey> keyEqualityComparer;
-
         public WeakDictionary(
             int capacity = 4,
             float loadFactor = 0.75f,
@@ -27,6 +20,75 @@ namespace Appalachia.Utility.Async.Internal
             this.loadFactor = loadFactor;
             gate = new SpinLock(false);
             keyEqualityComparer = keyComparer ?? EqualityComparer<TKey>.Default;
+        }
+
+        #region Fields and Autoproperties
+
+        private readonly float loadFactor;
+        private readonly IEqualityComparer<TKey> keyEqualityComparer;
+        private int size;
+        private SpinLock gate; // mutable struct(not readonly)
+        private Entry[] buckets;
+
+        #endregion
+
+        public List<KeyValuePair<TKey, TValue>> ToList()
+        {
+            var list = new List<KeyValuePair<TKey, TValue>>(size);
+            ToList(ref list, false);
+            return list;
+        }
+
+        // avoid allocate everytime.
+        public int ToList(ref List<KeyValuePair<TKey, TValue>> list, bool clear = true)
+        {
+            if (clear)
+            {
+                list.Clear();
+            }
+
+            var listIndex = 0;
+
+            var lockTaken = false;
+            try
+            {
+                for (var i = 0; i < buckets.Length; i++)
+                {
+                    var entry = buckets[i];
+                    while (entry != null)
+                    {
+                        if (entry.Key.TryGetTarget(out var target))
+                        {
+                            var item = new KeyValuePair<TKey, TValue>(target, entry.Value);
+                            if (listIndex < list.Count)
+                            {
+                                list[listIndex++] = item;
+                            }
+                            else
+                            {
+                                list.Add(item);
+                                listIndex++;
+                            }
+                        }
+                        else
+                        {
+                            // sweap
+                            Remove(i, entry);
+                        }
+
+                        entry = entry.Next;
+                    }
+                }
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    gate.Exit(false);
+                }
+            }
+
+            return listIndex;
         }
 
         public bool TryAdd(TKey key, TValue value)
@@ -93,37 +155,24 @@ namespace Appalachia.Utility.Async.Internal
             }
         }
 
-        private bool TryAddInternal(TKey key, TValue value)
+        private static int CalculateCapacity(int collectionSize, float loadFactor)
         {
-            var nextCapacity = CalculateCapacity(size + 1, loadFactor);
+            var size = (int)(collectionSize / loadFactor);
 
-            TRY_ADD_AGAIN:
-            if (buckets.Length < nextCapacity)
+            size--;
+            size |= size >> 1;
+            size |= size >> 2;
+            size |= size >> 4;
+            size |= size >> 8;
+            size |= size >> 16;
+            size += 1;
+
+            if (size < 8)
             {
-                // rehash
-                var nextBucket = new Entry[nextCapacity];
-                for (var i = 0; i < buckets.Length; i++)
-                {
-                    var e = buckets[i];
-                    while (e != null)
-                    {
-                        AddToBuckets(nextBucket, key, e.Value, e.Hash);
-                        e = e.Next;
-                    }
-                }
-
-                buckets = nextBucket;
-                goto TRY_ADD_AGAIN;
+                size = 8;
             }
 
-            // add entry
-            var successAdd = AddToBuckets(buckets, key, value, keyEqualityComparer.GetHashCode(key));
-            if (successAdd)
-            {
-                size++;
-            }
-
-            return successAdd;
+            return size;
         }
 
         private bool AddToBuckets(Entry[] targetBuckets, TKey newKey, TValue value, int keyHash)
@@ -180,6 +229,66 @@ namespace Appalachia.Utility.Async.Internal
             return false;
         }
 
+        private void Remove(int hashIndex, Entry entry)
+        {
+            if ((entry.Prev == null) && (entry.Next == null))
+            {
+                buckets[hashIndex] = null;
+            }
+            else
+            {
+                if (entry.Prev == null)
+                {
+                    buckets[hashIndex] = entry.Next;
+                }
+
+                if (entry.Prev != null)
+                {
+                    entry.Prev.Next = entry.Next;
+                }
+
+                if (entry.Next != null)
+                {
+                    entry.Next.Prev = entry.Prev;
+                }
+            }
+
+            size--;
+        }
+
+        private bool TryAddInternal(TKey key, TValue value)
+        {
+            var nextCapacity = CalculateCapacity(size + 1, loadFactor);
+
+            TRY_ADD_AGAIN:
+            if (buckets.Length < nextCapacity)
+            {
+                // rehash
+                var nextBucket = new Entry[nextCapacity];
+                for (var i = 0; i < buckets.Length; i++)
+                {
+                    var e = buckets[i];
+                    while (e != null)
+                    {
+                        AddToBuckets(nextBucket, key, e.Value, e.Hash);
+                        e = e.Next;
+                    }
+                }
+
+                buckets = nextBucket;
+                goto TRY_ADD_AGAIN;
+            }
+
+            // add entry
+            var successAdd = AddToBuckets(buckets, key, value, keyEqualityComparer.GetHashCode(key));
+            if (successAdd)
+            {
+                size++;
+            }
+
+            return successAdd;
+        }
+
         private bool TryGetEntry(TKey key, out int hashIndex, out Entry entry)
         {
             var table = buckets;
@@ -208,121 +317,22 @@ namespace Appalachia.Utility.Async.Internal
             return false;
         }
 
-        private void Remove(int hashIndex, Entry entry)
-        {
-            if ((entry.Prev == null) && (entry.Next == null))
-            {
-                buckets[hashIndex] = null;
-            }
-            else
-            {
-                if (entry.Prev == null)
-                {
-                    buckets[hashIndex] = entry.Next;
-                }
-
-                if (entry.Prev != null)
-                {
-                    entry.Prev.Next = entry.Next;
-                }
-
-                if (entry.Next != null)
-                {
-                    entry.Next.Prev = entry.Prev;
-                }
-            }
-
-            size--;
-        }
-
-        public List<KeyValuePair<TKey, TValue>> ToList()
-        {
-            var list = new List<KeyValuePair<TKey, TValue>>(size);
-            ToList(ref list, false);
-            return list;
-        }
-
-        // avoid allocate everytime.
-        public int ToList(ref List<KeyValuePair<TKey, TValue>> list, bool clear = true)
-        {
-            if (clear)
-            {
-                list.Clear();
-            }
-
-            var listIndex = 0;
-
-            var lockTaken = false;
-            try
-            {
-                for (var i = 0; i < buckets.Length; i++)
-                {
-                    var entry = buckets[i];
-                    while (entry != null)
-                    {
-                        if (entry.Key.TryGetTarget(out var target))
-                        {
-                            var item = new KeyValuePair<TKey, TValue>(target, entry.Value);
-                            if (listIndex < list.Count)
-                            {
-                                list[listIndex++] = item;
-                            }
-                            else
-                            {
-                                list.Add(item);
-                                listIndex++;
-                            }
-                        }
-                        else
-                        {
-                            // sweap
-                            Remove(i, entry);
-                        }
-
-                        entry = entry.Next;
-                    }
-                }
-            }
-            finally
-            {
-                if (lockTaken)
-                {
-                    gate.Exit(false);
-                }
-            }
-
-            return listIndex;
-        }
-
-        private static int CalculateCapacity(int collectionSize, float loadFactor)
-        {
-            var size = (int)(collectionSize / loadFactor);
-
-            size--;
-            size |= size >> 1;
-            size |= size >> 2;
-            size |= size >> 4;
-            size |= size >> 8;
-            size |= size >> 16;
-            size += 1;
-
-            if (size < 8)
-            {
-                size = 8;
-            }
-
-            return size;
-        }
+        #region Nested type: Entry
 
         private class Entry
         {
-            public WeakReference<TKey> Key;
-            public TValue Value;
+            #region Fields and Autoproperties
+
             public int Hash;
-            public Entry Prev;
+            public TValue Value;
             public Entry Next;
+            public Entry Prev;
+            public WeakReference<TKey> Key;
+
+            #endregion
 
             // debug only
+            /// <inheritdoc />
             public override string ToString()
             {
                 if (Key.TryGetTarget(out var target))
@@ -346,5 +356,7 @@ namespace Appalachia.Utility.Async.Internal
                 return count;
             }
         }
+
+        #endregion
     }
 }

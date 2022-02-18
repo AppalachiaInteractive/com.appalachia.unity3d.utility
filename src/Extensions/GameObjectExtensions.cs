@@ -484,12 +484,15 @@ namespace Appalachia.Utility.Extensions
             {
                 if (target != null)
                 {
-                    if (ui && (target.GetComponent<RectTransform>() == null))
+                    if (target.transform.parent == go.transform)
                     {
-                        target.AddComponent<RectTransform>();
-                    }
+                        if (ui && (target.GetComponent<RectTransform>() == null))
+                        {
+                            target.AddComponent<RectTransform>();
+                        }
 
-                    return;
+                        return;
+                    }
                 }
 
                 target = GetChild(go, name);
