@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Appalachia.Utility.Async;
 using Appalachia.Utility.Constants;
+using Appalachia.Utility.Events;
+using Appalachia.Utility.Events.Extensions;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Diagnostics;
@@ -8,50 +12,37 @@ using UnityEngine.Diagnostics;
 
 namespace Appalachia.Utility.Execution
 {
-    public static class AppalachiaApplication
+    public static partial class AppalachiaApplication
     {
-        public static bool OnMainThread
+        static AppalachiaApplication()
         {
-            get
-            {
-#if UNITY_EDITOR
-                try
-                {
-                    if (!APPASERIALIZE.CouldBeInSerializationWindow)
-                    {
-                        if (UnityEditor.AssetDatabase.IsAssetImportWorkerProcess())
-                        {
-                            return false;
-                        }
-                    }
-                }
-                catch
-                {
-                    //
-                }
-
-                if (PlayerLoopHelper.MainThreadId == 0)
-                {
-                    return System.Threading.Thread.CurrentThread.ManagedThreadId == 1;
-                }
-#endif
-
-                return System.Threading.Thread.CurrentThread.ManagedThreadId == PlayerLoopHelper.MainThreadId;
-            }
+            _staticConstructorCalls ??= new();
+            _staticConstructorCalls.Clear();
         }
 
-        public static bool OnBackgroundThread
-        {
-            get
-            {
-                if (OnMainThread)
-                {
-                    return false;
-                }
+        #region Static Fields and Autoproperties
 
-                return true;
-            }
-        }
+        public static AppaEvent.Data LowMemory;
+
+        public static ValueEvent<bool>.Data FocusChanged;
+        public static ValueEvent<string, string, LogType>.Data LogMessageReceived;
+
+        private static readonly ProfilerMarker _PRF_ApplicationOnLowMemory =
+            new ProfilerMarker(_PRF_PFX + nameof(ApplicationOnLowMemory));
+
+        private static readonly ProfilerMarker _PRF_ApplicationOnLogMessageReceivedThreaded =
+            new ProfilerMarker(_PRF_PFX + nameof(ApplicationOnLogMessageReceivedThreaded));
+
+        private static readonly ProfilerMarker _PRF_ApplicationOnFocusChanged =
+            new ProfilerMarker(_PRF_PFX + nameof(ApplicationOnFocusChanged));
+
+        private static bool _domainIsReloading;
+
+        private static bool _isQuitting;
+
+        [NonSerialized] private static HashSet<Type> _staticConstructorCalls;
+
+        #endregion
 
         /// <summary>
         ///     <para>Returns application install mode (Read Only).</para>
@@ -141,6 +132,10 @@ namespace Appalachia.Utility.Execution
         /// </footer>
         public static bool IsConsolePlatform => Application.isConsolePlatform;
 
+        public static bool IsDomainLoaded => !_domainIsReloading;
+
+        public static bool IsDomainReloading => _domainIsReloading;
+
         public static bool IsEditor => Application.isEditor;
 
         /// <summary>
@@ -216,6 +211,8 @@ namespace Appalachia.Utility.Execution
             }
         }
 
+        public static bool IsQuitting => _isQuitting;
+
         /// <summary>
         ///     <para>Whether the player currently is updating. Read-only.</para>
         /// </summary>
@@ -236,6 +233,49 @@ namespace Appalachia.Utility.Execution
                        UnityEditor.EditorApplication.isUpdating
 #endif
                     ;
+            }
+        }
+
+        public static bool OnBackgroundThread
+        {
+            get
+            {
+                if (OnMainThread)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public static bool OnMainThread
+        {
+            get
+            {
+#if UNITY_EDITOR
+                try
+                {
+                    if (!APPASERIALIZE.CouldBeInSerializationWindow)
+                    {
+                        if (UnityEditor.AssetDatabase.IsAssetImportWorkerProcess())
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch
+                {
+                    //
+                }
+
+                if (PlayerLoopHelper.MainThreadId == 0)
+                {
+                    return System.Threading.Thread.CurrentThread.ManagedThreadId == 1;
+                }
+#endif
+
+                return System.Threading.Thread.CurrentThread.ManagedThreadId == PlayerLoopHelper.MainThreadId;
             }
         }
 
@@ -510,6 +550,30 @@ namespace Appalachia.Utility.Execution
             set => Application.backgroundLoadingPriority = value;
         }
 
+        public static void EnsureStaticConstructorHasBeenCalled(Type typeToInvoke)
+        {
+            using (_PRF_EnsureStaticConstructorHasBeenCalled.Auto())
+            {
+                _staticConstructorCalls ??= new();
+
+                if (_staticConstructorCalls.Contains(typeToInvoke))
+                {
+                    return;
+                }
+
+                _staticConstructorCalls.Add(typeToInvoke);
+
+                var constructor = typeToInvoke.TypeInitializer;
+
+                if (constructor == null)
+                {
+                    return;
+                }
+                
+                constructor.Invoke(null, null);
+            }
+        }
+
         public static void ForceCrash(int mode)
         {
             Utils.ForceCrash((ForcedCrashCategory)mode);
@@ -548,6 +612,25 @@ namespace Appalachia.Utility.Execution
             {
                 return Application.GetStackTraceLogType(logType);
             }
+        }
+
+        public static void InitializeApplication()
+        {
+            Application.quitting -= OnQuitting;
+            Application.unloading -= OnUnloading;
+            Application.focusChanged -= ApplicationOnFocusChanged;
+            Application.logMessageReceivedThreaded -= ApplicationOnLogMessageReceivedThreaded;
+            Application.lowMemory -= ApplicationOnLowMemory;
+
+            Application.quitting += OnQuitting;
+            Application.unloading += OnUnloading;
+            Application.focusChanged += ApplicationOnFocusChanged;
+            Application.logMessageReceivedThreaded += ApplicationOnLogMessageReceivedThreaded;
+            Application.lowMemory += ApplicationOnLowMemory;
+
+#if UNITY_EDITOR
+            StaticInitializeInEditor();
+#endif
         }
 
         /// <summary>
@@ -654,9 +737,61 @@ namespace Appalachia.Utility.Execution
             Application.Unload();
         }
 
+        private static void ApplicationOnFocusChanged(bool isFocused)
+        {
+            using (_PRF_ApplicationOnFocusChanged.Auto())
+            {
+                FocusChanged.RaiseEvent(isFocused);
+            }
+        }
+
+        private static void ApplicationOnLogMessageReceivedThreaded(
+            string condition,
+            string stacktrace,
+            LogType type)
+        {
+            using (_PRF_ApplicationOnLogMessageReceivedThreaded.Auto())
+            {
+                LogMessageReceived.RaiseEvent(condition, stacktrace, type);
+            }
+        }
+
+        private static void ApplicationOnLowMemory()
+        {
+            using (_PRF_ApplicationOnLowMemory.Auto())
+            {
+                LowMemory.RaiseEvent();
+            }
+        }
+
+        private static void OnQuitting()
+        {
+            using (_PRF_OnQuitting.Auto())
+            {
+                _isQuitting = true;
+            }
+        }
+
+        private static void OnUnloading()
+        {
+            using (_PRF_OnUnloading.Auto())
+            {
+                _domainIsReloading = true;
+            }
+        }
+
         #region Profiling
 
         private const string _PRF_PFX = nameof(AppalachiaApplication) + ".";
+
+        private static readonly ProfilerMarker _PRF_EnsureStaticConstructorHasBeenCalled =
+            new ProfilerMarker(_PRF_PFX + nameof(EnsureStaticConstructorHasBeenCalled));
+
+        private static readonly ProfilerMarker _PRF_OnUnloading =
+            new ProfilerMarker(_PRF_PFX + nameof(OnUnloading));
+
+        private static readonly ProfilerMarker _PRF_OnQuitting =
+            new ProfilerMarker(_PRF_PFX + nameof(OnQuitting));
 
         private static readonly ProfilerMarker _PRF_IsPlayingOrWillPlay =
             new ProfilerMarker(_PRF_PFX + nameof(IsPlayingOrWillPlay));

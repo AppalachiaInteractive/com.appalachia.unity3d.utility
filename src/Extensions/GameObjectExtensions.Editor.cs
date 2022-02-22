@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 #region
 
 using System;
@@ -12,7 +14,6 @@ using Object = UnityEngine.Object;
 
 namespace Appalachia.Utility.Extensions
 {
-#if UNITY_EDITOR
     public static partial class GameObjectExtensions
     {
         public static string EditorGetFriendlyPath(this GameObject gameObj)
@@ -120,10 +121,10 @@ namespace Appalachia.Utility.Extensions
                 }
 
                 if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
-                    go,
-                    out var assetGUID,
-                    out long _
-                ))
+                        go,
+                        out var assetGUID,
+                        out long _
+                    ))
                 {
                     _assetGUIDLookup.Add(hashCode, assetGUID);
 
@@ -134,10 +135,105 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-#if UNITY_EDITOR
+        public static bool IsDescendentOf(this GameObject prospectiveChild, GameObject prospectiveParent)
+        {
+            using (_PRF_IsDescendentOf.Auto())
+            {
+                return IsDescendentOf(prospectiveChild.transform, prospectiveParent.transform);
+            }
+        }
+
+        public static bool IsDescendentOf(this Transform prospectiveChild, Transform prospectiveParent)
+        {
+            using (_PRF_IsDescendentOf.Auto())
+            {
+                if ((prospectiveChild == null) || (prospectiveParent == null))
+                {
+                    return false;
+                }
+
+                if (prospectiveChild.parent == null)
+                {
+                    return false;
+                }
+
+                var currentlyChecking = prospectiveChild;
+
+                while (currentlyChecking.parent != null)
+                {
+                    if (currentlyChecking == prospectiveParent)
+                    {
+                        return true;
+                    }
+
+                    currentlyChecking = currentlyChecking.parent;
+                }
+
+                return false;
+            }
+        }
+
+        public static bool IsSelected(this GameObject go)
+        {
+            using (_PRF_IsSelected.Auto())
+            {
+                if (go == null)
+                {
+                    return false;
+                }
+
+                var candidates = UnityEditor.Selection.gameObjects;
+                for (var i = 0; i < candidates.Length; i++)
+                {
+                    var candidate = candidates[i];
+
+                    if (candidate == null)
+                    {
+                        continue;
+                    }
+
+                    if (candidate == go)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        #region Profiling
 
         private static readonly ProfilerMarker _PRF_Editor_GetTransformFromRelativePath =
             new ProfilerMarker(_PRF_PFX + nameof(Editor_GetTransformFromRelativePath));
+
+        private static readonly ProfilerMarker _PRF_IsSelected =
+            new ProfilerMarker(_PRF_PFX + nameof(IsSelected));
+
+        private static readonly ProfilerMarker _PRF_IsDescendentOf =
+            new ProfilerMarker(_PRF_PFX + nameof(IsDescendentOf));
+
+        private static readonly ProfilerMarker _PRF_GetAssetGUID =
+            new ProfilerMarker(_PRF_PFX + nameof(GetAssetGUID));
+
+        private static readonly ProfilerMarker _PRF_EditorGetFriendlyPath =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetFriendlyPath));
+
+        private static readonly ProfilerMarker _PRF_EditorGetGameObjectFromComponent =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetGameObjectFromComponent));
+
+        private static readonly ProfilerMarker _PRF_EditorGetScriptableObjects =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorGetScriptableObjects));
+
+        private static readonly ProfilerMarker _PRF_EditorIsSceneObject =
+            new ProfilerMarker(_PRF_PFX + nameof(EditorIsSceneObject));
+
+        private static readonly ProfilerMarker
+            _PRF_GetAsset = new ProfilerMarker(_PRF_PFX + nameof(GetAsset));
+
+        #endregion
+
+#if UNITY_EDITOR
 
         public static Transform Editor_GetTransformFromRelativePath(this Transform relativeTo, string path)
         {
@@ -179,69 +275,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 #endif
-
-        public static bool IsDescendentOf(this GameObject prospectiveChild, GameObject prospectiveParent)
-        {
-            using (_PRF_IsDescendentOf.Auto())
-            {
-                return IsDescendentOf(prospectiveChild.transform, prospectiveParent.transform);
-            }
-        }
-
-        public static bool IsDescendentOf(this Transform prospectiveChild, Transform prospectiveParent)
-        {
-            using (_PRF_IsDescendentOf.Auto())
-            {
-                if ((prospectiveChild == null) || (prospectiveParent == null))
-                {
-                    return false;
-                }
-
-                if (prospectiveChild.parent == null)
-                {
-                    return false;
-                }
-
-                var currentlyChecking = prospectiveChild;
-
-                while (currentlyChecking.parent != null)
-                {
-                    if (currentlyChecking == prospectiveParent)
-                    {
-                        return true;
-                    }
-
-                    currentlyChecking = currentlyChecking.parent;
-                }
-
-                return false;
-            }
-        }
-
-        #region Profiling
-
-        private static readonly ProfilerMarker _PRF_IsDescendentOf =
-            new ProfilerMarker(_PRF_PFX + nameof(IsDescendentOf));
-
-        private static readonly ProfilerMarker _PRF_GetAssetGUID =
-            new ProfilerMarker(_PRF_PFX + nameof(GetAssetGUID));
-
-        private static readonly ProfilerMarker _PRF_EditorGetFriendlyPath =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetFriendlyPath));
-
-        private static readonly ProfilerMarker _PRF_EditorGetGameObjectFromComponent =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetGameObjectFromComponent));
-
-        private static readonly ProfilerMarker _PRF_EditorGetScriptableObjects =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorGetScriptableObjects));
-
-        private static readonly ProfilerMarker _PRF_EditorIsSceneObject =
-            new ProfilerMarker(_PRF_PFX + nameof(EditorIsSceneObject));
-
-        private static readonly ProfilerMarker
-            _PRF_GetAsset = new ProfilerMarker(_PRF_PFX + nameof(GetAsset));
-
-        #endregion
     }
-#endif
 }
+
+#endif

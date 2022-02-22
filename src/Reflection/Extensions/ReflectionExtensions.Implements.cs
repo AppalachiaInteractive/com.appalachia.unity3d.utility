@@ -87,9 +87,12 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 if (t.IsAssignableFrom(assemblyType))
                 {
-                    if (concreteOnly && assemblyType.IsInterface)
+                    if (concreteOnly)
                     {
-                        continue;
+                        if (assemblyType.IsInterface || assemblyType.IsAbstract)
+                        {
+                            continue;
+                        }
                     }
 
                     list.Add(assemblyType);
