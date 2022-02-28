@@ -24,7 +24,7 @@ namespace Appalachia.Utility.Execution
 
         public static AppaEvent.Data LowMemory;
 
-        public static ValueEvent<bool>.Data FocusChanged;
+        public static AppaEvent<bool>.Data FocusChanged;
         public static ValueEvent<string, string, LogType>.Data LogMessageReceived;
 
         private static readonly ProfilerMarker _PRF_ApplicationOnLowMemory =

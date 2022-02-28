@@ -16,6 +16,46 @@ namespace Appalachia.Utility.Extensions
 {
     public static partial class GameObjectExtensions
     {
+        public static Transform Editor_GetTransformFromRelativePath(this Transform relativeTo, string path)
+        {
+            using (_PRF_Editor_GetTransformFromRelativePath.Auto())
+            {
+                if (path.IsNullOrWhiteSpace())
+                {
+                    throw new ArgumentNullException(nameof(path));
+                }
+
+                // path = "MyObject/Child1/child2";
+                var pathParts = path.Split('/'); // [MyObject], [Child1], [child2]
+
+                var currentTransform = relativeTo;
+
+                for (var pathPartIndex = 0; pathPartIndex < pathParts.Length; pathPartIndex++)
+                {
+                    var pathPart = pathParts[pathPartIndex];
+
+                    var foundChild = currentTransform.Find(pathPart);
+
+                    if (foundChild == null)
+                    {
+                        var logMessage = ZString.Format(
+                            "Could not find transform path [{0}] relative to [{1}]",
+                            path,
+                            relativeTo.gameObject.name
+                        );
+
+                        AppaLog.Context.Extensions.Warn(logMessage, relativeTo);
+
+                        return null;
+                    }
+
+                    currentTransform = foundChild;
+                }
+
+                return currentTransform;
+            }
+        }
+
         public static string EditorGetFriendlyPath(this GameObject gameObj)
         {
             using (_PRF_EditorGetFriendlyPath.Auto())
@@ -232,49 +272,6 @@ namespace Appalachia.Utility.Extensions
             _PRF_GetAsset = new ProfilerMarker(_PRF_PFX + nameof(GetAsset));
 
         #endregion
-
-#if UNITY_EDITOR
-
-        public static Transform Editor_GetTransformFromRelativePath(this Transform relativeTo, string path)
-        {
-            using (_PRF_Editor_GetTransformFromRelativePath.Auto())
-            {
-                if (path.IsNullOrWhiteSpace())
-                {
-                    throw new ArgumentNullException(nameof(path));
-                }
-
-                // path = "MyObject/Child1/child2";
-                var pathParts = path.Split('/'); // [MyObject], [Child1], [child2]
-
-                var currentTransform = relativeTo;
-
-                for (var pathPartIndex = 0; pathPartIndex < pathParts.Length; pathPartIndex++)
-                {
-                    var pathPart = pathParts[pathPartIndex];
-
-                    var foundChild = currentTransform.Find(pathPart);
-
-                    if (foundChild == null)
-                    {
-                        var logMessage = ZString.Format(
-                            "Could not find transform path [{0}] relative to [{1}]",
-                            path,
-                            relativeTo.gameObject.name
-                        );
-
-                        AppaLog.Context.Extensions.Warn(logMessage, relativeTo);
-
-                        return null;
-                    }
-
-                    currentTransform = foundChild;
-                }
-
-                return currentTransform;
-            }
-        }
-#endif
     }
 }
 

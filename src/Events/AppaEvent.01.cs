@@ -1,23 +1,17 @@
 using Appalachia.Utility.Events.Base;
 using Appalachia.Utility.Events.Collections;
 using Appalachia.Utility.Events.Extensions;
-using UnityEngine;
 
 namespace Appalachia.Utility.Events
 {
-    public static class GameObjectValueEvent<T>
+    public static class AppaEvent<T>
     {
         public delegate void Handler(Args args);
 
         #region Nested type: Args
 
-        public sealed class Args : GameObjectValueBaseArgs<Args, T>
+        public sealed class Args : ValueBaseArgs<Args, T>
         {
-            public static implicit operator GameObject(Args o)
-            {
-                return o.gameObject;
-            }
-
             public static implicit operator T(Args o)
             {
                 return o.value;
@@ -53,11 +47,6 @@ namespace Appalachia.Utility.Events
             public int SubscriberCount => _subscribers.SubscriberCountSafe();
 
             internal Subscribers Subscribers => _subscribers;
-
-            public void UnsubscribeAll()
-            {
-                _subscribers.Clear();
-            }
         }
 
         #endregion

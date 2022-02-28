@@ -1,22 +1,17 @@
 using Appalachia.Utility.Events.Base;
 using Appalachia.Utility.Events.Collections;
 using Appalachia.Utility.Events.Extensions;
-using UnityEngine;
 
 namespace Appalachia.Utility.Events
 {
-    public static class GameObjectEvent
+    public static class AppaEvent<T1, T2>
     {
         public delegate void Handler(Args args);
 
         #region Nested type: Args
 
-        public sealed class Args : GameObjectBaseArgs<Args>
+        public sealed class Args : ValueBaseArgs<Args, T1, T2>
         {
-            public static implicit operator GameObject(Args o)
-            {
-                return o.gameObject;
-            }
         }
 
         #endregion

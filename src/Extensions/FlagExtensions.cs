@@ -186,6 +186,45 @@ namespace Appalachia.Utility.Enums
         }
 
         [Pure]
+        public static T SetFlags<T>(this T value, params T[] flags)
+            where T : Enum
+        {
+            using (_PRF_SetFlags.Auto())
+            {
+                if (value.IsUnsignedEnum())
+                {
+                    var valueNum = value.GetUnsignedValue();
+
+                    for (var i = 0; i < flags.Length; i++)
+                    {
+                        var flag = flags[i];
+
+                        var flagNum = flag.GetUnsignedValue();
+
+                        valueNum |= flagNum;
+                    }
+
+                    return valueNum.ConvertBack<T>();
+                }
+                else
+                {
+                    var valueNum = value.GetSignedValue();
+
+                    for (var i = 0; i < flags.Length; i++)
+                    {
+                        var flag = flags[i];
+
+                        var flagNum = flag.GetSignedValue();
+
+                        valueNum |= flagNum;
+                    }
+
+                    return valueNum.ConvertBack<T>();
+                }
+            }
+        }
+
+        [Pure]
         public static T UnsetFlag<T>(this T value, T flag)
             where T : Enum
         {
@@ -272,6 +311,9 @@ namespace Appalachia.Utility.Enums
         #region Profiling
 
         private const string _PRF_PFX = nameof(FlagExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_SetFlags =
+            new ProfilerMarker(_PRF_PFX + nameof(SetFlags));
 
         private static readonly ProfilerMarker _PRF_GetSignedValue =
             new ProfilerMarker(_PRF_PFX + nameof(GetSignedValue));

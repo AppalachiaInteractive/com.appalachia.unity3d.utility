@@ -3,7 +3,7 @@ using Unity.Profiling;
 
 namespace Appalachia.Utility.Events.Extensions
 {
-    public static class AppaEventExtensions
+    public static partial class AppaEventExtensions
     {
         /// <summary>
         ///     Invokes the event.
@@ -32,11 +32,15 @@ namespace Appalachia.Utility.Events.Extensions
 
         #region Profiling
 
-        private const string _PRF_PFX = nameof(ComponentArgsExtensions) + ".";
+        private const string _PRF_PFX = nameof(AppaEventExtensions) + ".";
 
         private static readonly ProfilerMarker _PRF_RaiseEvent =
             new ProfilerMarker(_PRF_PFX + nameof(RaiseEvent));
 
+        private static readonly ProfilerMarker _PRF_ToArgs =
+            new ProfilerMarker(_PRF_PFX + nameof(ToArgs));
+
+        
         #endregion
     }
 }

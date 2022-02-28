@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Appalachia.Utility.Constants;
+using Appalachia.Utility.Enums;
 using Appalachia.Utility.Logging;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
