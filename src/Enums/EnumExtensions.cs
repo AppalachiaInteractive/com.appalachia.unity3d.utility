@@ -42,10 +42,7 @@ namespace Appalachia.Utility.Enums
                 _enumNameLookup.Add(enumType, new Dictionary<object, string>());
             }
 
-            if (_enumNameLookup[enumType].ContainsKey(value))
-            {
-                return _enumNameLookup[enumType][value];
-            }
+            if (_enumNameLookup[enumType].TryGetValue(value, out var result)) return result;
 
             var stringValue = value.ToString();
 
@@ -73,7 +70,7 @@ namespace Appalachia.Utility.Enums
                 }
             }
 
-            var result = newString.ToString();
+            result = newString.ToString();
 
             _enumNameLookup[enumType].Add(value, result);
 

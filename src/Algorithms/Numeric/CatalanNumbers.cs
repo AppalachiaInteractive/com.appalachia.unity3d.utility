@@ -71,10 +71,7 @@ namespace Appalachia.Utility.Algorithms.Numeric
         /// <returns></returns>
         private static BigInteger _recursiveHelper(uint rank)
         {
-            if (CachedCatalanNumbers.ContainsKey(rank))
-            {
-                return CachedCatalanNumbers[rank];
-            }
+            if (CachedCatalanNumbers.TryGetValue(rank, out var result)) return result;
 
             BigInteger number = 0;
             var lastRank = rank - 1;

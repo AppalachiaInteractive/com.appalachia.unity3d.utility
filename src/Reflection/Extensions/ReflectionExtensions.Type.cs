@@ -81,12 +81,7 @@ namespace Appalachia.Utility.Reflection.Extensions
                 _typeByNameLookup ??= new Dictionary<string, Type>(types.Length);
                 _typesInNameLookup ??= new();
 
-                if (_typeByNameLookup.ContainsKey(nameWithNamespace))
-                {
-                    return _typeByNameLookup[nameWithNamespace];
-                }
-
-                Type result = null;
+                if (_typeByNameLookup.TryGetValue(nameWithNamespace, out var result)) return result;
 
                 foreach (var type in types)
                 {

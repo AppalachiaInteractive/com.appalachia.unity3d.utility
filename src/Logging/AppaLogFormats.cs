@@ -71,10 +71,7 @@ namespace Appalachia.Utility.Logging
             {
                 get
                 {
-                    if (_formatsByKey.ContainsKey(s))
-                    {
-                        return _formatsByKey[s];
-                    }
+                    if (_formatsByKey.TryGetValue(s, out var result)) return result;
 
                     var newFormat = CreateFormatForKey(s, _formatsByKey);
 

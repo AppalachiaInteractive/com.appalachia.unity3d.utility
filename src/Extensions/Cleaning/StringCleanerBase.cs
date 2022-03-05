@@ -31,12 +31,8 @@ namespace Appalachia.Utility.Extensions.Cleaning
         {
             using (_PRF_Clean.Auto())
             {
-                if (_lookup.ContainsKey(input))
-                {
-                    return _lookup[input];
-                }
+                if (_lookup.TryGetValue(input, out var result)) return result;
 
-                string result;
                 using (_PRF_Clean_Action.Auto())
                 {
                     result = _action((T) this, input);

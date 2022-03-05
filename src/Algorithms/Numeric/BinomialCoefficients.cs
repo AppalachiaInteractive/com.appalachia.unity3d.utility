@@ -28,10 +28,7 @@ namespace Appalachia.Utility.Algorithms.Numeric
                 return 1;
             }
 
-            if (Cache.ContainsKey(n))
-            {
-                return Cache[n];
-            }
+            if (Cache.TryGetValue(n, out var result)) return result;
 
             var value = n * Factorial(n - 1);
             Cache[n] = value;

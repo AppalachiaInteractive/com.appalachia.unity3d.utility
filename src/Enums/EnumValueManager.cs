@@ -60,15 +60,9 @@ namespace Appalachia.Utility.Enums
 
             Debug.Assert(typeName != null, nameof(typeName) + " != null");
 
-            if (includeObsolete && _lookupWithObsolete.ContainsKey(typeName))
-            {
-                return (T[]) _lookupWithObsolete[typeName];
-            }
-
-            if (!includeObsolete && _lookupWithoutObsolete.ContainsKey(typeName))
-            {
-                return (T[]) _lookupWithoutObsolete[typeName];
-            }
+            if (includeObsolete && _lookupWithObsolete.TryGetValue(typeName, out var result)) return (T[])result;
+             
+            if (!includeObsolete && _lookupWithoutObsolete.TryGetValue(typeName, out result)) return (T[])result;
 
             var allValues = Enum.GetValues(type).Cast<T>().ToArray();
 
@@ -120,15 +114,9 @@ namespace Appalachia.Utility.Enums
 
             Debug.Assert(typeName != null, nameof(typeName) + " != null");
 
-            if (includeObsolete && _boxedLookupWithObsolete.ContainsKey(typeName))
-            {
-                return _boxedLookupWithObsolete[typeName];
-            }
+            if (includeObsolete && _boxedLookupWithObsolete.TryGetValue(typeName, out var result)) return result;
 
-            if (!includeObsolete && _boxedLookupWithoutObsolete.ContainsKey(typeName))
-            {
-                return _boxedLookupWithoutObsolete[typeName];
-            }
+            if (!includeObsolete && _boxedLookupWithoutObsolete.TryGetValue(typeName, out result)) return result;
 
             var allValues = Enum.GetValues(type).Cast<object>().ToArray();
 

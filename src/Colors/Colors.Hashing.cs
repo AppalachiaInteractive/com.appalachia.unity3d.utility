@@ -21,10 +21,7 @@ namespace Appalachia.Utility.Colors
         {
             _hashedStrings ??= new Dictionary<string, Color>();
 
-            if (_hashedStrings.ContainsKey(s))
-            {
-                return _hashedStrings[s];
-            }
+            if (_hashedStrings.TryGetValue(s, out var result)) return result;
 
             var upperString = s.ToUpperInvariant();
 
@@ -36,7 +33,7 @@ namespace Appalachia.Utility.Colors
             var saturation = saturationRange.x + ((saturationRange.y - saturationRange.x) * saturationTime);
             var value = valueRange.x + ((valueRange.y - valueRange.x) * valueTime);
 
-            var result = HSVToRGB(hue, saturation, value, 1f, false);
+            result = HSVToRGB(hue, saturation, value, 1f, false);
 
             _hashedStrings.Add(s, result);
 

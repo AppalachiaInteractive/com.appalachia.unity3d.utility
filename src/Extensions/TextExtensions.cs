@@ -22,10 +22,7 @@ namespace Appalachia.Utility.Extensions
                 var rounded = (float)Math.Round(value, decimalPoints);
                 _floatLookup ??= new Dictionary<float, string>();
 
-                if (_floatLookup.ContainsKey(rounded))
-                {
-                    return _floatLookup[rounded];
-                }
+                if (_floatLookup.TryGetValue(rounded, out var result)) return result;
 
                 var newString = rounded.ToString();
 
@@ -41,10 +38,7 @@ namespace Appalachia.Utility.Extensions
             {
                 _intLookup ??= new Dictionary<int, string>();
 
-                if (_intLookup.ContainsKey(value))
-                {
-                    return _intLookup[value];
-                }
+                if (_intLookup.TryGetValue(value, out var result)) return result;
 
                 var newString = value.ToString();
 

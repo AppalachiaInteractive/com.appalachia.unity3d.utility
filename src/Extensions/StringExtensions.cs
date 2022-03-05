@@ -38,19 +38,25 @@ namespace Appalachia.Utility.Extensions
         private static StringCleanerWithContext<char[]> _extensionCleaner;
 
         #endregion
+
         public static string CleanExtension(this string extension)
         {
             using (_PRF_CleanExtension.Auto())
             {
                 if (_extensionCleaner == null)
                 {
-                    _extensionCleaner = new StringCleanerWithContext<char[]>(
-                        new[] { '.', ' ', '\t', ',' },
-                        (cleaner, value) =>
+                    string CleanExtensionString(StringCleanerWithContext<char[]> cleaner, string value)
+                    {
+                        using (_PRF_CleanExtension_CleanExtensionString.Auto())
                         {
                             var result = value.ToLowerInvariant().Trim(cleaner.context1);
                             return result;
                         }
+                    }
+
+                    _extensionCleaner = new StringCleanerWithContext<char[]>(
+                        new[] { '.', ' ', '\t', ',' },
+                        CleanExtensionString
                     );
                 }
 
@@ -461,6 +467,9 @@ namespace Appalachia.Utility.Extensions
         #region Profiling
 
         private const string _PRF_PFX = nameof(StringExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_CleanExtension_CleanExtensionString =
+            new ProfilerMarker(_PRF_PFX + nameof(CleanExtension) + ".CleanExtensionString");
 
         private static readonly ProfilerMarker _PRF_InitializePackagePathReplacements =
             new ProfilerMarker(_PRF_PFX + nameof(InitializePackagePathReplacements));

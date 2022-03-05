@@ -433,7 +433,7 @@ namespace Appalachia.Utility.Constants
             {
                 if (!CachedTypeFormatForLoggingResults.ContainsKey(value))
                 {
-                    CachedTypeFormatForLoggingResults.Add(value, Color(Bold(value.Name), LogType));
+                    CachedTypeFormatForLoggingResults.Add(value, Color(Bold(value.GetReadableName()), LogType));
                 }
 
                 return CachedTypeFormatForLoggingResults[value];

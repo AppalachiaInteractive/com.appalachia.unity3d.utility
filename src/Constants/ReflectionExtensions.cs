@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
 
-namespace Appalachia.Utility.Reflection.Extensions
+namespace Appalachia.Utility.Constants
 {
-    public static partial class ReflectionExtensions
+    internal static class ReflectionExtensions
     {
         #region Constants and Static Readonly
+
+        public const int TYPE_ESTIMATE = 1000;
 
         private static readonly Dictionary<string, string> TypeNameKeywordAlternatives = new()
         {
@@ -49,81 +52,19 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static Dictionary<Type, string> _GetSimpleReadableFullNameLookup;
 
         private static Dictionary<Type, string> _GetSimpleReadableNameLookup;
+        private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
+
+        private static object READABLE_NAME_CACHE_LOCK = new();
 
         #endregion
-
-        public static string GetReadableFullName(this Type type)
-        {
-            using (_PRF_GetReadableFullName.Auto())
-            {
-                if (type.IsNested && !type.IsGenericParameter)
-                {
-                    return ZString.Format(
-                        "{0}.{1}",
-                        GetReadableFullName(type.DeclaringType),
-                        GetCachedReadableName(type)
-                    );
-                }
-
-                var str = GetCachedReadableName(type);
-                if (type.Namespace != null)
-                {
-                    str = ZString.Format("{0}.{1}", type.Namespace, str);
-                }
-
-                return str;
-            }
-        }
 
         public static string GetReadableName(this Type type)
         {
             using (_PRF_GetReadableName.Auto())
             {
                 return type.IsNested && !type.IsGenericParameter
-                    ? ZString.Format(
-                        "{0}.{1}",
-                        type.DeclaringType.GetReadableName(),
-                        GetCachedReadableName(type)
-                    )
+                    ? ZString.Format("{0}.{1}", type.DeclaringType.GetReadableName(), GetCachedReadableName(type))
                     : GetCachedReadableName(type);
-            }
-        }
-
-        public static string GetSimpleReadableFullName(this Type type)
-        {
-            using (_PRF_GetSimpleReadableFullName.Auto())
-            {
-                _GetSimpleReadableFullNameLookup ??= new Dictionary<Type, string>();
-
-                if (_GetSimpleReadableFullNameLookup.TryGetValue(type, out var result))
-                {
-                    return result;
-                }
-
-                result = type.GetReadableFullName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
-
-                _GetSimpleReadableFullNameLookup.Add(type, result);
-
-                return result;
-            }
-        }
-
-        public static string GetSimpleReadableName(this Type type)
-        {
-            using (_PRF_GetSimpleReadableName.Auto())
-            {
-                _GetSimpleReadableNameLookup ??= new Dictionary<Type, string>();
-
-                if (_GetSimpleReadableNameLookup.TryGetValue(type, out var result))
-                {
-                    return result;
-                }
-
-                result = type.GetReadableName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
-
-                _GetSimpleReadableNameLookup.Add(type, result);
-
-                return result;
             }
         }
 
@@ -194,10 +135,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             using (_PRF_GetCachedReadableName.Auto())
             {
-                if (!READABLE_NAMES_CACHE.ContainsKey(type))
-                {
-                    CheckInitialization(type);
-                }
+                InitializeConstantsAndCollections();
 
                 if (!READABLE_NAMES_CACHE.ContainsKey(type))
                 {
@@ -205,6 +143,50 @@ namespace Appalachia.Utility.Reflection.Extensions
                 }
 
                 return READABLE_NAMES_CACHE[type];
+            }
+        }
+
+        private static bool InheritsFrom(this Type type, Type baseType)
+        {
+            using (_PRF_InheritsFrom.Auto())
+            {
+                if (baseType.IsAssignableFrom(type))
+                {
+                    return true;
+                }
+
+                if (type.IsInterface && !baseType.IsInterface)
+                {
+                    return false;
+                }
+
+                if (baseType.IsInterface)
+                {
+                    return type.GetInterfaces().Contains(baseType);
+                }
+
+                for (var type1 = type; type1 != null; type1 = type1.BaseType)
+                {
+                    if ((type1 == baseType) ||
+                        (baseType.IsGenericTypeDefinition &&
+                         type1.IsGenericType &&
+                         (type1.GetGenericTypeDefinition() == baseType)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static void InitializeConstantsAndCollections()
+        {
+            using (_PRF_InitializeConstantsAndCollections.Auto())
+            {
+                READABLE_NAMES_CACHE ??= new Dictionary<Type, string>(TYPE_ESTIMATE);
+
+                READABLE_NAME_CACHE_LOCK ??= new object();
             }
         }
 
@@ -229,17 +211,15 @@ namespace Appalachia.Utility.Reflection.Extensions
 
         #region Profiling
 
+        private const string _PRF_PFX = nameof(ReflectionExtensions) + ".";
+
+        private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
+            new ProfilerMarker(_PRF_PFX + nameof(InitializeConstantsAndCollections));
+
+        private static readonly ProfilerMarker _PRF_InheritsFrom = new ProfilerMarker(_PRF_PFX + nameof(InheritsFrom));
+
         private static readonly ProfilerMarker _PRF_GetReadableName =
             new ProfilerMarker(_PRF_PFX + nameof(GetReadableName));
-
-        private static readonly ProfilerMarker _PRF_GetReadableFullName =
-            new ProfilerMarker(_PRF_PFX + nameof(GetReadableFullName));
-
-        private static readonly ProfilerMarker _PRF_GetSimpleReadableName =
-            new ProfilerMarker(_PRF_PFX + nameof(GetSimpleReadableName));
-
-        private static readonly ProfilerMarker _PRF_GetSimpleReadableFullName =
-            new ProfilerMarker(_PRF_PFX + nameof(GetSimpleReadableFullName));
 
         private static readonly ProfilerMarker _PRF_CalculateReadableName =
             new ProfilerMarker(_PRF_PFX + nameof(CalculateReadableName));

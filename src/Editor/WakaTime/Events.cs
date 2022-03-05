@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
@@ -8,28 +9,31 @@ namespace Appalachia.Utility.WakaTime
 {
     internal class Events
     {
-        internal static void LinkCallbacks(bool clean = false)
+        internal static void LinkCallbacks()
         {
-            if (clean)
-            {
-                EditorApplication.contextualPropertyMenu -= ContextualPropertyMenu;
-                EditorApplication.hierarchyChanged -= EditorApplicationOnhierarchyChanged;
-                EditorApplication.projectChanged -= EditorApplicationOnprojectChanged;
-                EditorApplication.searchChanged -= SearchChanged;
-                EditorApplication.modifierKeysChanged -= ModifierKeysChanged;
-                EditorApplication.quitting -= EditorApplicationOnquitting;
-                EditorApplication.pauseStateChanged -= EditorApplicationOnpauseStateChanged;
-                EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
-                SceneManager.sceneLoaded -= EditorSceneManagerOnsceneLoaded;
-                SceneManager.sceneUnloaded -= EditorSceneManagerOnsceneUnloaded;
-                EditorSceneManager.sceneOpened -= EditorSceneManagerOnsceneOpened;
-                EditorSceneManager.sceneClosed -= EditorSceneManagerOnsceneClosed;
-                EditorSceneManager.newSceneCreated -= EditorSceneManagerOnnewSceneCreated;
-
-                //EditorSceneManager.sceneSaved -= EditorSceneManagerOnsceneSaved;
-                EditorSceneManager.sceneDirtied -= EditorSceneManagerOnsceneDirtied;
-            }
-
+            UnityEditor.Selection.selectionChanged -= SelectionChanged;
+            UnityEditor.Compilation.CompilationPipeline.compilationStarted -= CompilationPipelineOncompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.compilationFinished -= CompilationPipelineOncompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.assemblyCompilationFinished -= CompilationPipelineOnassemblyCompilationFinished;
+            EditorApplication.contextualPropertyMenu -= ContextualPropertyMenu;
+            EditorApplication.hierarchyChanged -= EditorApplicationOnhierarchyChanged;
+            EditorApplication.projectChanged -= EditorApplicationOnprojectChanged;
+            EditorApplication.searchChanged -= SearchChanged;
+            EditorApplication.modifierKeysChanged -= ModifierKeysChanged;
+            EditorApplication.quitting -= EditorApplicationOnquitting;
+            EditorApplication.pauseStateChanged -= EditorApplicationOnpauseStateChanged;
+            EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
+            SceneManager.sceneLoaded -= EditorSceneManagerOnsceneLoaded;
+            SceneManager.sceneUnloaded -= EditorSceneManagerOnsceneUnloaded;
+            EditorSceneManager.sceneOpened -= EditorSceneManagerOnsceneOpened;
+            EditorSceneManager.sceneClosed -= EditorSceneManagerOnsceneClosed;
+            EditorSceneManager.newSceneCreated -= EditorSceneManagerOnnewSceneCreated;
+            EditorSceneManager.sceneDirtied -= EditorSceneManagerOnsceneDirtied;
+            
+            UnityEditor.Selection.selectionChanged += SelectionChanged;
+            UnityEditor.Compilation.CompilationPipeline.compilationStarted += CompilationPipelineOncompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.compilationFinished += CompilationPipelineOncompilationStarted;
+            UnityEditor.Compilation.CompilationPipeline.assemblyCompilationFinished += CompilationPipelineOnassemblyCompilationFinished;
             EditorApplication.contextualPropertyMenu += ContextualPropertyMenu;
             EditorApplication.hierarchyChanged += EditorApplicationOnhierarchyChanged;
             EditorApplication.projectChanged += EditorApplicationOnprojectChanged;
@@ -43,9 +47,22 @@ namespace Appalachia.Utility.WakaTime
             EditorSceneManager.sceneOpened += EditorSceneManagerOnsceneOpened;
             EditorSceneManager.sceneClosed += EditorSceneManagerOnsceneClosed;
             EditorSceneManager.newSceneCreated += EditorSceneManagerOnnewSceneCreated;
-
-            //EditorSceneManager.sceneSaved += EditorSceneManagerOnsceneSaved;
             EditorSceneManager.sceneDirtied += EditorSceneManagerOnsceneDirtied;
+        }
+
+        private static void SelectionChanged()
+        {
+            WakaTime.SendHeartbeat();
+        }
+
+        private static void CompilationPipelineOnassemblyCompilationFinished(string arg1, CompilerMessage[] arg2)
+        {
+            WakaTime.SendHeartbeat();
+        }
+
+        private static void CompilationPipelineOncompilationStarted(object obj)
+        {
+            WakaTime.SendHeartbeat();
         }
 
         private static void EditorSceneManagerOnsceneDirtied(Scene scene)

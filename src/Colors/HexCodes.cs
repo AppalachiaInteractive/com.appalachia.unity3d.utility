@@ -76,10 +76,7 @@ namespace Appalachia.Utility.Colors
 
                 _lookup ??= new Dictionary<string, Color>();
 
-                if (_lookup.ContainsKey(hexCode))
-                {
-                    return _lookup[hexCode];
-                }
+                if (_lookup.TryGetValue(hexCode, out var result)) return result;
 
                 var cleanHexCode = hexCode.Replace("#", "").ToUpperInvariant().Trim();
 
@@ -119,8 +116,6 @@ namespace Appalachia.Utility.Colors
                 var parsedPart3 = int.Parse(rawPart3, NumberStyles.HexNumber);
                 var floatPart3 = parsedPart3 / 255f;
 
-                Color result;
-
                 if (fourPart)
                 {
                     var rawPart4 = ZString.Format("{0}{1}", cleanHexCode[6], cleanHexCode[7]);
@@ -159,10 +154,7 @@ namespace Appalachia.Utility.Colors
                 _hexCodeLookup.Add(format, new Dictionary<Color32, string>());
             }
 
-            if (_hexCodeLookup[format].ContainsKey(color))
-            {
-                return _hexCodeLookup[format][color];
-            }
+            if (_hexCodeLookup[format].TryGetValue(color, out var result)) return result;
 
             var includeNumberSign = (format | HexCodeFormat.IncludeNumberSign) == format;
             var includeAlpha = (format | HexCodeFormat.IncludeAlpha) == format;
@@ -179,7 +171,7 @@ namespace Appalachia.Utility.Colors
             var b = ZString.Format("{0:X2}", bPart);
             var a = includeAlpha ? ZString.Format("{0:X2}", aPart) : string.Empty;
 
-            var result = alphaFirst
+            result = alphaFirst
                 ? ZString.Format("{0}{1}{2}{3}{4}", num, a, r, g, b)
                 : ZString.Format("{0}{1}{2}{3}{4}", num, r, g, b, a);
 

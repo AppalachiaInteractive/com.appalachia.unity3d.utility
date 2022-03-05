@@ -25,12 +25,7 @@ namespace Appalachia.Utility.Reflection.Extensions
             {
                 _unityAssetTypeCache ??= new();
 
-                if (_unityAssetTypeCache.ContainsKey(t))
-                {
-                    return _unityAssetTypeCache[t];
-                }
-
-                var result = false;
+                if (_unityAssetTypeCache.TryGetValue(t, out var result)) return result;
 
                 if (t.InheritsFrom(typeof(UnityEngine.Object)))
                 {

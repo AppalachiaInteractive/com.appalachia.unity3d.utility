@@ -271,7 +271,8 @@ namespace Appalachia.Utility.Events.Collections
                         {
                             Log.Warn(
                                 ZString.Format(
-                                    "Invoking the following event took {0}ms: {1}",
+                                    "Invoking the following event with {0} subscribers took {1}ms: {2}",
+                                    SubscriberCount,
                                     duration.TotalMilliseconds.FormatNumberForLogging(),
                                     callerFilePath.FormatCallerMembersForLogging(
                                         callerMemberName,

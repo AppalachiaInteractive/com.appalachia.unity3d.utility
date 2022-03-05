@@ -136,9 +136,7 @@ namespace Appalachia.Utility.Extensions
             {
                 if (matrix == _matrix_zero)
                 {
-                    throw new NotSupportedException(
-                        ZString.Format("Default matrix for {0}.", t.gameObject.name)
-                    );
+                    throw new NotSupportedException(ZString.Format("Default matrix for {0}.", t.gameObject.name));
                 }
 
                 t.position = matrix.GetColumn(3);
@@ -198,8 +196,7 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_FindInParents =
             new ProfilerMarker(_PRF_PFX + nameof(FindInParents));
 
-        private static readonly ProfilerMarker _PRF_FullPath =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFullPath));
+        private static readonly ProfilerMarker _PRF_FullPath = new ProfilerMarker(_PRF_PFX + nameof(GetFullPath));
 
         private static readonly ProfilerMarker _PRF_GetPathRelativeTo =
             new ProfilerMarker(_PRF_PFX + nameof(GetPathRelativeTo));
@@ -210,11 +207,9 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_SetMatrix4x4ToTransform =
             new ProfilerMarker(_PRF_PFX + nameof(SetMatrix4x4ToTransform));
 
-        private static readonly ProfilerMarker _PRF_SortChildren =
-            new ProfilerMarker(_PRF_PFX + nameof(SortChildren));
+        private static readonly ProfilerMarker _PRF_SortChildren = new ProfilerMarker(_PRF_PFX + nameof(SortChildren));
 
-        private static readonly ProfilerMarker _PRF_SetToOrigin =
-            new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
+        private static readonly ProfilerMarker _PRF_SetToOrigin = new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
 
         #endregion
     }

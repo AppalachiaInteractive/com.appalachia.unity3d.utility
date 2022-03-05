@@ -23,8 +23,7 @@ namespace Appalachia.Utility.Reflection.Extensions
 
         public const BindingFlags AllStatic = PublicStatic | PrivateStatic;
 
-        public const BindingFlags NonInheritedAllInstance =
-            NonInheritedPrivateInstance | NonInheritedPublicInstance;
+        public const BindingFlags NonInheritedAllInstance = NonInheritedPrivateInstance | NonInheritedPublicInstance;
 
         public const BindingFlags NonInheritedPrivateInstance = PrivateInstance | BindingFlags.DeclaredOnly;
 
@@ -53,23 +52,20 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static Dictionary<MemberInfo, bool> _MEMBER_STATIC_LOOKUP_CACHE;
         private static Dictionary<MemberInfo, Dictionary<bool, Attribute[]>> _ATTRIBUTE_BASE_CACHE = new();
 
-        private static Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>>
-            _ATTRIBUTE_CACHE = new();
+        private static Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>> _ATTRIBUTE_CACHE = new();
 
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>
-            _FIELD_CACHE = new();
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>> _FIELD_CACHE = new();
 
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>>
-            _METHOD_CACHE = new();
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, List<MethodInfo>>>> _METHOD_CACHE =
+            new();
 
-        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>
-            _PROPERTY_CACHE = new();
+        private static Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>> _PROPERTY_CACHE =
+            new();
 
         private static Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>> _FIELD_CACHE_BASIC = new();
-        private static Dictionary<Type, Dictionary<BindingFlags, MethodInfo[]>> _METHOD_CACHE_BASIC = new();
+        private static Dictionary<Type, Dictionary<BindingFlags, List<MethodInfo>>> _METHOD_CACHE_BASIC = new();
 
-        private static Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>> _PROPERTY_CACHE_BASIC =
-            new();
+        private static Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>> _PROPERTY_CACHE_BASIC = new();
 
         private static Dictionary<Type, string> READABLE_NAMES_CACHE = new();
 
@@ -186,9 +182,9 @@ namespace Appalachia.Utility.Reflection.Extensions
                 _typesByAttributeLookup ??= new Dictionary<Type, Type[]>();
                 var attributeType = typeof(T);
 
-                if (_typesByAttributeLookup.ContainsKey(attributeType))
+                if (_typesByAttributeLookup.TryGetValue(attributeType, out var result))
                 {
-                    return _typesByAttributeLookup[attributeType];
+                    return result;
                 }
 
                 var results = new List<Type>();
@@ -220,12 +216,12 @@ namespace Appalachia.Utility.Reflection.Extensions
 
             if (!_METHOD_CACHE_BASIC.ContainsKey(t))
             {
-                _METHOD_CACHE_BASIC.Add(t, new Dictionary<BindingFlags, MethodInfo[]>());
+                _METHOD_CACHE_BASIC.Add(t, new Dictionary<BindingFlags, List<MethodInfo>>());
             }
 
             if (!_METHOD_CACHE.ContainsKey(t))
             {
-                _METHOD_CACHE.Add(t, new Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>());
+                _METHOD_CACHE.Add(t, new Dictionary<BindingFlags, Dictionary<string, List<MethodInfo>>>());
             }
 
             if (!_FIELD_CACHE_BASIC.ContainsKey(t))
@@ -358,85 +354,35 @@ namespace Appalachia.Utility.Reflection.Extensions
                     All
                 };
 
-                if (_POPULATED_TYPES_CACHE == null)
-                {
-                    _POPULATED_TYPES_CACHE = new HashSet<Type>(TYPE_ESTIMATE);
-                }
+                _POPULATED_TYPES_CACHE ??= new HashSet<Type>(TYPE_ESTIMATE);
 
-                if (_ASSEMBLIES_CACHE == null)
-                {
-                    _ASSEMBLIES_CACHE = AppDomain.CurrentDomain.GetAssemblies();
-                }
+                _ASSEMBLIES_CACHE ??= AppDomain.CurrentDomain.GetAssemblies();
 
-                if (_ASSEMBLY_TYPE_CACHE == null)
-                {
-                    _ASSEMBLY_TYPE_CACHE = new Dictionary<Assembly, Type[]>(ASSEMBLY_ESTIMATE);
-                }
+                _ASSEMBLY_TYPE_CACHE ??= new Dictionary<Assembly, Type[]>(ASSEMBLY_ESTIMATE);
 
-                if (_ATTRIBUTE_CACHE == null)
-                {
-                    _ATTRIBUTE_CACHE =
-                        new Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>>(
-                            TYPE_ESTIMATE
-                        );
-                }
+                _ATTRIBUTE_CACHE ??=
+                    new Dictionary<MemberInfo, Dictionary<Type, Dictionary<bool, Attribute[]>>>(TYPE_ESTIMATE);
 
-                if (_FIELD_CACHE_BASIC == null)
-                {
-                    _FIELD_CACHE_BASIC =
-                        new Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>>(TYPE_ESTIMATE);
-                }
+                _FIELD_CACHE_BASIC ??= new Dictionary<Type, Dictionary<BindingFlags, FieldInfo[]>>(TYPE_ESTIMATE);
 
-                if (_FIELD_CACHE == null)
-                {
-                    _FIELD_CACHE =
-                        new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>(
-                            TYPE_ESTIMATE
-                        );
-                }
+                _FIELD_CACHE ??=
+                    new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, FieldInfo>>>(TYPE_ESTIMATE);
 
-                if (_PROPERTY_CACHE_BASIC == null)
-                {
-                    _PROPERTY_CACHE_BASIC =
-                        new Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>>(TYPE_ESTIMATE);
-                }
+                _PROPERTY_CACHE_BASIC ??= new Dictionary<Type, Dictionary<BindingFlags, PropertyInfo[]>>(TYPE_ESTIMATE);
 
-                if (_PROPERTY_CACHE == null)
-                {
-                    _PROPERTY_CACHE =
-                        new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>(
-                            TYPE_ESTIMATE
-                        );
-                }
+                _PROPERTY_CACHE ??=
+                    new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, PropertyInfo>>>(TYPE_ESTIMATE);
 
-                if (_METHOD_CACHE_BASIC == null)
-                {
-                    _METHOD_CACHE_BASIC =
-                        new Dictionary<Type, Dictionary<BindingFlags, MethodInfo[]>>(TYPE_ESTIMATE);
-                }
+                _METHOD_CACHE_BASIC ??= new Dictionary<Type, Dictionary<BindingFlags, List<MethodInfo>>>(TYPE_ESTIMATE);
 
-                if (_METHOD_CACHE == null)
-                {
-                    _METHOD_CACHE =
-                        new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, MethodInfo[]>>>(
-                            TYPE_ESTIMATE
-                        );
-                }
+                _METHOD_CACHE ??=
+                    new Dictionary<Type, Dictionary<BindingFlags, Dictionary<string, List<MethodInfo>>>>(TYPE_ESTIMATE);
 
-                if (_MEMBER_STATIC_LOOKUP_CACHE == null)
-                {
-                    _MEMBER_STATIC_LOOKUP_CACHE = new Dictionary<MemberInfo, bool>(TYPE_ESTIMATE);
-                }
+                _MEMBER_STATIC_LOOKUP_CACHE ??= new Dictionary<MemberInfo, bool>(TYPE_ESTIMATE);
 
-                if (READABLE_NAMES_CACHE == null)
-                {
-                    READABLE_NAMES_CACHE = new Dictionary<Type, string>(TYPE_ESTIMATE);
-                }
+                READABLE_NAMES_CACHE ??= new Dictionary<Type, string>(TYPE_ESTIMATE);
 
-                if (READABLE_NAME_CACHE_LOCK == null)
-                {
-                    READABLE_NAME_CACHE_LOCK = new object();
-                }
+                READABLE_NAME_CACHE_LOCK ??= new object();
             }
         }
 
@@ -444,17 +390,14 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             using (_PRF_IsStatic_INTERNAL.Auto())
             {
-                if (_MEMBER_STATIC_LOOKUP_CACHE == null)
-                {
-                    _MEMBER_STATIC_LOOKUP_CACHE = new Dictionary<MemberInfo, bool>();
-                }
-
-                if (_MEMBER_STATIC_LOOKUP_CACHE.ContainsKey(member))
-                {
-                    return _MEMBER_STATIC_LOOKUP_CACHE[member];
-                }
+                _MEMBER_STATIC_LOOKUP_CACHE ??= new Dictionary<MemberInfo, bool>();
 
                 bool result;
+
+                if (_MEMBER_STATIC_LOOKUP_CACHE.TryGetValue(member, out result))
+                {
+                    return result;
+                }
 
                 switch (member)
                 {
@@ -542,16 +485,38 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 if (!typeMethodCache.ContainsKey(flags))
                 {
-                    typeMethodCache.Add(flags, new Dictionary<string, MethodInfo[]>());
+                    typeMethodCache.Add(flags, new Dictionary<string, List<MethodInfo>>());
                 }
 
                 var flagTypeMethodCache = typeMethodCache[flags];
 
-                MethodInfo[] methods;
+                List<MethodInfo> methods;
 
                 if (!typeMethodCacheBasic.ContainsKey(flags))
                 {
-                    methods = t.GetMethods(flags);
+                    if (flags.HasFlag(BindingFlags.Static) && !flags.HasFlag(BindingFlags.DeclaredOnly))
+                    {
+                        var checkingType = t;
+                        var uniqueMethods = new HashSet<MethodInfo>();
+
+                        while ((checkingType != null) && (checkingType != typeof(object)))
+                        {
+                            var found = checkingType.GetMethods(flags);
+
+                            foreach (var method in found)
+                            {
+                                uniqueMethods.Add(method);
+                            }
+                            
+                            checkingType = checkingType.BaseType;
+                        }
+
+                        methods = uniqueMethods.ToList();
+                    }
+                    else
+                    {
+                        methods = t.GetMethods(flags).ToList();
+                    }
 
                     typeMethodCacheBasic.Add(flags, methods);
                 }
@@ -560,27 +525,25 @@ namespace Appalachia.Utility.Reflection.Extensions
                     methods = typeMethodCacheBasic[flags];
                 }
 
-                var suitableMethods = new List<MethodInfo>();
-
-                for (var index = 0; index < methods.Length; index++)
+                for (var index = 0; index < methods.Count; index++)
                 {
                     var method = methods[index];
 
                     if (!flagTypeMethodCache.ContainsKey(method.Name))
                     {
-                        suitableMethods.Clear();
+                        var nameMatches = new List<MethodInfo>();
 
-                        for (var innerIndex = 0; innerIndex < methods.Length; innerIndex++)
+                        for (var innerIndex = 0; innerIndex < methods.Count; innerIndex++)
                         {
-                            var innerMethod = methods[index];
+                            var innerMethod = methods[innerIndex];
 
                             if (innerMethod.Name == method.Name)
                             {
-                                suitableMethods.Add(innerMethod);
+                                nameMatches.Add(innerMethod);
                             }
                         }
 
-                        flagTypeMethodCache.Add(method.Name, suitableMethods.ToArray());
+                        flagTypeMethodCache.Add(method.Name, nameMatches);
                     }
                 }
             }
@@ -628,8 +591,7 @@ namespace Appalachia.Utility.Reflection.Extensions
 
         #region Profiling
 
-        private static readonly ProfilerMarker _PRF_InitializeCaches =
-            new(_PRF_PFX + nameof(InitializeCaches));
+        private static readonly ProfilerMarker _PRF_InitializeCaches = new(_PRF_PFX + nameof(InitializeCaches));
 
         private static readonly ProfilerMarker _PRF_InitializeConstantsAndCollections =
             new(_PRF_PFX + nameof(InitializeConstantsAndCollections));
@@ -640,15 +602,13 @@ namespace Appalachia.Utility.Reflection.Extensions
         private static readonly ProfilerMarker _PRF_InitializeAssemblyTypeCache =
             new(_PRF_PFX + nameof(InitializeAssemblyTypeCache));
 
-        private static readonly ProfilerMarker _PRF_GetAssemblies =
-            new(_PRF_PFX + nameof(GetAssemblies_CACHED));
+        private static readonly ProfilerMarker _PRF_GetAssemblies = new(_PRF_PFX + nameof(GetAssemblies_CACHED));
 
         private static readonly ProfilerMarker _PRF_GetAllTypes = new(_PRF_PFX + nameof(GetAllTypes_CACHED));
 
         private static readonly ProfilerMarker _PRF_SafeGetTypes = new(_PRF_PFX + nameof(GetTypes_CACHED));
 
-        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL =
-            new(_PRF_PFX + nameof(IsStatic_INTERNAL));
+        private static readonly ProfilerMarker _PRF_IsStatic_INTERNAL = new(_PRF_PFX + nameof(IsStatic_INTERNAL));
 
         private static readonly ProfilerMarker _PRF_PopulateMethods_INTERNAL =
             new(_PRF_PFX + nameof(PopulateMethods_INTERNAL));

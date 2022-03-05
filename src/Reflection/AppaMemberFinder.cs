@@ -316,7 +316,7 @@ namespace Appalachia.Utility.Reflection
                     }
                     else if (paramTypes.Count > 0)
                     {
-                        source2 = source2.Where(x => x.HasParamaters(paramTypes));
+                        source2 = source2.Where(x => x.HasParameters(paramTypes));
                     }
 
                     source1 = source2.OfType<MemberInfo>();
@@ -401,7 +401,7 @@ namespace Appalachia.Utility.Reflection
                 if (isMethod &&
                     (paramTypes.Count > 0) &&
                     memberInfo is MethodInfo &&
-                    !(memberInfo as MethodInfo).HasParamaters(paramTypes))
+                    !(memberInfo as MethodInfo).HasParameters(paramTypes))
                 {
                     errorMessage = str +
                                    "method " +

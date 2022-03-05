@@ -44,10 +44,7 @@ namespace Appalachia.Utility.Reflection.Extensions
 
                 PopulateFields_INTERNAL(t, flags);
 
-                if (_FIELD_CACHE[t][flags].ContainsKey(fieldName))
-                {
-                    return _FIELD_CACHE[t][flags][fieldName];
-                }
+                if (_FIELD_CACHE[t][flags].TryGetValue(fieldName, out var result)) return result;
 
                 AppaLog.Context.Extensions.Error(
                     ZString.Format(
@@ -73,10 +70,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             using (_PRF_GetFieldsCached.Auto())
             {
-                if (_FIELD_CACHE_BASIC.ContainsKey(t) && _FIELD_CACHE_BASIC[t].ContainsKey(flags))
-                {
-                    return _FIELD_CACHE_BASIC[t][flags];
-                }
+                if (_FIELD_CACHE_BASIC.ContainsKey(t) && _FIELD_CACHE_BASIC[t].TryGetValue(flags, out var result)) return result;
 
                 PopulateFields_INTERNAL(t, flags);
 

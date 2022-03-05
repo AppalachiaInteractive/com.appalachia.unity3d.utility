@@ -30,10 +30,7 @@ namespace Appalachia.Utility.Reflection.Extensions
         {
             using (_PRF_GetPropertiesCached.Auto())
             {
-                if (_PROPERTY_CACHE_BASIC.ContainsKey(t) && _PROPERTY_CACHE_BASIC[t].ContainsKey(flags))
-                {
-                    return _PROPERTY_CACHE_BASIC[t][flags];
-                }
+                if (_PROPERTY_CACHE_BASIC.ContainsKey(t) && _PROPERTY_CACHE_BASIC[t].TryGetValue(flags, out var result)) return result;
 
                 PopulateProperties_INTERNAL(t, flags);
 

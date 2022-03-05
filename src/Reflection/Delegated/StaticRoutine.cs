@@ -32,7 +32,7 @@ namespace Appalachia.Utility.Reflection.Delegated
             string methodName,
             BindingFlags flags = ReflectionExtensions.AllStatic)
         {
-            var bestMethod = t.PrepareAndGetBestMethod(methodName, flags, null);
+            var bestMethod = t.PrepareAndGetBestMethod(methodName, flags, null, typeof(TA));
 
             return (Action<TA>)Delegate.CreateDelegate(typeof(Action<TA>), bestMethod);
         }

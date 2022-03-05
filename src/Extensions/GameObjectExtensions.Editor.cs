@@ -155,10 +155,7 @@ namespace Appalachia.Utility.Extensions
 
                 var hashCode = go.GetHashCode();
 
-                if (_assetGUIDLookup.ContainsKey(hashCode))
-                {
-                    return _assetGUIDLookup[hashCode];
-                }
+                if (_assetGUIDLookup.TryGetValue(hashCode, out var result)) return result;
 
                 if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(
                         go,
