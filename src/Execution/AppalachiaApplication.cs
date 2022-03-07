@@ -22,9 +22,9 @@ namespace Appalachia.Utility.Execution
 
         #region Static Fields and Autoproperties
 
-        public static AppaEvent.Data LowMemory;
-
         public static AppaEvent<bool>.Data FocusChanged;
+
+        public static AppaEvent.Data LowMemory;
         public static ValueEvent<string, string, LogType>.Data LogMessageReceived;
 
         private static readonly ProfilerMarker _PRF_ApplicationOnLowMemory =
@@ -212,6 +212,21 @@ namespace Appalachia.Utility.Execution
         }
 
         public static bool IsQuitting => _isQuitting;
+
+        /// <summary>
+        /// Indicates whether or not the game is a release build.
+        /// </summary>
+        public static bool IsReleaseBuild
+        {
+            get
+            {
+#if DEBUG
+                return false;
+#else
+                return true;
+#endif
+            }
+        }
 
         /// <summary>
         ///     <para>Whether the player currently is updating. Read-only.</para>
@@ -569,7 +584,7 @@ namespace Appalachia.Utility.Execution
                 {
                     return;
                 }
-                
+
                 constructor.Invoke(null, null);
             }
         }
@@ -677,8 +692,7 @@ namespace Appalachia.Utility.Execution
             Application.Quit();
         }
 
-        public static bool RequestAdvertisingIdentifierAsync(
-            Application.AdvertisingIdentifierCallback delegateMethod)
+        public static bool RequestAdvertisingIdentifierAsync(Application.AdvertisingIdentifierCallback delegateMethod)
         {
             using (_PRF_RequestAdvertisingIdentifierAsync.Auto())
             {
@@ -745,10 +759,7 @@ namespace Appalachia.Utility.Execution
             }
         }
 
-        private static void ApplicationOnLogMessageReceivedThreaded(
-            string condition,
-            string stacktrace,
-            LogType type)
+        private static void ApplicationOnLogMessageReceivedThreaded(string condition, string stacktrace, LogType type)
         {
             using (_PRF_ApplicationOnLogMessageReceivedThreaded.Auto())
             {
@@ -787,17 +798,14 @@ namespace Appalachia.Utility.Execution
         private static readonly ProfilerMarker _PRF_EnsureStaticConstructorHasBeenCalled =
             new ProfilerMarker(_PRF_PFX + nameof(EnsureStaticConstructorHasBeenCalled));
 
-        private static readonly ProfilerMarker _PRF_OnUnloading =
-            new ProfilerMarker(_PRF_PFX + nameof(OnUnloading));
+        private static readonly ProfilerMarker _PRF_OnUnloading = new ProfilerMarker(_PRF_PFX + nameof(OnUnloading));
 
-        private static readonly ProfilerMarker _PRF_OnQuitting =
-            new ProfilerMarker(_PRF_PFX + nameof(OnQuitting));
+        private static readonly ProfilerMarker _PRF_OnQuitting = new ProfilerMarker(_PRF_PFX + nameof(OnQuitting));
 
         private static readonly ProfilerMarker _PRF_IsPlayingOrWillPlay =
             new ProfilerMarker(_PRF_PFX + nameof(IsPlayingOrWillPlay));
 
-        private static readonly ProfilerMarker _PRF_GetBuildTags =
-            new ProfilerMarker(_PRF_PFX + nameof(GetBuildTags));
+        private static readonly ProfilerMarker _PRF_GetBuildTags = new ProfilerMarker(_PRF_PFX + nameof(GetBuildTags));
 
         private static readonly ProfilerMarker _PRF_GetStackTraceLogType =
             new ProfilerMarker(_PRF_PFX + nameof(GetStackTraceLogType));
@@ -807,8 +815,7 @@ namespace Appalachia.Utility.Execution
         private static readonly ProfilerMarker _PRF_RequestAdvertisingIdentifierAsync =
             new ProfilerMarker(_PRF_PFX + nameof(RequestAdvertisingIdentifierAsync));
 
-        private static readonly ProfilerMarker _PRF_SetBuildTags =
-            new ProfilerMarker(_PRF_PFX + nameof(SetBuildTags));
+        private static readonly ProfilerMarker _PRF_SetBuildTags = new ProfilerMarker(_PRF_PFX + nameof(SetBuildTags));
 
         private static readonly ProfilerMarker _PRF_SetStackTraceLogType =
             new ProfilerMarker(_PRF_PFX + nameof(SetStackTraceLogType));

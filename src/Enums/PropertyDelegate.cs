@@ -1,6 +1,6 @@
 using System;
 
-namespace Appalachia.Utility.Events
+namespace Appalachia.Utility.Enums
 {
     public sealed class PropertyDelegate<T>
     {
