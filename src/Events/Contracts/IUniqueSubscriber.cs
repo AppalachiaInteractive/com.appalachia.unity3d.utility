@@ -4,6 +4,6 @@ namespace Appalachia.Utility.Events.Contracts
 {
     public interface IUniqueSubscriber
     {
-        public ObjectId ObjectId { get; }
+        public ObjectID ObjectID { get; }
     }
 }

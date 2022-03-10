@@ -4,7 +4,7 @@ using Unity.Profiling;
 
 namespace Appalachia.Utility.Events.Base
 {
-    public abstract class DelegateBaseArgs<T> : SelfPoolingObject<T>, IDisposable
+    public abstract class DelegateBaseArgs<T> : SelfPoolingObject<T>
         where T : DelegateBaseArgs<T>, new()
     {
 #pragma warning disable CS0612
@@ -55,31 +55,16 @@ namespace Appalachia.Utility.Events.Base
             }
         }
 
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            using (_PRF_Dispose.Auto())
-            {
-                Return();
-            }
-        }
-
-        #endregion
-
         #region Profiling
 
-        protected static readonly ProfilerMarker _PRF_Configure =
-            new ProfilerMarker(_PRF_PFX + nameof(Configure));
+        protected static readonly ProfilerMarker _PRF_Configure = new ProfilerMarker(_PRF_PFX + nameof(Configure));
 
-        protected static readonly ProfilerMarker
-            _PRF_Dispose = new ProfilerMarker(_PRF_PFX + nameof(Dispose));
+        protected static readonly ProfilerMarker _PRF_Dispose = new ProfilerMarker(_PRF_PFX + nameof(Dispose));
 
         protected static readonly ProfilerMarker _PRF_OnInitialize =
             new ProfilerMarker(_PRF_PFX + nameof(OnInitialize));
 
-        protected static readonly ProfilerMarker
-            _PRF_OnReset = new ProfilerMarker(_PRF_PFX + nameof(OnReset));
+        protected static readonly ProfilerMarker _PRF_OnReset = new ProfilerMarker(_PRF_PFX + nameof(OnReset));
 
         #endregion
     }

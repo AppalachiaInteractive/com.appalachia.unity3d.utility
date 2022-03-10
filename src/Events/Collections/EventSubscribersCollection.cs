@@ -84,20 +84,14 @@ namespace Appalachia.Utility.Events.Collections
                     if (SubscriberCount > SUBSCRIBER_LIMIT)
                     {
                         Log.Warn(
-                            ZString.Format(
-                                "The event has {0} subscribers, and more are subscribing.",
-                                SubscriberCount
-                            )
+                            ZString.Format("The event has {0} subscribers, and more are subscribing.", SubscriberCount)
                         );
                     }
 
                     if (SubscriberCount > SUBSCRIBER_FLUSH_LIMIT)
                     {
                         Log.Warn(
-                            ZString.Format(
-                                "The event has {0} subscribers, which will now be removed.",
-                                SubscriberCount
-                            )
+                            ZString.Format("The event has {0} subscribers, which will now be removed.", SubscriberCount)
                         );
 
                         _subscribers.Clear();
@@ -245,10 +239,7 @@ namespace Appalachia.Utility.Events.Collections
                             var message = ZString.Format(
                                 "The event invoked at the following location has {0} subscribers: {1}",
                                 SubscriberCount,
-                                callerFilePath.FormatCallerMembersForLogging(
-                                    callerMemberName,
-                                    callerLineNumber
-                                )
+                                callerFilePath.FormatCallerMembersForLogging(callerMemberName, callerLineNumber)
                             );
                             Log.Warn(message);
 
@@ -274,10 +265,7 @@ namespace Appalachia.Utility.Events.Collections
                                     "Invoking the following event with {0} subscribers took {1}ms: {2}",
                                     SubscriberCount,
                                     duration.TotalMilliseconds.FormatNumberForLogging(),
-                                    callerFilePath.FormatCallerMembersForLogging(
-                                        callerMemberName,
-                                        callerLineNumber
-                                    )
+                                    callerFilePath.FormatCallerMembersForLogging(callerMemberName, callerLineNumber)
                                 )
                             );
                         }
@@ -299,7 +287,7 @@ namespace Appalachia.Utility.Events.Collections
 
                 if (target is IUniqueSubscriber i)
                 {
-                    hashCode.Add(i.ObjectId);
+                    hashCode.Add(i.ObjectID);
                 }
                 else if (target is Component c)
                 {
@@ -395,8 +383,7 @@ namespace Appalachia.Utility.Events.Collections
         private static readonly ProfilerMarker _PRF_SynchronizeCollections =
             new ProfilerMarker(_PRF_PFX + "SynchronizeCollections");
 
-        private static readonly ProfilerMarker _PRF_InvokeSafe =
-            new ProfilerMarker(_PRF_PFX + nameof(InvokeSafe));
+        private static readonly ProfilerMarker _PRF_InvokeSafe = new ProfilerMarker(_PRF_PFX + nameof(InvokeSafe));
 
         private static readonly ProfilerMarker _PRF_Add = new ProfilerMarker(_PRF_PFX + nameof(Add));
 

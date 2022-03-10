@@ -12,10 +12,10 @@ namespace Appalachia.Utility.Standards
     ///     Represent a 12-bytes BSON type used in document Id
     /// </summary>
     [Serializable]
-    public class ObjectId : IComparable<ObjectId>, IEquatable<ObjectId>
+    public class ObjectID : IComparable<ObjectID>, IEquatable<ObjectID>
     {
         // static constructor
-        static ObjectId()
+        static ObjectID()
         {
             _currentMachine = (GetMachineHash() + AppDomain.CurrentDomain.Id) & 0x00ffffff;
             _machineIncrement = new Random().Next();
@@ -31,31 +31,25 @@ namespace Appalachia.Utility.Standards
         }
 
         /// <summary>
-        ///     Initializes a new empty instance of the ObjectId class.
+        ///     Initializes a new empty instance of the ObjectID class.
         /// </summary>
-        public ObjectId()
+        public ObjectID()
         {
-            _timestamp = 0;
-            _machine = 0;
-            _pid = 0;
-            _increment = 0;
+            Update(0, 0, 0, 0);
         }
 
         /// <summary>
-        ///     Initializes a new instance of the ObjectId class from ObjectId vars.
+        ///     Initializes a new instance of the ObjectID class from ObjectID vars.
         /// </summary>
-        public ObjectId(int timestamp, int machine, short pid, int increment)
+        public ObjectID(int timestamp, int machine, short pid, int increment)
         {
-            _timestamp = timestamp;
-            _machine = machine;
-            _pid = pid;
-            _increment = increment;
+            Update(timestamp, machine, pid, increment);
         }
 
         /// <summary>
-        ///     Initializes a new instance of ObjectId class from another ObjectId.
+        ///     Initializes a new instance of ObjectID class from another ObjectID.
         /// </summary>
-        public ObjectId(ObjectId from)
+        public ObjectID(ObjectID from)
         {
             _timestamp = from.Timestamp;
             _machine = from.Machine;
@@ -64,34 +58,34 @@ namespace Appalachia.Utility.Standards
         }
 
         /// <summary>
-        ///     Initializes a new instance of the ObjectId class from hex string.
+        ///     Initializes a new instance of the ObjectID class from hex string.
         /// </summary>
-        public ObjectId(string value) : this(FromHex(value))
+        public ObjectID(string value) : this(FromHex(value))
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the ObjectId class from byte array.
+        ///     Initializes a new instance of the ObjectID class from byte array.
         /// </summary>
-        public ObjectId(byte[] bytes, int startIndex = 0)
+        public ObjectID(byte[] bytes, int startIndex = 0)
         {
             if (bytes == null)
             {
                 throw new ArgumentNullException(nameof(bytes));
             }
 
-            _timestamp = (bytes[startIndex + 0] << 24) +
-                         (bytes[startIndex + 1] << 16) +
-                         (bytes[startIndex + 2] << 8) +
-                         bytes[startIndex + 3];
+            var timestamp = (bytes[startIndex + 0] << 24) +
+                            (bytes[startIndex + 1] << 16) +
+                            (bytes[startIndex + 2] << 8) +
+                            bytes[startIndex + 3];
 
-            _machine = (bytes[startIndex + 4] << 16) + (bytes[startIndex + 5] << 8) + bytes[startIndex + 6];
+            var machine = (bytes[startIndex + 4] << 16) + (bytes[startIndex + 5] << 8) + bytes[startIndex + 6];
 
-            _pid = (short)((bytes[startIndex + 7] << 8) + bytes[startIndex + 8]);
+            var pid = (short)((bytes[startIndex + 7] << 8) + bytes[startIndex + 8]);
 
-            _increment = (bytes[startIndex + 9] << 16) +
-                         (bytes[startIndex + 10] << 8) +
-                         bytes[startIndex + 11];
+            var increment = (bytes[startIndex + 9] << 16) + (bytes[startIndex + 10] << 8) + bytes[startIndex + 11];
+
+            Update(timestamp, machine, pid, increment);
         }
 
         #region Static Fields and Autoproperties
@@ -109,12 +103,16 @@ namespace Appalachia.Utility.Standards
         [SerializeField] private int _timestamp;
         [SerializeField] private short _pid;
 
+        private string _displayString;
+
         #endregion
 
         /// <summary>
-        ///     A zero 12-bytes ObjectId
+        ///     A zero 12-bytes ObjectID
         /// </summary>
-        public static ObjectId Empty => new ObjectId();
+        public static ObjectID Empty => new ObjectID();
+
+        public bool IsEmpty => this == Empty;
 
         /// <summary>
         ///     Get creation time
@@ -142,18 +140,15 @@ namespace Appalachia.Utility.Standards
         public short Pid => _pid;
 
         /// <summary>
-        ///     Creates a new ObjectId.
+        ///     Creates a new ObjectID.
         /// </summary>
-        public static ObjectId NewObjectId()
+        public static ObjectID NewObjectID()
         {
-            var timestamp = (long)Math.Floor((DateTime.UtcNow - Constants.UNIX_EPOCH).TotalSeconds);
-
-            var inc = Interlocked.Increment(ref _machineIncrement) & 0x00ffffff;
-
-            return new ObjectId((int)timestamp, _currentMachine, _currentProcessID, inc);
+            CalculateNew(out var timestamp, out var machine, out var pid, out var increment);
+            return new ObjectID(timestamp, machine, pid, increment);
         }
 
-        public static bool operator ==(ObjectId lhs, ObjectId rhs)
+        public static bool operator ==(ObjectID lhs, ObjectID rhs)
         {
             if (lhs is null)
             {
@@ -168,27 +163,27 @@ namespace Appalachia.Utility.Standards
             return lhs.Equals(rhs);
         }
 
-        public static bool operator >(ObjectId lhs, ObjectId rhs)
+        public static bool operator >(ObjectID lhs, ObjectID rhs)
         {
             return lhs.CompareTo(rhs) > 0;
         }
 
-        public static bool operator >=(ObjectId lhs, ObjectId rhs)
+        public static bool operator >=(ObjectID lhs, ObjectID rhs)
         {
             return lhs.CompareTo(rhs) >= 0;
         }
 
-        public static bool operator !=(ObjectId lhs, ObjectId rhs)
+        public static bool operator !=(ObjectID lhs, ObjectID rhs)
         {
             return !(lhs == rhs);
         }
 
-        public static bool operator <(ObjectId lhs, ObjectId rhs)
+        public static bool operator <(ObjectID lhs, ObjectID rhs)
         {
             return lhs.CompareTo(rhs) < 0;
         }
 
-        public static bool operator <=(ObjectId lhs, ObjectId rhs)
+        public static bool operator <=(ObjectID lhs, ObjectID rhs)
         {
             return lhs.CompareTo(rhs) <= 0;
         }
@@ -198,7 +193,7 @@ namespace Appalachia.Utility.Standards
         /// </summary>
         public override bool Equals(object other)
         {
-            return Equals(other as ObjectId);
+            return Equals(other as ObjectID);
         }
 
         /// <summary>
@@ -217,11 +212,24 @@ namespace Appalachia.Utility.Standards
         /// <inheritdoc />
         public override string ToString()
         {
-            return BitConverter.ToString(ToByteArray()).Replace("-", "").ToLower();
+            if (string.IsNullOrWhiteSpace(_displayString))
+            {
+                _displayString = BitConverter.ToString(ToByteArray()).Replace("-", "").ToLower();
+            }
+
+            return _displayString;
+        }
+
+        public void EnsureNotEmpty()
+        {
+            if (this == Empty)
+            {
+                CalculateNew(out _timestamp, out _machine, out _pid, out _increment);
+            }
         }
 
         /// <summary>
-        ///     Represent ObjectId as 12 bytes array
+        ///     Represent ObjectID as 12 bytes array
         /// </summary>
         public void ToByteArray(byte[] bytes, int startIndex)
         {
@@ -248,6 +256,17 @@ namespace Appalachia.Utility.Standards
             return bytes;
         }
 
+        private static void CalculateNew(out int timestamp, out int machine, out short pid, out int increment)
+        {
+            timestamp = (int)(long)Math.Floor((DateTime.UtcNow - Constants.UNIX_EPOCH).TotalSeconds);
+
+            machine = _currentMachine;
+
+            pid = _currentProcessID;
+
+            increment = Interlocked.Increment(ref _machineIncrement) & 0x00ffffff;
+        }
+
         /// <summary>
         ///     Convert hex value string in byte array
         /// </summary>
@@ -261,7 +280,7 @@ namespace Appalachia.Utility.Standards
             if (value.Length != 24)
             {
                 throw new ArgumentException(
-                    $"ObjectId strings should be 24 hex characters, got {value.Length} : \"{value}\""
+                    $"ObjectID strings should be 24 hex characters, got {value.Length} : \"{value}\""
                 );
             }
 
@@ -288,12 +307,20 @@ namespace Appalachia.Utility.Standards
             return 0x00ffffff & hostName.GetHashCode(); // use first 3 bytes of hash
         }
 
-        #region IComparable<ObjectId> Members
+        private void Update(int timestamp, int machine, short pid, int increment)
+        {
+            _timestamp = timestamp;
+            _machine = machine;
+            _pid = pid;
+            _increment = increment;
+        }
+
+        #region IComparable<ObjectID> Members
 
         /// <summary>
-        ///     Compares two instances of ObjectId
+        ///     Compares two instances of ObjectID
         /// </summary>
-        public int CompareTo(ObjectId other)
+        public int CompareTo(ObjectID other)
         {
             var r = Timestamp.CompareTo(other.Timestamp);
             if (r != 0)
@@ -318,14 +345,14 @@ namespace Appalachia.Utility.Standards
 
         #endregion
 
-        #region IEquatable<ObjectId> Members
+        #region IEquatable<ObjectID> Members
 
         /// <summary>
-        ///     Checks if this ObjectId is equal to the given object. Returns true
+        ///     Checks if this ObjectID is equal to the given object. Returns true
         ///     if the given object is equal to the value of this instance.
         ///     Returns false otherwise.
         /// </summary>
-        public bool Equals(ObjectId other)
+        public bool Equals(ObjectID other)
         {
             return (other != null) &&
                    (Timestamp == other.Timestamp) &&

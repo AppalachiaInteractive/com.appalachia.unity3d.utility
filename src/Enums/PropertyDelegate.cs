@@ -1,19 +1,16 @@
 using System;
+using Appalachia.Utility.Pooling.Objects;
 
 namespace Appalachia.Utility.Enums
 {
-    public sealed class PropertyDelegate<T>
+#pragma warning disable CS0612
+    public sealed class PropertyDelegate<T> : SelfPoolingObject<PropertyDelegate<T>>
+#pragma warning restore CS0612
     {
-        public PropertyDelegate(Func<T> getter, Action<T> setter)
-        {
-            _getter = getter;
-            _setter = setter;
-        }
-
         #region Fields and Autoproperties
 
-        private readonly Action<T> _setter;
-        private readonly Func<T> _getter;
+        private Action<T> _setter;
+        private Func<T> _getter;
 
         #endregion
 
@@ -21,6 +18,34 @@ namespace Appalachia.Utility.Enums
         {
             get => _getter();
             set => _setter(value);
+        }
+
+        public static PropertyDelegate<T> Get(Func<T> getter, Action<T> setter)
+        {
+            var instance = Get();
+
+            instance._getter = getter;
+            instance._setter = setter;
+
+            return instance;
+        }
+
+        public override void Initialize()
+        {
+            using (_PRF_Initialize.Auto())
+            {
+                _getter = null;
+                _setter = null;
+            }
+        }
+
+        public override void Reset()
+        {
+            using (_PRF_Reset.Auto())
+            {
+                _getter = null;
+                _setter = null;
+            }
         }
     }
 }

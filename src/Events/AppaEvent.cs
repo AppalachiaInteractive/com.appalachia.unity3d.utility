@@ -29,7 +29,7 @@ namespace Appalachia.Utility.Events
 
             #region Fields and Autoproperties
 
-            private ObjectId _objectId;
+            private ObjectID _objectId;
 
             private Subscribers _subscribers;
 
@@ -44,13 +44,13 @@ namespace Appalachia.Utility.Events
                 }
             }
 
-            public ObjectId ObjectId
+            public ObjectID ObjectID
             {
                 get
                 {
-                    if ((_objectId == null) || (_objectId == ObjectId.Empty))
+                    if ((_objectId == null) || (_objectId == ObjectID.Empty))
                     {
-                        _objectId = ObjectId.NewObjectId();
+                        _objectId = ObjectID.NewObjectID();
                     }
 
                     return _objectId;
@@ -83,7 +83,7 @@ namespace Appalachia.Utility.Events
 
             public override int GetHashCode()
             {
-                return ObjectId.GetHashCode();
+                return ObjectID.GetHashCode();
             }
 
             public void UnsubscribeAll()

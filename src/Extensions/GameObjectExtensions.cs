@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Appalachia.Utility.Constants;
-using Appalachia.Utility.Enums;
 using Appalachia.Utility.Logging;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
@@ -281,9 +280,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static T Get<T>(
-            this GameObject obj,
-            GetComponentStrategy getStyle = GetComponentStrategy.CurrentObject)
+        public static T Get<T>(this GameObject obj, GetComponentStrategy getStyle = GetComponentStrategy.CurrentObject)
             where T : Component
         {
             using (_PRF_Get.Auto())
@@ -445,6 +442,17 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        public static string GetFullNameForFile(this GameObject gameObj)
+        {
+            using (_PRF_GetFullNameForFile.Auto())
+            {
+                var path = GetFullName(gameObj);
+
+                var clean = path.Replace('/', '_').Replace('\\', '_');
+                return clean;
+            }
+        }
+
         /// <summary>
         ///     Searches for a child game object by name.
         ///     If it exists, it will be assigned to the <paramref name="target" /> argument.
@@ -456,11 +464,7 @@ namespace Appalachia.Utility.Extensions
         /// <param name="ui">
         ///     Whether or not this game object is a UI object (using <see cref="RectTransform" />) or a 3D object (using <see cref="Transform" />).
         /// </param>
-        public static void GetOrAddChild(
-            this MonoBehaviour behaviour,
-            ref GameObject target,
-            string name,
-            bool ui)
+        public static void GetOrAddChild(this MonoBehaviour behaviour, ref GameObject target, string name, bool ui)
         {
             using (_PRF_GetOrCreateChild.Auto())
             {
@@ -557,11 +561,7 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_GetOrCreateComponent.Auto())
             {
-                DestroyComponentOnWrongGameObject(
-                    obj,
-                    ref component,
-                    DestructionMode.DestroyIfOnOtherGameObject
-                );
+                DestroyComponentOnWrongGameObject(obj, ref component, DestructionMode.DestroyIfOnOtherGameObject);
 
                 if (component == null)
                 {
@@ -584,20 +584,14 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_GetOrCreateComponent.Auto())
             {
-                DestroyComponentOnWrongGameObject(
-                    obj,
-                    ref component,
-                    DestructionMode.DestroyIfNotOnChildGameObject
-                );
+                DestroyComponentOnWrongGameObject(obj, ref component, DestructionMode.DestroyIfNotOnChildGameObject);
 
                 if (component == null)
                 {
                     var components = obj.GetComponentsInChildren<T>(true);
 
                     var childComponents = components.Where(c => c.transform.parent == obj.transform);
-                    var match = childComponents.FirstOrDefault(
-                        c => !requireNameMatch || (c.gameObject.name == name)
-                    );
+                    var match = childComponents.FirstOrDefault(c => !requireNameMatch || (c.gameObject.name == name));
 
                     component = match;
                     if (component == null)
@@ -610,10 +604,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static void GetOrAddLifetimeComponentInChild<T>(
-            this GameObject obj,
-            ref T component,
-            string name = null)
+        public static void GetOrAddLifetimeComponentInChild<T>(this GameObject obj, ref T component, string name = null)
             where T : Component
         {
             using (_PRF_GetOrCreateLifetimeComponentInChild.Auto())
@@ -752,11 +743,7 @@ namespace Appalachia.Utility.Extensions
                 if (worldTransform != default)
                 {
                     transform.position = column3;
-                    transform.localScale = new Vector3(
-                        column0.magnitude,
-                        column1.magnitude,
-                        column2.magnitude
-                    );
+                    transform.localScale = new Vector3(column0.magnitude, column1.magnitude, column2.magnitude);
                     transform.rotation = Quaternion.LookRotation(column2, column1);
                 }
 
@@ -768,9 +755,7 @@ namespace Appalachia.Utility.Extensions
         {
             using (_PRF_MoveToActiveScene.Auto())
             {
-                AppaLog.Context.Extensions.Debug(
-                    ZString.Format("Moving [{0}] to currently active scene.", go.name)
-                );
+                AppaLog.Context.Extensions.Debug(ZString.Format("Moving [{0}] to currently active scene.", go.name));
 
                 var scene = SceneManager.GetActiveScene();
                 SceneManager.MoveGameObjectToScene(go, scene);
@@ -791,9 +776,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static Dictionary<Transform, int> MoveToLayerRecursiveRecoverable(
-            this GameObject go,
-            int layer)
+        public static Dictionary<Transform, int> MoveToLayerRecursiveRecoverable(this GameObject go, int layer)
         {
             using (_PRF_MoveToLayerRecursiveRecoverable.Auto())
             {
@@ -839,9 +822,7 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
-        public static void RecoverLayersRecursive(
-            this GameObject go,
-            Dictionary<Transform, int> originalLayers)
+        public static void RecoverLayersRecursive(this GameObject go, Dictionary<Transform, int> originalLayers)
         {
             using (_PRF_RecoverLayersRecursive.Auto())
             {
@@ -961,15 +942,12 @@ namespace Appalachia.Utility.Extensions
 
         private const string _PRF_PFX = nameof(GameObjectExtensions) + ".";
 
-        private static readonly ProfilerMarker _PRF_GetSiblings =
-            new ProfilerMarker(_PRF_PFX + nameof(GetSiblings));
+        private static readonly ProfilerMarker _PRF_GetFullNameForFile =
+            new ProfilerMarker(_PRF_PFX + nameof(GetFullNameForFile));
 
-        private static readonly ProfilerMarker _PRF_GetChildren =
-            new ProfilerMarker(_PRF_PFX + nameof(GetChildren));
-
-        private static readonly ProfilerMarker _PRF_GetChild =
-            new ProfilerMarker(_PRF_PFX + nameof(GetChild));
-
+        private static readonly ProfilerMarker _PRF_GetSiblings = new ProfilerMarker(_PRF_PFX + nameof(GetSiblings));
+        private static readonly ProfilerMarker _PRF_GetChildren = new ProfilerMarker(_PRF_PFX + nameof(GetChildren));
+        private static readonly ProfilerMarker _PRF_GetChild = new ProfilerMarker(_PRF_PFX + nameof(GetChild));
         private static readonly ProfilerMarker _PRF_Get = new ProfilerMarker(_PRF_PFX + nameof(Get));
 
         private static readonly ProfilerMarker _PRF_GetComponentInParent =
@@ -1008,11 +986,9 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
             new ProfilerMarker(_PRF_PFX + nameof(GetOrAddComponent));
 
-        private static readonly ProfilerMarker
-            _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
+        private static readonly ProfilerMarker _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));
 
-        private static readonly ProfilerMarker _PRF_GetFullName =
-            new ProfilerMarker(_PRF_PFX + nameof(GetFullName));
+        private static readonly ProfilerMarker _PRF_GetFullName = new ProfilerMarker(_PRF_PFX + nameof(GetFullName));
 
         private static readonly ProfilerMarker _PRF_CreateGameObjectInScene =
             new ProfilerMarker(_PRF_PFX + nameof(AddGameObjectInScene));
@@ -1029,8 +1005,7 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_SetAsSiblingTo =
             new ProfilerMarker(_PRF_PFX + nameof(SetAsSiblingTo));
 
-        private static readonly ProfilerMarker _PRF_SetParentTo =
-            new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
+        private static readonly ProfilerMarker _PRF_SetParentTo = new ProfilerMarker(_PRF_PFX + nameof(SetParentTo));
 
         private static readonly ProfilerMarker _PRF_GetOrCreateChild =
             new ProfilerMarker(_PRF_PFX + nameof(GetOrAddChild));

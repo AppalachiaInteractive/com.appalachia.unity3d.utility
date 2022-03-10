@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Appalachia.Utility.Colors;
+using Appalachia.Utility.Standards;
 using Appalachia.Utility.Strings;
 using Unity.Profiling;
 using UnityEngine;
@@ -52,8 +53,7 @@ namespace Appalachia.Utility.Constants
 
         private static readonly Utf16PreparedFormat<string> BOLD = ZString.PrepareUtf16<string>("<b>{0}</b>");
 
-        private static readonly Utf16PreparedFormat<string> ITALIC =
-            ZString.PrepareUtf16<string>("<i>{0}</i>");
+        private static readonly Utf16PreparedFormat<string> ITALIC = ZString.PrepareUtf16<string>("<i>{0}</i>");
 
         #endregion
 
@@ -67,8 +67,7 @@ namespace Appalachia.Utility.Constants
 
         private static Dictionary<object, string> _cachedObjectFormatForLoggingResults;
 
-        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>>
-            _cachedCallerMemberFormatResults;
+        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>> _cachedCallerMemberFormatResults;
 
         private static Dictionary<string, string> _cachedStringBoldResults;
 
@@ -148,8 +147,7 @@ namespace Appalachia.Utility.Constants
             }
         }
 
-        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>>
-            CachedCallerMemberFormatResults
+        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>> CachedCallerMemberFormatResults
         {
             get
             {
@@ -328,9 +326,7 @@ namespace Appalachia.Utility.Constants
 
                 if (!callerFilePathDictionary[callerMemberName].ContainsKey(callerLineNumber))
                 {
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(callerFilePath)
-                                         .Bold()
-                                         .Color(LogType);
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(callerFilePath).Bold().Color(LogType);
                     var lineNumber = callerLineNumber.FormatNumberForLogging();
                     var memberName = callerMemberName.Bold().Color(LogMethod);
                     var filePath = callerFilePath.Italic().Color(LogPath);
@@ -450,6 +446,32 @@ namespace Appalachia.Utility.Constants
                 }
 
                 return CachedIntFormatForLoggingResults[value];
+            }
+        }
+
+        public static string FormatForLogging(this ObjectID value)
+        {
+            using (_PRF_FormatForLogging.Auto())
+            {
+                if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
+                {
+                    CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogName));
+                }
+
+                return CachedObjectFormatForLoggingResults[value];
+            }
+        }
+
+        public static string FormatForLogging(this string value)
+        {
+            using (_PRF_FormatForLogging.Auto())
+            {
+                if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
+                {
+                    CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value), LogName));
+                }
+
+                return CachedObjectFormatForLoggingResults[value];
             }
         }
 

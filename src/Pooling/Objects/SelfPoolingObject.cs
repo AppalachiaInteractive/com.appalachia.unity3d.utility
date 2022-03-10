@@ -7,11 +7,29 @@ using Unity.Profiling;
 
 namespace Appalachia.Utility.Pooling.Objects
 {
-    public abstract class SelfPoolingObject
+    public abstract class SelfPoolingObject : IDisposable
     {
         public abstract void Initialize();
         public abstract void Reset();
         public abstract void Return();
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Return();
+            }
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 
     public abstract class SelfPoolingObject<T> : SelfPoolingObject
@@ -96,8 +114,7 @@ namespace Appalachia.Utility.Pooling.Objects
         protected static readonly ProfilerMarker _PRF_ExecuteReset =
             new ProfilerMarker(_PRF_PFX + nameof(ExecuteReset));
 
-        protected static readonly ProfilerMarker _PRF_Initialize =
-            new ProfilerMarker(_PRF_PFX + nameof(Initialize));
+        protected static readonly ProfilerMarker _PRF_Initialize = new ProfilerMarker(_PRF_PFX + nameof(Initialize));
 
         protected static readonly ProfilerMarker _PRF_Reset = new ProfilerMarker(_PRF_PFX + nameof(Reset));
 

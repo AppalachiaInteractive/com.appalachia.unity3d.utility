@@ -9,10 +9,9 @@ namespace Appalachia.Utility.Events.Collections
     {
         #region Static Fields and Autoproperties
 
-        private static Dictionary<ObjectId, Dictionary<TKey1, Dictionary<TKey2, Action>>>
-            _updateDelegatesByData;
+        private static Dictionary<ObjectID, Dictionary<TKey1, Dictionary<TKey2, Action>>> _updateDelegatesByData;
 
-        private static Dictionary<ObjectId, Dictionary<TKey1, Dictionary<TKey2, AppaEvent.Handler>>>
+        private static Dictionary<ObjectID, Dictionary<TKey1, Dictionary<TKey2, AppaEvent.Handler>>>
             _updateHandlersByData;
 
         #endregion
@@ -25,11 +24,7 @@ namespace Appalachia.Utility.Events.Collections
         /// <param name="targetEvent">The event to subscribe to (once).</param>
         /// <param name="delegateCreator">A delegate to create the update/subscribe delegate.</param>
         /// <exception cref="ArgumentNullException">Thrown whenever any key is null.</exception>
-        public void Subscribe(
-            TKey1 key1,
-            TKey2 key2,
-            ref AppaEvent.Data targetEvent,
-            Func<Action> delegateCreator)
+        public void Subscribe(TKey1 key1, TKey2 key2, ref AppaEvent.Data targetEvent, Func<Action> delegateCreator)
         {
             using (_PRF_Subscribe.Auto())
             {
@@ -52,30 +47,29 @@ namespace Appalachia.Utility.Events.Collections
                 AppaEvent.Handler updateHandler;
 
                 // first
-                if (!_updateDelegatesByData.ContainsKey(targetEvent.ObjectId))
+                if (!_updateDelegatesByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    _updateDelegatesByData.Add(targetEvent.ObjectId, new());
+                    _updateDelegatesByData.Add(targetEvent.ObjectID, new());
                 }
 
-                if (!_updateHandlersByData.ContainsKey(targetEvent.ObjectId))
+                if (!_updateHandlersByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    _updateHandlersByData.Add(targetEvent.ObjectId, new());
+                    _updateHandlersByData.Add(targetEvent.ObjectID, new());
                 }
 
-                if (!_updateDelegatesByData[targetEvent.ObjectId].ContainsKey(key1))
+                if (!_updateDelegatesByData[targetEvent.ObjectID].ContainsKey(key1))
                 {
-                    _updateDelegatesByData[targetEvent.ObjectId].Add(key1, new Dictionary<TKey2, Action>());
+                    _updateDelegatesByData[targetEvent.ObjectID].Add(key1, new Dictionary<TKey2, Action>());
                 }
 
-                updateDelegates = _updateDelegatesByData[targetEvent.ObjectId][key1];
+                updateDelegates = _updateDelegatesByData[targetEvent.ObjectID][key1];
 
-                if (!_updateHandlersByData[targetEvent.ObjectId].ContainsKey(key1))
+                if (!_updateHandlersByData[targetEvent.ObjectID].ContainsKey(key1))
                 {
-                    _updateHandlersByData[targetEvent.ObjectId]
-                       .Add(key1, new Dictionary<TKey2, AppaEvent.Handler>());
+                    _updateHandlersByData[targetEvent.ObjectID].Add(key1, new Dictionary<TKey2, AppaEvent.Handler>());
                 }
 
-                updateHandlers = _updateHandlersByData[targetEvent.ObjectId][key1];
+                updateHandlers = _updateHandlersByData[targetEvent.ObjectID][key1];
 
                 if (!updateDelegates.ContainsKey(key2))
                 {
@@ -120,7 +114,7 @@ namespace Appalachia.Utility.Events.Collections
                     return;
                 }
 
-                var updateDelegate = _updateDelegatesByData[targetEvent.ObjectId][key1][key2];
+                var updateDelegate = _updateDelegatesByData[targetEvent.ObjectID][key1][key2];
                 updateDelegate();
             }
         }
@@ -129,8 +123,7 @@ namespace Appalachia.Utility.Events.Collections
 
         private const string _PRF_PFX = nameof(ReusableDelegateCollection<TKey1, TKey2>) + ".";
 
-        private static readonly ProfilerMarker _PRF_Subscribe =
-            new ProfilerMarker(_PRF_PFX + nameof(Subscribe));
+        private static readonly ProfilerMarker _PRF_Subscribe = new ProfilerMarker(_PRF_PFX + nameof(Subscribe));
 
         private static readonly ProfilerMarker _PRF_SubscribeAndInvoke =
             new ProfilerMarker(_PRF_PFX + nameof(SubscribeAndInvoke));

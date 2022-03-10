@@ -9,9 +9,9 @@ namespace Appalachia.Utility.Events.Collections
     {
         #region Fields and Autoproperties
 
-        private Dictionary<ObjectId, Dictionary<TKey1, Action>> _updateDelegatesByData;
+        private Dictionary<ObjectID, Dictionary<TKey1, Action>> _updateDelegatesByData;
 
-        private Dictionary<ObjectId, Dictionary<TKey1, AppaEvent.Handler>> _updateHandlersByData;
+        private Dictionary<ObjectID, Dictionary<TKey1, AppaEvent.Handler>> _updateHandlersByData;
 
         #endregion
 
@@ -37,30 +37,29 @@ namespace Appalachia.Utility.Events.Collections
                 AppaEvent.Handler updateHandler;
 
                 // first
-                if (!_updateDelegatesByData.ContainsKey(targetEvent.ObjectId))
+                if (!_updateDelegatesByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    _updateDelegatesByData.Add(targetEvent.ObjectId, new());
+                    _updateDelegatesByData.Add(targetEvent.ObjectID, new());
                 }
 
-                if (!_updateDelegatesByData[targetEvent.ObjectId].ContainsKey(key1))
+                if (!_updateDelegatesByData[targetEvent.ObjectID].ContainsKey(key1))
                 {
-                    _updateDelegatesByData[targetEvent.ObjectId].Add(key1, delegateCreator());
+                    _updateDelegatesByData[targetEvent.ObjectID].Add(key1, delegateCreator());
                 }
 
-                updateDelegate = _updateDelegatesByData[targetEvent.ObjectId][key1];
+                updateDelegate = _updateDelegatesByData[targetEvent.ObjectID][key1];
 
-                if (!_updateHandlersByData.ContainsKey(targetEvent.ObjectId))
+                if (!_updateHandlersByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    _updateHandlersByData.Add(targetEvent.ObjectId, new());
+                    _updateHandlersByData.Add(targetEvent.ObjectID, new());
                 }
 
-                if (!_updateHandlersByData[targetEvent.ObjectId].ContainsKey(key1))
+                if (!_updateHandlersByData[targetEvent.ObjectID].ContainsKey(key1))
                 {
-                    _updateHandlersByData[targetEvent.ObjectId]
-                       .Add(key1, new AppaEvent.Handler(updateDelegate));
+                    _updateHandlersByData[targetEvent.ObjectID].Add(key1, new AppaEvent.Handler(updateDelegate));
                 }
 
-                updateHandler = _updateHandlersByData[targetEvent.ObjectId][key1];
+                updateHandler = _updateHandlersByData[targetEvent.ObjectID][key1];
 
                 targetEvent.Event += updateHandler;
             }
@@ -89,7 +88,7 @@ namespace Appalachia.Utility.Events.Collections
                     return;
                 }
 
-                var updateDelegate = _updateDelegatesByData[targetEvent.ObjectId][key1];
+                var updateDelegate = _updateDelegatesByData[targetEvent.ObjectID][key1];
                 updateDelegate();
             }
         }
@@ -104,23 +103,23 @@ namespace Appalachia.Utility.Events.Collections
         {
             using (_PRF_Unsubscribe.Auto())
             {
-                if (_updateDelegatesByData.ContainsKey(targetEvent.ObjectId))
+                if (_updateDelegatesByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    if (_updateDelegatesByData[targetEvent.ObjectId].ContainsKey(key1))
+                    if (_updateDelegatesByData[targetEvent.ObjectID].ContainsKey(key1))
                     {
-                        _updateDelegatesByData[targetEvent.ObjectId].Remove(key1);
+                        _updateDelegatesByData[targetEvent.ObjectID].Remove(key1);
                     }
                 }
 
-                if (_updateHandlersByData.ContainsKey(targetEvent.ObjectId))
+                if (_updateHandlersByData.ContainsKey(targetEvent.ObjectID))
                 {
-                    if (_updateHandlersByData[targetEvent.ObjectId].ContainsKey(key1))
+                    if (_updateHandlersByData[targetEvent.ObjectID].ContainsKey(key1))
                     {
-                        var target = _updateHandlersByData[targetEvent.ObjectId][key1];
+                        var target = _updateHandlersByData[targetEvent.ObjectID][key1];
 
                         targetEvent.Event -= target;
 
-                        _updateHandlersByData[targetEvent.ObjectId].Remove(key1);
+                        _updateHandlersByData[targetEvent.ObjectID].Remove(key1);
                     }
                 }
             }
@@ -130,11 +129,8 @@ namespace Appalachia.Utility.Events.Collections
 
         private const string _PRF_PFX = nameof(ReusableDelegateCollection<TKey1>) + ".";
 
-        private static readonly ProfilerMarker _PRF_Unsubscribe =
-            new ProfilerMarker(_PRF_PFX + nameof(Unsubscribe));
-
-        private static readonly ProfilerMarker _PRF_Subscribe =
-            new ProfilerMarker(_PRF_PFX + nameof(Subscribe));
+        private static readonly ProfilerMarker _PRF_Unsubscribe = new ProfilerMarker(_PRF_PFX + nameof(Unsubscribe));
+        private static readonly ProfilerMarker _PRF_Subscribe = new ProfilerMarker(_PRF_PFX + nameof(Subscribe));
 
         private static readonly ProfilerMarker _PRF_SubscribeAndInvoke =
             new ProfilerMarker(_PRF_PFX + nameof(SubscribeAndInvoke));
