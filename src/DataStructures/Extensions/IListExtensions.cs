@@ -49,6 +49,32 @@ namespace Appalachia.Utility.DataStructures.Extensions
         }
 
         /// <summary>
+        ///     Returns the second item in the list.
+        /// </summary>
+        /// <param name="collection">The list to pull the item from.</param>
+        /// <typeparam name="T">The list element type.</typeparam>
+        /// <returns>The item.</returns>
+        public static T SecondOrDefault<T>(this IEnumerable<T> collection)
+        {
+            using (_PRF_GetSecond.Auto())
+            {
+                var first = false;
+                foreach (var item in collection)
+                {
+                    if (!first)
+                    {
+                        first = true;
+                        continue;
+                    }
+
+                    return item;
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
         ///     Return a human readable, multi-line, print-out (string) of this list.
         /// </summary>
         /// <returns>The human readable string.</returns>
@@ -90,13 +116,11 @@ namespace Appalachia.Utility.DataStructures.Extensions
 
         private const string _PRF_PFX = nameof(IListExtensions) + ".";
 
-        private static readonly ProfilerMarker
-            _PRF_GetFirst = new ProfilerMarker(_PRF_PFX + nameof(GetFirst));
+        private static readonly ProfilerMarker _PRF_GetFirst = new ProfilerMarker(_PRF_PFX + nameof(GetFirst));
 
         private static readonly ProfilerMarker _PRF_GetLast = new ProfilerMarker(_PRF_PFX + nameof(GetLast));
 
-        private static readonly ProfilerMarker _PRF_GetSecond =
-            new ProfilerMarker(_PRF_PFX + nameof(GetSecond));
+        private static readonly ProfilerMarker _PRF_GetSecond = new ProfilerMarker(_PRF_PFX + nameof(GetSecond));
 
         private static readonly ProfilerMarker _PRF_ToHumanReadable =
             new ProfilerMarker(_PRF_PFX + nameof(ToHumanReadable));

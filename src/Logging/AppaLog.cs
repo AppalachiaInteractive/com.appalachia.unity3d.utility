@@ -16,8 +16,6 @@ namespace Appalachia.Utility.Logging
         private const bool TRACING_ENABLED = false;
         private const int MENU_PRIORITY = PKG.Menu.Appalachia.Logging.Priority;
         private const string MENU_BASE = PKG.Menu.Appalachia.Logging.Base;
-        
-        /*private const string MENU_DEBUGGER = MENU_BASE + "Debugger Boundary";*/
 
         #endregion
 
@@ -180,18 +178,7 @@ namespace Appalachia.Utility.Logging
         {
             using (_PRF_Info.Auto())
             {
-                LogInternal(
-                    LogLevel.Info,
-                    null,
-                    null,
-                    message,
-                    context,
-                    null,
-                    logIf,
-                    memberName,
-                    filePath,
-                    lineNumber
-                );
+                LogInternal(LogLevel.Info, null, null, message, context, null, logIf, memberName, filePath, lineNumber);
             }
         }
 
@@ -214,18 +201,7 @@ namespace Appalachia.Utility.Logging
         {
             using (_PRF_Log.Auto())
             {
-                LogInternal(
-                    level,
-                    null,
-                    null,
-                    message,
-                    context,
-                    null,
-                    logIf,
-                    memberName,
-                    filePath,
-                    lineNumber
-                );
+                LogInternal(level, null, null, message, context, null, logIf, memberName, filePath, lineNumber);
             }
         }
 
@@ -278,18 +254,7 @@ namespace Appalachia.Utility.Logging
         {
             using (_PRF_Warn.Auto())
             {
-                LogInternal(
-                    LogLevel.Warn,
-                    null,
-                    null,
-                    message,
-                    context,
-                    null,
-                    logIf,
-                    memberName,
-                    filePath,
-                    lineNumber
-                );
+                LogInternal(LogLevel.Warn, null, null, message, context, null, logIf, memberName, filePath, lineNumber);
             }
         }
 
@@ -338,12 +303,10 @@ namespace Appalachia.Utility.Logging
                     );
 
                     var logType = LogLevelToLogType(level);
-
-                    UnityEngine.Debug.unityLogger.Log(
-                        logType,
-                        consoleMessage,
-                        context is Object o ? o : null
-                    );
+                    using (_PRF_LogInternal_UnityInternal.Auto())
+                    {
+                        UnityEngine.Debug.unityLogger.Log(logType, consoleMessage, context is Object o ? o : null);
+                    }
 
                     if (exception != null)
                     {
@@ -367,7 +330,7 @@ namespace Appalachia.Utility.Logging
                         lineNumber
                     );
                 }
-              
+
 // ReSharper restore HeuristicUnreachableCode
 #pragma warning restore CS0162
             }
@@ -434,6 +397,10 @@ namespace Appalachia.Utility.Logging
         #region Profiling
 
         private const string _PRF_PFX = nameof(AppaLog) + ".";
+
+        private static readonly ProfilerMarker _PRF_LogInternal_UnityInternal =
+            new ProfilerMarker(_PRF_PFX + nameof(LogInternal) + ".UnityInternal");
+
         private static readonly ProfilerMarker _PRF_Debug = new(_PRF_PFX + nameof(Debug));
         private static readonly ProfilerMarker _PRF_Error = new(_PRF_PFX + nameof(Error));
 
@@ -449,9 +416,10 @@ namespace Appalachia.Utility.Logging
 
         private static readonly ProfilerMarker _PRF_Fatal = new(_PRF_PFX + nameof(Fatal));
 
-        private static readonly ProfilerMarker _PRF_LogLevelToLogType =
-            new(_PRF_PFX + nameof(LogLevelToLogType));
+        private static readonly ProfilerMarker _PRF_LogLevelToLogType = new(_PRF_PFX + nameof(LogLevelToLogType));
 
         #endregion
+
+        /*private const string MENU_DEBUGGER = MENU_BASE + "Debugger Boundary";*/
     }
 }

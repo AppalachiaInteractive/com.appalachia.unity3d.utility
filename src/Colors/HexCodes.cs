@@ -60,8 +60,12 @@ namespace Appalachia.Utility.Colors
         ///     aarrggbb
         ///     AARRGGBB
         ///     #AARRGGBB
+        ///     rrggbbaa
+        ///     RRGGBBAA
+        ///     #RRGGBBAA
         /// </summary>
         /// <param name="hexCode">The hexadecimal code.</param>
+        /// <param name="alphaLast">Whether or not alpha is first or last.</param>
         /// <exception cref="ArgumentException">The argument was not appropriate.</exception>
         /// <exception cref="ArgumentNullException">The argument was null.</exception>
         /// <returns>The color that the code represents.</returns>
@@ -76,10 +80,18 @@ namespace Appalachia.Utility.Colors
 
                 _lookup ??= new Dictionary<string, Color>();
 
-                if (_lookup.TryGetValue(hexCode, out var result)) return result;
+                if (_lookup.TryGetValue(hexCode, out var result))
+                {
+                    return result;
+                }
 
                 var cleanHexCode = hexCode.Replace("#", "").ToUpperInvariant().Trim();
 
+                if (_lookup.TryGetValue(cleanHexCode, out result))
+                {
+                    return result;
+                }
+                
                 var threePart = cleanHexCode.Length == 6;
                 var fourPart = cleanHexCode.Length == 8;
 

@@ -37,6 +37,7 @@ namespace Appalachia.Utility.Constants
         private static readonly Color LogMethod = new(166f / 255f, 090f / 255f, 050f / 255f, 1.0f);
 
         private static readonly Color LogName = Green;
+        private static readonly Color LogNull = new(022f / 255f, 095f / 255f, 050f / 255f, 1.0f);
         private static readonly Color LogPath = new(176f / 255f, 083f / 255f, 070f / 255f, 1.0f);
         private static readonly Color LogType = new(191f / 255f, 144f / 255f, 067f / 255f, 1.0f);
         private const string COMPONENT_FORMAT_STRING = "{0}.{1}";
@@ -52,46 +53,29 @@ namespace Appalachia.Utility.Constants
             ZString.PrepareUtf16<string, string>("<color={0}>{1}</color>");
 
         private static readonly Utf16PreparedFormat<string> BOLD = ZString.PrepareUtf16<string>("<b>{0}</b>");
-
         private static readonly Utf16PreparedFormat<string> ITALIC = ZString.PrepareUtf16<string>("<i>{0}</i>");
+        private static Dictionary<double, string> _cachedDoubleFormatForLoggingResults;
+        private static Dictionary<float, string> _cachedFloatFormatForLoggingResults;
+        private static Dictionary<int, string> _cachedIntFormatForLoggingResults;
+        private static Dictionary<object, string> _cachedObjectFormatForLoggingResults;
+        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>> _cachedCallerMemberFormatResults;
+        private static Dictionary<string, string> _cachedStringBoldResults;
+        private static Dictionary<string, string> _cachedStringFormatConstantForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatEventForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatFieldForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatMethodForLoggingResults;
+        private static Dictionary<string, string> _cachedStringFormatNameForLoggingResults;
+        private static Dictionary<string, string> _cachedStringItalicResults;
+        private static Dictionary<Type, Dictionary<object, string>> _cachedFormatEnumForLogging;
+        private static Dictionary<Type, string> _cachedTypeFormatForLoggingResults;
+        private static Dictionary<Type, string> _formattedTypes;
+        private static Utf8PreparedFormat<string, string> _componentFormatString;
+        private static Utf8PreparedFormat<string, string> _genericMethodExceptionFormat;
+        private static readonly string NULL = Color(Bold("<NULL>"), LogNull);
 
         #endregion
 
         #region Static Fields and Autoproperties
-
-        private static Dictionary<double, string> _cachedDoubleFormatForLoggingResults;
-
-        private static Dictionary<float, string> _cachedFloatFormatForLoggingResults;
-
-        private static Dictionary<int, string> _cachedIntFormatForLoggingResults;
-
-        private static Dictionary<object, string> _cachedObjectFormatForLoggingResults;
-
-        private static Dictionary<string, Dictionary<string, Dictionary<int, string>>> _cachedCallerMemberFormatResults;
-
-        private static Dictionary<string, string> _cachedStringBoldResults;
-
-        private static Dictionary<string, string> _cachedStringFormatConstantForLoggingResults;
-
-        private static Dictionary<string, string> _cachedStringFormatEventForLoggingResults;
-
-        private static Dictionary<string, string> _cachedStringFormatFieldForLoggingResults;
-
-        private static Dictionary<string, string> _cachedStringFormatMethodForLoggingResults;
-
-        private static Dictionary<string, string> _cachedStringFormatNameForLoggingResults;
-
-        private static Dictionary<string, string> _cachedStringItalicResults;
-
-        private static Dictionary<Type, Dictionary<object, string>> _cachedFormatEnumForLogging;
-
-        private static Dictionary<Type, string> _cachedTypeFormatForLoggingResults;
-
-        private static Dictionary<Type, string> _formattedTypes;
-
-        private static Utf8PreparedFormat<string, string> _componentFormatString;
-
-        private static Utf8PreparedFormat<string, string> _genericMethodExceptionFormat;
 
         #endregion
 
@@ -345,6 +329,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (_componentFormatString == null)
                 {
                     _componentFormatString = new Utf8PreparedFormat<string, string>(COMPONENT_FORMAT_STRING);
@@ -366,6 +355,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatConstantForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedStringFormatConstantForLoggingResults.ContainsKey(value))
                 {
                     CachedStringFormatConstantForLoggingResults.Add(value, Color(Bold(value), LogConstant));
@@ -380,6 +374,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedFormatEnumForLogging.ContainsKey(typeof(T)))
                 {
                     CachedFormatEnumForLogging.Add(typeof(T), new Dictionary<object, string>());
@@ -401,6 +400,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatEventForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedStringFormatEventForLoggingResults.ContainsKey(value))
                 {
                     CachedStringFormatEventForLoggingResults.Add(value, Color(Bold(value), LogEvent));
@@ -414,6 +418,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatFieldForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedStringFormatFieldForLoggingResults.ContainsKey(value))
                 {
                     CachedStringFormatFieldForLoggingResults.Add(value, Color(Bold(value), LogField));
@@ -427,6 +436,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedTypeFormatForLoggingResults.ContainsKey(value))
                 {
                     CachedTypeFormatForLoggingResults.Add(value, Color(Bold(value.GetReadableName()), LogType));
@@ -453,6 +467,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
                 {
                     CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogName));
@@ -466,6 +485,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
                 {
                     CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value), LogName));
@@ -479,6 +503,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedObjectFormatForLoggingResults.ContainsKey(value))
                 {
                     CachedObjectFormatForLoggingResults.Add(value, Color(Bold(value.ToString()), LogName));
@@ -492,6 +521,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 return FormatNameForLogging(value.name);
             }
         }
@@ -500,6 +534,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatMethodForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedStringFormatMethodForLoggingResults.ContainsKey(value))
                 {
                     CachedStringFormatMethodForLoggingResults.Add(value, Color(Bold(value), LogMethod));
@@ -513,6 +552,11 @@ namespace Appalachia.Utility.Constants
         {
             using (_PRF_FormatNameForLogging.Auto())
             {
+                if (value == null)
+                {
+                    return NULL;
+                }
+
                 if (!CachedStringFormatNameForLoggingResults.ContainsKey(value))
                 {
                     CachedStringFormatNameForLoggingResults.Add(value, Color(Bold(value), LogName));

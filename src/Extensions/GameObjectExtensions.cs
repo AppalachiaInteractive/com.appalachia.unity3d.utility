@@ -496,6 +496,8 @@ namespace Appalachia.Utility.Extensions
                             target.AddComponent<RectTransform>();
                         }
 
+                        target.name = name;
+
                         return;
                     }
                 }
@@ -534,7 +536,7 @@ namespace Appalachia.Utility.Extensions
         public static void GetOrAddComponent<T>(this MonoBehaviour obj, ref T component)
             where T : Component
         {
-            using (_PRF_GetOrCreateComponent.Auto())
+            using (_PRF_GetOrAddComponent.Auto())
             {
                 if (component == null)
                 {
@@ -559,7 +561,7 @@ namespace Appalachia.Utility.Extensions
         public static void GetOrAddComponent<T>(this GameObject obj, ref T component)
             where T : Component
         {
-            using (_PRF_GetOrCreateComponent.Auto())
+            using (_PRF_GetOrAddComponent.Auto())
             {
                 DestroyComponentOnWrongGameObject(obj, ref component, DestructionMode.DestroyIfOnOtherGameObject);
 
@@ -582,7 +584,7 @@ namespace Appalachia.Utility.Extensions
             bool requireNameMatch = true)
             where T : Component
         {
-            using (_PRF_GetOrCreateComponent.Auto())
+            using (_PRF_GetOrAddComponent.Auto())
             {
                 DestroyComponentOnWrongGameObject(obj, ref component, DestructionMode.DestroyIfNotOnChildGameObject);
 
@@ -632,7 +634,7 @@ namespace Appalachia.Utility.Extensions
                     }
                     else
                     {
-                        component.name = typeof(T).Name;
+                        component.name = typeof(T).Name.Nicify();
                     }
 
                     return;
@@ -983,7 +985,7 @@ namespace Appalachia.Utility.Extensions
         private static readonly ProfilerMarker _PRF_DestroyComponentOnWrongGameObject =
             new ProfilerMarker(_PRF_PFX + nameof(DestroyComponentOnWrongGameObject));
 
-        private static readonly ProfilerMarker _PRF_GetOrCreateComponent =
+        private static readonly ProfilerMarker _PRF_GetOrAddComponent =
             new ProfilerMarker(_PRF_PFX + nameof(GetOrAddComponent));
 
         private static readonly ProfilerMarker _PRF_AddChild = new ProfilerMarker(_PRF_PFX + nameof(AddChild));

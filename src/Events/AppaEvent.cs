@@ -2,6 +2,7 @@ using System;
 using Appalachia.Utility.Events.Collections;
 using Appalachia.Utility.Events.Extensions;
 using Appalachia.Utility.Standards;
+using Unity.Profiling;
 
 namespace Appalachia.Utility.Events
 {
@@ -29,11 +30,15 @@ namespace Appalachia.Utility.Events
 
             #region Fields and Autoproperties
 
+            private bool _isSuspended;
+
             private ObjectID _objectId;
 
             private Subscribers _subscribers;
 
             #endregion
+
+            public bool IsSuspended => _isSuspended;
 
             public int SubscriberCount
             {
@@ -86,9 +91,25 @@ namespace Appalachia.Utility.Events
                 return ObjectID.GetHashCode();
             }
 
+            public void Suspend()
+            {
+                using (_PRF_Suspend.Auto())
+                {
+                    _isSuspended = true;
+                }
+            }
+
             public void UnsubscribeAll()
             {
                 _subscribers.Clear();
+            }
+
+            public void Unsuspend()
+            {
+                using (_PRF_Unsuspend.Auto())
+                {
+                    _isSuspended = false;
+                }
             }
 
             #region IEquatable<Data> Members
@@ -97,6 +118,16 @@ namespace Appalachia.Utility.Events
             {
                 return Equals(_objectId, other._objectId);
             }
+
+            #endregion
+
+            #region Profiling
+
+            private const string _PRF_PFX = nameof(Data) + ".";
+
+            private static readonly ProfilerMarker _PRF_Unsuspend = new ProfilerMarker(_PRF_PFX + nameof(Unsuspend));
+
+            private static readonly ProfilerMarker _PRF_Suspend = new ProfilerMarker(_PRF_PFX + nameof(Suspend));
 
             #endregion
         }

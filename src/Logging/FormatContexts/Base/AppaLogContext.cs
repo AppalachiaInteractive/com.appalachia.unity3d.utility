@@ -62,7 +62,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Critical(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
@@ -95,7 +95,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Debug(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -128,7 +128,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Error(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
@@ -162,7 +162,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Fatal(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             Exception exception = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
@@ -195,7 +195,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Info(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -229,7 +229,7 @@ namespace Appalachia.Utility.Logging
         public void Log(
             LogLevel level,
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -262,7 +262,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Trace(
             string message,
-            object context = null,
+            UnityEngine.Object context = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,
@@ -294,7 +294,7 @@ namespace Appalachia.Utility.Logging
         [DebuggerStepperBoundary]
         public void Warn(
             object message,
-            object context = null,
+            UnityEngine.Object context = null,
             bool logIf = true,
             [CallerMemberName] string memberName = null,
             [CallerFilePath] string filePath = null,

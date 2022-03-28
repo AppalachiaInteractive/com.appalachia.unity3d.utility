@@ -97,7 +97,6 @@ namespace Appalachia.Utility.Algorithms.Graphs
                 if (!visited.Contains(current))
                 {
                     // DFS VISIT NODE STEP
-                    Console.Write("({0}) ", current);
                     visited.Add(current);
 
                     // Get the adjacent nodes of current

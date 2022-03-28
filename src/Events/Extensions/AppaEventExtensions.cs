@@ -21,6 +21,11 @@ namespace Appalachia.Utility.Events.Extensions
                     return;
                 }
 
+                if (eventHandler.IsSuspended)
+                {
+                    return;
+                }
+
                 eventHandler.Subscribers.InvokeSafe(
                     subscriber => subscriber.Invoke(),
                     callerFilePath,
@@ -34,13 +39,10 @@ namespace Appalachia.Utility.Events.Extensions
 
         private const string _PRF_PFX = nameof(AppaEventExtensions) + ".";
 
-        private static readonly ProfilerMarker _PRF_RaiseEvent =
-            new ProfilerMarker(_PRF_PFX + nameof(RaiseEvent));
+        private static readonly ProfilerMarker _PRF_RaiseEvent = new ProfilerMarker(_PRF_PFX + nameof(RaiseEvent));
 
-        private static readonly ProfilerMarker _PRF_ToArgs =
-            new ProfilerMarker(_PRF_PFX + nameof(ToArgs));
+        private static readonly ProfilerMarker _PRF_ToArgs = new ProfilerMarker(_PRF_PFX + nameof(ToArgs));
 
-        
         #endregion
     }
 }

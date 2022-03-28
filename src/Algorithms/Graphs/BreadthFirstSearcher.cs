@@ -103,7 +103,6 @@ namespace Appalachia.Utility.Algorithms.Graphs
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                Console.Write("({0}) ", current);
 
                 foreach (var adjacent in Graph.Neighbours(current))
                 {

@@ -91,6 +91,31 @@ namespace Appalachia.Utility.Extensions
             }
         }
 
+        /// <summary>
+        ///     Searches for a <see cref="Component" /> or <see cref="MonoBehaviour" /> on the current <see cref="GameObject" />.
+        ///     If it exists, it will be assigned to the <paramref name="component" /> argument.
+        ///     If it does not exist, it will be created and then assigned to the <paramref name="component" /> argument.
+        /// </summary>
+        /// <param name="obj">The current game object.</param>
+        /// <param name="component">The field we will assign the result to.</param>
+        /// <typeparam name="T">The <see cref="Component" /> or <see cref="MonoBehaviour" /> type to search for.</typeparam>
+        public static void GetOrAddComponent<T>(this Transform obj, ref T component)
+            where T : Component
+        {
+            using (_PRF_GetOrAddComponent.Auto())
+            {
+                if (component == null)
+                {
+                    component = obj.GetComponent<T>();
+
+                    if (component == null)
+                    {
+                        component = obj.gameObject.AddComponent<T>();
+                    }
+                }
+            }
+        }
+
         public static string GetPathRelativeTo(this GameObject current, GameObject relativeTo)
         {
             using (_PRF_GetPathRelativeTo.Auto())
@@ -190,6 +215,9 @@ namespace Appalachia.Utility.Extensions
 
         private const string _PRF_PFX = nameof(TransformExtensions) + ".";
 
+        private static readonly ProfilerMarker _PRF_GetOrAddComponent =
+            new ProfilerMarker(_PRF_PFX + nameof(GetOrAddComponent));
+
         private static readonly ProfilerMarker _PRF_DestroyChildren =
             new ProfilerMarker(_PRF_PFX + nameof(DestroyChildren));
 
@@ -208,7 +236,6 @@ namespace Appalachia.Utility.Extensions
             new ProfilerMarker(_PRF_PFX + nameof(SetMatrix4x4ToTransform));
 
         private static readonly ProfilerMarker _PRF_SortChildren = new ProfilerMarker(_PRF_PFX + nameof(SortChildren));
-
         private static readonly ProfilerMarker _PRF_SetToOrigin = new ProfilerMarker(_PRF_PFX + nameof(SetToOrigin));
 
         #endregion

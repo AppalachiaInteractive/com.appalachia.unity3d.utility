@@ -214,7 +214,7 @@ namespace Appalachia.Utility.Events.Collections
 
                 if (_currentlyInvoking)
                 {
-                    Log.Info(
+                    Log.Warn(
                         ZString.Format(
                             "Recursive invocation of events! Initiated here: {0}",
                             callerFilePath.FormatCallerMembersForLogging(callerMemberName, callerLineNumber)
@@ -255,7 +255,7 @@ namespace Appalachia.Utility.Events.Collections
                     {
                         SynchronizeCollections();
 
-                        var endTime = DateTime.UtcNow;
+                        /*var endTime = DateTime.UtcNow;
                         var duration = endTime - startTime;
 
                         if ((duration.TotalMilliseconds > 20f) && !Debugger.IsAttached)
@@ -268,7 +268,7 @@ namespace Appalachia.Utility.Events.Collections
                                     callerFilePath.FormatCallerMembersForLogging(callerMemberName, callerLineNumber)
                                 )
                             );
-                        }
+                        }*/
 
                         _lockedToModifications = false;
                         _currentlyInvoking = false;
